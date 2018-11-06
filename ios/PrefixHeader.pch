@@ -1,0 +1,16 @@
+//
+//  PrefixHeader.pch
+//  OpenCVSampleApp
+//
+//  Created by Adam G Freeman on 10/25/18.
+//  Copyright © 2018 Adam Freeman. All rights reserved.
+//
+
+#ifndef PrefixHeader_h
+#define PrefixHeader_h
+
+#ifdef __cplusplus
+#include <opencv2/opencv.hpp>
+#endif
+
+#endif /* PrefixHeader_h */
