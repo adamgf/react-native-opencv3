@@ -5,7 +5,8 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
+#import <UIKit/UIKit.h>
+
 @interface RNOpencv3 : NSObject <RCTBridgeModule>
 
 @end
-  

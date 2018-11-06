@@ -13,7 +13,7 @@
 
 Add to Podfile ->
 
-`pod 'RNOpencv3', :path => '../node_modules/react-native-opencv3'`
+`pod 'RNOpencv3', :podspec => '../node_modules/react-native-opencv3/ios/RNOpencv3.podspec'`
 
 `$ pod install`
 
