@@ -13,6 +13,6 @@
   "author": "Adam G. Freeman",
   "license": "BSD",
   "peerDependencies": {
-    "react-native": "^0.41.2"
+    "react-native": "^0.57.4"
   }
 }
