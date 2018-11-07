@@ -1,6 +1,6 @@
 
 // @author Adam G. Freeman - adamgf@gmail.com
-package org.opencvport;
+package org.opencv.reactnative;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
