@@ -1,7 +1,7 @@
 
 {
   "name": "react-native-opencv3",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "OpenCV 3.4.* ported to React-Native for both iOS and Android",
   "main": "index.js",
   "scripts": {
