@@ -13,11 +13,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class CameraModule extends ReactContextBaseJavaModule {
+public class CvCameraModule extends ReactContextBaseJavaModule {
 
-    private static final String TAG = CameraModule.class.getSimpleName();
+    private static final String TAG = CvCameraModule.class.getSimpleName();
 
-    public CameraModule(ReactApplicationContext reactContext) {
+    public CvCameraModule(ReactApplicationContext reactContext) {
         super(reactContext);
     }
 

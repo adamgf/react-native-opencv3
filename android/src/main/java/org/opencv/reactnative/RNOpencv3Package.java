@@ -13,7 +13,7 @@ import com.facebook.react.bridge.JavaScriptModule;
 public class RNOpencv3Package implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-      return Arrays.<NativeModule>asList(new RNOpencv3Module(reactContext), new CameraModule(reactContext));
+      return Arrays.<NativeModule>asList(new RNOpencv3Module(reactContext), new CvCameraModule(reactContext));
     }
 
     // Deprecated from RN 0.47
@@ -24,7 +24,7 @@ public class RNOpencv3Package implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
       return Collections.<ViewManager>singletonList(
-              new CameraViewManager()
+              new CvCameraViewManager()
       );
     }
 }

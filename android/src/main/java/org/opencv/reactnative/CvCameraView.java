@@ -5,21 +5,21 @@ import android.content.Context;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import org.opencv.android.JavaCameraView;
 
+import org.opencv.android.JavaCameraView;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import android.widget.Toast;
+//import android.widget.Toast;
 
-public class CameraPreview extends JavaCameraView implements CvCameraViewListener2 {
+public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
-    private static final String TAG = CameraPreview.class.getSimpleName();
+    private static final String TAG = CvCameraView.class.getSimpleName();
 
     private SurfaceHolder mHolder;
     private Context mContext;
 
-    public CameraPreview(Context context, int cameraId) {
+    public CvCameraView(Context context, int cameraId) {
       super( context, cameraId);
       Log.d(TAG, "Creating and setting view");
       mContext = context;
