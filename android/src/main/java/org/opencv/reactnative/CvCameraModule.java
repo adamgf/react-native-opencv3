@@ -23,7 +23,7 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "AndroidCameraModule";
+        return "CvCameraModule";
     }
 
     /**

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5080B7F121915DC800170E85 /* RNOpencv3.mm */; };
+		50FC7429219953C800A48FE3 /* CvCamera.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7426219953C800A48FE3 /* CvCamera.mm */; };
+		50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7427219953C800A48FE3 /* CvCameraView.m */; };
+		50FC747321997CC000A48FE3 /* FileUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50FC747221997CC000A48FE3 /* FileUtils.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +29,12 @@
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5080B7F121915DC800170E85 /* RNOpencv3.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpencv3.mm; sourceTree = "<group>"; };
 		5080B7F221915DC800170E85 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		50FC741A219939E500A48FE3 /* CvCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CvCameraView.h; sourceTree = "<group>"; };
+		50FC7426219953C800A48FE3 /* CvCamera.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvCamera.mm; sourceTree = "<group>"; };
+		50FC7427219953C800A48FE3 /* CvCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CvCameraView.m; sourceTree = "<group>"; };
+		50FC7428219953C800A48FE3 /* CvCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvCamera.h; sourceTree = "<group>"; };
+		50FC747221997CC000A48FE3 /* FileUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileUtils.mm; sourceTree = "<group>"; };
+		50FC747421997D4000A48FE3 /* FileUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpencv3.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -51,6 +60,12 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				50FC747421997D4000A48FE3 /* FileUtils.h */,
+				50FC747221997CC000A48FE3 /* FileUtils.mm */,
+				50FC7428219953C800A48FE3 /* CvCamera.h */,
+				50FC7426219953C800A48FE3 /* CvCamera.mm */,
+				50FC7427219953C800A48FE3 /* CvCameraView.m */,
+				50FC741A219939E500A48FE3 /* CvCameraView.h */,
 				5080B7F221915DC800170E85 /* PrefixHeader.pch */,
 				5080B7F121915DC800170E85 /* RNOpencv3.mm */,
 				B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */,
@@ -115,6 +130,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */,
+				50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */,
+				50FC7429219953C800A48FE3 /* CvCamera.mm in Sources */,
+				50FC747321997CC000A48FE3 /* FileUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

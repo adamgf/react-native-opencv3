@@ -9,7 +9,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
     @Override
     public String getName() {
-        return "AndroidCameraView";
+        return "CvCameraView";
     }
 
     @Override

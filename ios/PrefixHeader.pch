@@ -11,6 +11,8 @@
 
 #ifdef __cplusplus
 #include <opencv2/opencv.hpp>
+#include <opencv2/videoio/cap_ios.h>
+using namespace cv;
 #endif
 
 #endif /* PrefixHeader_h */

@@ -4,12 +4,12 @@ import { NativeModules, requireNativeComponent, View } from 'react-native';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-const CvCameraModule = NativeModules.AndroidCameraModule;
+//const CvCameraModule = NativeModules.CvCameraModule;
 
 class CvCamera extends Component {
 
   render() {
-    return (<AndroidCameraView {...this.props} />);
+    return (<CvCameraView {...this.props} />);
   }
 }
 
@@ -18,7 +18,7 @@ CvCamera.propTypes = {
   type: PropTypes.string
 };
 
-const AndroidCameraView = requireNativeComponent('AndroidCameraView', CvCamera);
+const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
 
 const { RNOpencv3 } = NativeModules;
 
