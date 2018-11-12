@@ -1,6 +1,21 @@
 
-import { NativeModules } from 'react-native';
+import { NativeModules, requireNativeComponent, View } from 'react-native';
 
-const { RNOpencv3 } = NativeModules;
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-export default RNOpencv3;
+const CameraModule = NativeModules.AndroidCameraModule;
+
+export default class Camera extends Component {
+
+  render() {
+    return (<AndroidCameraView {...this.props} />);
+  }
+}
+
+Camera.propTypes = {
+  ...View.propTypes,
+  type: PropTypes.string
+};
+
+const AndroidCameraView = requireNativeComponent('AndroidCameraView', Camera);
