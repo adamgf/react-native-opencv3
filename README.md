@@ -13,7 +13,7 @@
 
 Add to Podfile ->
 
-`pod 'RNOpencv3', :podspec => '../node_modules/react-native-opencv3/ios/RNOpencv3.podspec'`
+`pod 'RNCv', :podspec => '../node_modules/react-native-opencv3/ios/RNOpencv3.podspec'`
 
 `$ pod install`
 
@@ -45,10 +45,10 @@ Add to Podfile ->
 
 ## Usage
 ```javascript
-import RNOpencv3 from 'react-native-opencv3';
+import RNCv from 'react-native-opencv3';
 
 // Basic convert input jpg or png to grayscale
-RNOpencv3.cvtColorGray(inFile, outFile)
+RNCv.cvtColorGray(inFile, outFile)
 .then((image) => {
   const { width, height, uri } = image
   console.log('width is: ' + width + 'height is: ' + height + ' uri is: ' + uri)
