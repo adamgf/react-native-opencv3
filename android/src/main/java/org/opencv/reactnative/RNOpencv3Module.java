@@ -39,7 +39,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "RNOpencv3";
+        return "RNCv";
     }
 
     private void reject(Promise promise, String filepath, Exception ex) {

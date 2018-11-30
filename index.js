@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 //const CvCameraModule = NativeModules.CvCameraModule;
 
 class CvCamera extends Component {
-
   render() {
     return (<CvCameraView {...this.props} />);
   }

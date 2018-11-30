@@ -1,8 +1,8 @@
 
 Pod::Spec.new do |s|
-  s.name         = "RNOpencv3"
+  s.name         = "RNCv"
   s.version      = "1.0.0"
-  s.summary      = "OpenCV 3.4.* ported to React-Native for both iOS and Android"
+  s.summary      = "OpenCV 3.4.2 ported to React-Native for both iOS and Android"
   s.description  = <<-DESC
                   react-native-opencv3 wraps functionality from OpenCV Java SDK 3.4.3 and iOS OpenCV pod 3.4.2 for use in React-Native apps.  Please enjoy!
                    DESC
