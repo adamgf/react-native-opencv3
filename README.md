@@ -13,7 +13,7 @@
 
 Add to Podfile ->
 
-`pod 'RNCv', :podspec => '../node_modules/react-native-opencv3/ios/RNOpencv3.podspec'`
+`pod 'RNOpencv3', :podspec => '../node_modules/react-native-opencv3/ios/RNOpencv3.podspec'`
 
 `$ pod install`
 
@@ -45,7 +45,7 @@ Add to Podfile ->
 
 ## Usage
 ```javascript
-import RNCv from 'react-native-opencv3';
+import {RNCv} from 'react-native-opencv3';
 
 // Basic convert input jpg or png to grayscale
 RNCv.cvtColorGray(inFile, outFile)
@@ -56,3 +56,33 @@ RNCv.cvtColorGray(inFile, outFile)
 .error((err) => {
   console.error(err)
 })
+```
+
+## CvCamera Usage
+```javascript
+import React, {Component} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {CvCamera} from 'react-native-opencv3';
+
+type Props = {};
+export default class App extends Component<Props> {
+  render() {
+    const { type } = 'back';
+    return (
+      <View
+        style={styles.preview}
+      >
+        <CvCamera
+          style={styles.preview}
+          type={type}
+        />
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  preview: {
+    flex: 1
+  },
+});
