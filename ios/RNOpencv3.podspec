@@ -1,6 +1,6 @@
 
 Pod::Spec.new do |s|
-  s.name         = "RNCv"
+  s.name         = "RNOpencv3"
   s.version      = "1.0.0"
   s.summary      = "OpenCV 3.4.2 ported to React-Native for both iOS and Android"
   s.description  = <<-DESC
