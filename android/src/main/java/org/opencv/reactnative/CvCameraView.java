@@ -1,15 +1,31 @@
 // @author Adam G. Freeman - adamgf@gmail.com
 package org.opencv.reactnative;
 
+import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+import android.graphics.Bitmap;
 import android.content.Context;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.util.Base64;
 
+import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+// useful for popping up an alert if needed ...
 //import android.widget.Toast;
 
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
@@ -17,9 +33,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private static final String TAG = CvCameraView.class.getSimpleName();
 
     private SurfaceHolder mHolder;
-    private Context mContext;
+    private ThemedReactContext mContext;
+    private ReadableArray functions;
+    private ReadableArray paramsArr;
 
-    public CvCameraView(Context context, int cameraId) {
+    public CvCameraView(ThemedReactContext context, int cameraId) {
       super( context, cameraId);
       Log.d(TAG, "Creating and setting view");
       mContext = context;
@@ -56,7 +74,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
         try {
             this.enableView();
-        } catch (Exception e){
+        }
+        catch (Exception e){
             Log.d("CameraPreview", "Error enabling camera preview: " + e.getMessage());
         }
     }
@@ -69,6 +88,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         //}
     }
 
+    public void setFunctions(ReadableArray functions) {
+      Log.d(TAG, "In setFunctions functions is: " + functions.getString(0));
+      this.functions = functions;
+    }
+
+    public void setParamsArr(ReadableArray paramsArr) {
+      Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.getString(0));
+      this.paramsArr = paramsArr;
+    }
+
     public void onCameraViewStarted(int width, int height) {
       Log.d(TAG, "In onCameraViewStarted ... width is: " + width + " height is: " + height);
     }
@@ -78,9 +107,40 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
       this.disableView();
     }
 
+    private static byte[] toJpeg(Bitmap bitmap, int quality) throws OutOfMemoryError {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+
+        try {
+            return outputStream.toByteArray();
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                Log.e(TAG, "problem compressing jpeg", e);
+            }
+        }
+    }
+
+    public String toBase64(Bitmap currentRepresentation, int jpegQualityPercent) {
+      return Base64.encodeToString(toJpeg(currentRepresentation, jpegQualityPercent), Base64.NO_WRAP);
+    }
+
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
-        return inputFrame.rgba();
+        Mat in = inputFrame.rgba();
+        Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
+
+        // AKA bowel movement!
+        Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(in, bm);
+        String encodedData = toBase64(bm, 60);
+        WritableMap response = new WritableNativeMap();
+        response.putString("data", encodedData);
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("onCameraFrame", response);
+
+        return in;
     }
 
     @Override
