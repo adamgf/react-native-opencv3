@@ -129,7 +129,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
+
+        // hardcoded for right now to make sure it iw working ...
         Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
+        Log.d(TAG, "functions: " + this.functions.getString(1) + " paramsArr: " + this.paramsArr.getString(1));
+        Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2));
 
         // AKA bowel movement!
         Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
