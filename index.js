@@ -3,13 +3,25 @@ import { NativeModules, requireNativeComponent, View } from 'react-native';
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+const { RNOpencv3 } = NativeModules;
 
 //const CvCameraModule = NativeModules.CvCameraModule;
+const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
+
 class CvCamera extends Component {
+  constructor(props) {
+    super(props)
+    //alert(JSON.stringify(props))
+  }
   render() {
     return (<CvCameraView {...this.props} />);
   }
 }
+
+CvCamera.propTypes = {
+  ...View.propTypes,
+  type: PropTypes.string
+};
 
 class CvInvoke extends Component {
   static propTypes = {
@@ -35,12 +47,12 @@ class CvInvoke extends Component {
     newparams.push(params)
 
     const newKidsOnTheBlock = React.Children.map(children,
-  (child, index) => React.cloneElement(child, {
-    functions: newfunctions, paramsArr: newparams
-  })
- );
+      (child, index) => React.cloneElement(child, {
+        ...child.props, functions: newfunctions, paramsArr: newparams
+      })
+    );
     return newKidsOnTheBlock
-}
+  }
   render() {
     return (
       <React.Fragment>
@@ -49,15 +61,6 @@ class CvInvoke extends Component {
     )
   }
 }
-
-CvCamera.propTypes = {
-  ...View.propTypes,
-  type: PropTypes.string
-};
-
-const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
-
-const { RNOpencv3 } = NativeModules;
 
 const RNCv = RNOpencv3
 

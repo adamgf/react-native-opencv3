@@ -20,13 +20,17 @@ import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 // useful for popping up an alert if needed ...
-//import android.widget.Toast;
+import android.widget.Toast;
 
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
@@ -36,15 +40,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private ThemedReactContext mContext;
     private ReadableArray functions;
     private ReadableArray paramsArr;
+    private int mCameraFacing;
 
-    public CvCameraView(ThemedReactContext context, int cameraId) {
-      super( context, cameraId);
+    public CvCameraView(ThemedReactContext context, int cameraFacing) {
+      super( context, cameraFacing);
       Log.d(TAG, "Creating and setting view");
+      mCameraFacing = cameraFacing;
       mContext = context;
 
       this.setVisibility(SurfaceView.VISIBLE);
       this.setCvCameraViewListener(this);
-
       System.loadLibrary("opencv_java3");
 
       mHolder = getHolder();
@@ -81,11 +86,17 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 
     // TODO: not sure if this is the right place for this ...
-    public void changeCameraType(int type) {
-        //if(mCameraType != type) {
-        //    mCameraType = type;
+    public void changeFacing(int facing) {
+        //MakeAToast("Camera facing is: " + facing);
+        if (mCameraFacing != facing) {
+            mCameraFacing = facing;
             // TODO: restart camera preview
-        //}
+            //releaseCamera();
+            disableView();
+            setCameraIndex(mCameraFacing);
+            enableView();
+            //initializeCamera(1080, 720);
+        }
     }
 
     public void setFunctions(ReadableArray functions) {
@@ -126,15 +137,35 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
       return Base64.encodeToString(toJpeg(currentRepresentation, jpegQualityPercent), Base64.NO_WRAP);
     }
 
+    private void MakeAToast(String message) {
+      Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+    }
+
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
 
         // hardcoded for right now to make sure it iw working ...
-        Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
-        Log.d(TAG, "functions: " + this.functions.getString(1) + " paramsArr: " + this.paramsArr.getString(1));
-        Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2));
+        //Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
+        //Log.d(TAG, "functions: " + this.functions.getString(1) + " paramsArr: " + this.paramsArr.getString(1));
+        //Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2));
 
+        //Mat in1 = new Mat(src.rows(), src.cols(), CvType.CV_8UC4);
+        /**
+        int numRows = src.rows();
+        int numCols = src.cols();
+        //Core.transpose(in.t(), in);
+        Mat flipEm = src.t();
+        Mat in = new Mat();
+
+        Core.flip(flipEm, in, 1);
+        Size sz = new Size(numCols, numRows);
+        Imgproc.resize( in, in, sz );
+
+        MakeAToast("width is: " + in.cols() + " height is: " + in.rows());
+         */
+
+        //Core.flip(src.t(), src, 1);
         // AKA bowel movement!
         Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(in, bm);

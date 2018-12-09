@@ -8,6 +8,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.bridge.ReadableArray;
 
 public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
+
     @Override
     public String getName() {
         return "CvCameraView";
@@ -18,9 +19,9 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         return new CvCameraView(reactContext, -1);
     }
 
-    @ReactProp(name = "type")
-    public void setType(CvCameraView view, String type) {
-        view.changeCameraType(type.equals("front") ? 1 : 2);
+    @ReactProp(name = "facing")
+    public void setFacing(CvCameraView view, String facing) {
+        view.changeFacing(facing.equals("front") ? 1 : -1);
     }
 
     @ReactProp(name = "functions")
