@@ -20,27 +20,44 @@ import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.objdetect.CascadeClassifier;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.File;
 
-// useful for popping up an alert if needed ...
+// useful for popping up an alert if need be ...
 import android.widget.Toast;
 
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
     private static final String TAG = CvCameraView.class.getSimpleName();
 
-    private SurfaceHolder mHolder;
-    private ThemedReactContext mContext;
-    private ReadableArray functions;
-    private ReadableArray paramsArr;
-    private int mCameraFacing;
+    private SurfaceHolder          mHolder;
+    private ThemedReactContext     mContext;
+
+    // params
+    private ReadableArray          mFunctions;
+    private ReadableArray          mParamsArr;
+    private int                    mCameraFacing;
+    private File                   mCascadeFile;
+
+    private static final Scalar    FACE_RECT_COLOR     = new Scalar(0, 255, 0, 255);
+    private CascadeClassifier      mJavaDetector;
+    private boolean                mUseFaceDetection   = false;
+    private float                  mRelativeFaceSize   = 0.2f;
+    private int                    mAbsoluteFaceSize   = 0;
 
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -72,7 +89,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         Log.d(TAG, "In surfaceChanged ...");
 
         if (mHolder.getSurface() == null){
-            Log.d(TAG, "In surfaceChanged surface is null ...");
+            Log.e(TAG, "In surfaceChanged surface is null ...");
             // preview surface does not exist
             return;
         }
@@ -81,7 +98,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             this.enableView();
         }
         catch (Exception e){
-            Log.d("CameraPreview", "Error enabling camera preview: " + e.getMessage());
+            Log.e("CameraPreview", "Error enabling camera preview: " + e.getMessage());
         }
     }
 
@@ -101,12 +118,61 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
     public void setFunctions(ReadableArray functions) {
       Log.d(TAG, "In setFunctions functions is: " + functions.getString(0));
-      this.functions = functions;
+      this.mFunctions = functions;
     }
 
     public void setParamsArr(ReadableArray paramsArr) {
       Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.getString(0));
-      this.paramsArr = paramsArr;
+      this.mParamsArr = paramsArr;
+    }
+
+    public void setCascadeClassifier(String cascadeClassifier) {
+      try {
+          mUseFaceDetection = true;
+
+          // load cascade file from application resources
+          InputStream is = mContext.getAssets().open(cascadeClassifier + ".xml");
+
+          if (is == null) {
+            MakeAToast("Input stream is nullified!");
+          }
+
+          //int res = mContext.getResources().getIdentifier("icon", "drawable", mContext.getPackageName());
+          //MakeAToast("res is: " + res + " cascadeClassifier is: " + cascadeClassifier +
+          //  " packageName is: " + mContext.getPackageName());
+          //InputStream is = mContext.getResources().openRawResource(res);
+
+          //File cascadeDir = mContext.getDir("cascade", mContext.MODE_PRIVATE);
+
+          File cacheDir = mContext.getCacheDir();
+
+          mCascadeFile = new File(cacheDir, cascadeClassifier + ".xml");
+          FileOutputStream os = new FileOutputStream(mCascadeFile);
+
+          byte[] buffer = new byte[4096];
+          int bytesRead;
+          while ((bytesRead = is.read(buffer)) != -1) {
+              os.write(buffer, 0, bytesRead);
+          }
+          is.close();
+          os.close();
+
+          mJavaDetector = new CascadeClassifier(mCascadeFile.getAbsolutePath());
+          if (mJavaDetector.empty()) {
+              //MakeAToast("Failed to load cascade classifier: " + mCascadeFile.getAbsolutePath());
+              Log.e(TAG, "Failed to load cascade classifier");
+              mJavaDetector = null;
+          }
+          else {
+              //MakeAToast("Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
+              Log.i(TAG, "Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
+          }
+
+          mCascadeFile.delete();
+      }
+      catch (IOException ioe) {
+          Log.e(TAG, "Failed to load cascade. IOException thrown: " + ioe.getMessage());
+      }
     }
 
     public void onCameraViewStarted(int width, int height) {
@@ -144,7 +210,37 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
+        Mat ingray = null;
 
+        if (mUseFaceDetection) {
+          ingray = inputFrame.gray();
+        }
+
+        if (mCameraFacing == 1) {
+            Core.flip(in, in, 1);
+            if (mUseFaceDetection) {
+                Core.flip(ingray, ingray, 1);
+            }
+        }
+
+        if (mUseFaceDetection) {
+          if (mAbsoluteFaceSize == 0) {
+                int height = ingray.rows();
+                if (Math.round(height * mRelativeFaceSize) > 0) {
+                    mAbsoluteFaceSize = Math.round(height * mRelativeFaceSize);
+                }
+            }
+
+            MatOfRect faces = new MatOfRect();
+            if (mJavaDetector != null && ingray != null)
+                mJavaDetector.detectMultiScale(ingray, faces, 1.1, 2, 2, // TODO: objdetect.CV_HAAR_SCALE_IMAGE
+                    new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+
+            Rect[] facesArray = faces.toArray();
+            for (int i = 0; i < facesArray.length; i++) {
+                Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+            }
+        }
         // hardcoded for right now to make sure it iw working ...
         //Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
         //Log.d(TAG, "functions: " + this.functions.getString(1) + " paramsArr: " + this.paramsArr.getString(1));
