@@ -29,6 +29,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.objdetect.Objdetect;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private int                    mCameraFacing;
     private File                   mCascadeFile;
 
-    private static final Scalar    FACE_RECT_COLOR     = new Scalar(0, 255, 0, 255);
+    private static final Scalar    FACE_RECT_COLOR     = new Scalar(255, 255, 0, 255);
     private CascadeClassifier      mJavaDetector;
     private boolean                mUseFaceDetection   = false;
     private float                  mRelativeFaceSize   = 0.2f;
@@ -231,15 +232,39 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                 }
             }
 
+            Imgproc.equalizeHist(ingray, ingray);
+
+            //-- Detect faces
             MatOfRect faces = new MatOfRect();
             if (mJavaDetector != null && ingray != null)
-                mJavaDetector.detectMultiScale(ingray, faces, 1.1, 2, 2, // TODO: objdetect.CV_HAAR_SCALE_IMAGE
-                    new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                mJavaDetector.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
 
             Rect[] facesArray = faces.toArray();
-            for (int i = 0; i < facesArray.length; i++) {
-                Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+
+            String faceInfo = "";
+            if (facesArray.length > 0) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("{\"faces\":[");
+                for (int i = 0; i < facesArray.length; i++) {
+                    float x = (float)facesArray[i].tl().x/(float)ingray.cols();
+                    float y = (float)facesArray[i].tl().y/(float)ingray.rows();
+                    float w = (float)(facesArray[i].br().x - facesArray[i].tl().x)/(float)ingray.cols();
+                    float h = (float)(facesArray[i].br().y - facesArray[i].tl().y)/(float)ingray.rows();
+                    String id = "faceId" + i;
+                    sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h+",\"faceId\":\""+id+"\"}");
+                    if (i != (facesArray.length - 1)) {
+                      sb.append(",");
+                    }
+                    //good for testing ...
+                    //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+                }
+                sb.append("]}");
+                faceInfo = sb.toString();
             }
+            WritableMap response = new WritableNativeMap();
+            response.putString("payload", faceInfo);
+            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+              .emit("onFacesDetected", response);
         }
         // hardcoded for right now to make sure it iw working ...
         //Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
@@ -267,7 +292,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         Utils.matToBitmap(in, bm);
         String encodedData = toBase64(bm, 60);
         WritableMap response = new WritableNativeMap();
-        response.putString("data", encodedData);
+        response.putString("payload", encodedData);
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
           .emit("onCameraFrame", response);
 
