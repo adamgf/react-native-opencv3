@@ -13,6 +13,8 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBridgeModule.h>
 #import <UIKit/UIKit.h>
+#import <React/RCTEventDispatcher.h>
+#import <React/UIView+React.h>
 
 @class CvVideoCamera;
 @protocol CvVideoCameraDelegate;
@@ -21,7 +23,11 @@
 
 @property (nonatomic, weak) RCTBridge *bridge;
 
+@property (nonatomic, weak) RCTEventDispatcher *eventDispatcher;
+
 @property (nonatomic, strong) CvVideoCamera* videoCamera;
+
+@property (nonatomic, copy) RCTBubblingEventBlock onFacesDetected;
 
 - (id)initWithBridge:(RCTBridge *)bridge;
 

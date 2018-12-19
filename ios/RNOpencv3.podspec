@@ -11,11 +11,12 @@ Pod::Spec.new do |s|
   s.author             = { "Adam G. Freeman" => "adamgf@gmail.com" }
   s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/adamgf/react-native-opencv3.git", :tag => "master" }
-  s.source_files  = "RNOpencv3/**/*.{h,mm}"
+  s.source_files  = "RNOpencv3/**/*.{h,mm,m}"
   s.requires_arc = true
 
   s.subspec "CvCamera" do |ss|
     ss.source_files = "CvCamera/**/*.{h,m,mm}"
+    ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/**/*.xml' }
   end
 
   s.dependency "React"

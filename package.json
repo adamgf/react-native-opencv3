@@ -14,5 +14,10 @@
   "license": "BSD",
   "peerDependencies": {
     "react-native": "^0.57.4"
+  },
+  "rnpm": {
+    "Assets": [
+      "./assets/classifiers/"
+    ]
   }
 }
