@@ -73,11 +73,24 @@ CascadeClassifier face_cascade;
 
         face_cascade.detectMultiScale(gray, faces, 1.3, 5);
         if (faces.size() > 0) {
-            NSString *payloadJSON = @"Whatever the fuck who cares?";
-            self.onFacesDetected(@{@"payload":payloadJSON});
+            NSString *payloadJSON = @"{\"faces\":[";
             for(size_t i = 0; i < faces.size(); i++) {
-                rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 0, 255, 0 ), 3);
+                float x = (float)faces[i].tl().x/(float)gray.cols;
+                float y = (float)faces[i].tl().y/(float)gray.rows;
+                float w = (float)(faces[i].br().x - faces[i].tl().x)/(float)gray.cols;
+                float h = (float)(faces[i].br().y - faces[i].tl().y)/(float)gray.rows;
+                
+                NSString *faceIdStr = [NSString stringWithFormat:@"faceId%d", (int)i];
+                NSString *faceData = [NSString stringWithFormat:@"{\"x\":%f,\"y\":%f,\"width\":%f,\"height\":%f,\"faceId\":\"%@\"}",
+                    x,y,w,h,faceIdStr];
+                payloadJSON = [payloadJSON stringByAppendingString:faceData];
+                if (i != (faces.size() - 1)) {
+                    payloadJSON = [payloadJSON stringByAppendingString:@","];
+                }
+                rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
             }
+            payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
+            self.onFacesDetected(@{@"payload":payloadJSON});
         }
     }
 
