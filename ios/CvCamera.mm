@@ -57,23 +57,17 @@ CascadeClassifier face_cascade;
     [self.videoCamera stop];
 }
 
--(void)rotateImage:(cv::Mat&)image width:(float&)width height:(float&)height deviceOrientation:(UIDeviceOrientation)deviceOrientation {
-    width = image.cols;
-    height = image.rows;
+-(void)rotateImage:(cv::Mat&)image deviceOrientation:(UIDeviceOrientation)deviceOrientation {
     
     switch (deviceOrientation) {
         case UIDeviceOrientationLandscapeLeft:
             rotate(image, image, ROTATE_90_COUNTERCLOCKWISE);
-            width = image.rows;
-            height = image.cols;
             break;
         case UIDeviceOrientationPortraitUpsideDown:
             rotate(image, image, ROTATE_180);
             break;
         case UIDeviceOrientationLandscapeRight:
             rotate(image, image, ROTATE_90_CLOCKWISE);
-            width = image.rows;
-            height = image.cols;
             break;
         default:
             break;
@@ -91,9 +85,8 @@ CascadeClassifier face_cascade;
         Mat gray;
         cvtColor(image, gray, COLOR_BGR2GRAY);
         equalizeHist(gray, gray);
-        float widthToUse, heightToUse;
         UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
-        [self rotateImage:gray width:widthToUse height:heightToUse deviceOrientation:deviceOrientation];
+        [self rotateImage:gray deviceOrientation:deviceOrientation];
         //face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(50, 50));
         
         face_cascade.detectMultiScale(gray, faces, 1.3, 5);
@@ -102,6 +95,9 @@ CascadeClassifier face_cascade;
         if (faces.size() > 0) {
             payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
             for(size_t i = 0; i < faces.size(); i++) {
+                float widthToUse = image.cols;
+                float heightToUse = image.rows;
+                
                 float X0 = faces[i].tl().x;
                 float Y0 = faces[i].tl().y;
                 float X1 = faces[i].br().x;
@@ -121,8 +117,6 @@ CascadeClassifier face_cascade;
                     case UIDeviceOrientationPortraitUpsideDown:
                         x = 1.0 - X1/widthToUse;
                         y = 1.0 - Y1/heightToUse;
-                        w = (X1 - X0)/widthToUse;
-                        h = (Y1 - Y0)/heightToUse;
                         break;
                     case UIDeviceOrientationLandscapeRight:
                         x = Y0/widthToUse;
@@ -157,9 +151,9 @@ CascadeClassifier face_cascade;
     //cvtColor(image_copy, bgr, COLOR_GRAY2BGR);
 
     //cvtColor(bgr, image, COLOR_BGR2BGRA);
+    UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
         [self setImage:videoImage];
     });
 }

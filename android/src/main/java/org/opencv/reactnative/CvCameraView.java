@@ -46,7 +46,7 @@ import java.io.File;
 import java.lang.Runnable;
 
 // useful for popping up an alert if need be ...
-import android.widget.Toast;
+//import android.widget.Toast;
 
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
@@ -66,7 +66,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private boolean                mUseFaceDetection   = false;
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
-    private int                    mRotation = 0;
+    private int                    mRotation = -1;
 
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -86,11 +86,20 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
       OrientationEventListener orientationEventListener = new OrientationEventListener(mContext) {
             @Override
-            public void onOrientationChanged(int orientation) {
-                if (mRotation != orientation) {
-                    mRotation = orientation;
-                }
-                Log.d(TAG, "orientation = " + orientation);
+            public void onOrientationChanged(int rotation) {
+              if (((rotation >= 0) && (rotation <= 45)) || (rotation > 315)) {
+                  mRotation = Core.ROTATE_90_CLOCKWISE;
+              }
+              else if ((rotation > 45) && (rotation <= 135)) {
+                  mRotation = Core.ROTATE_180;
+              }
+              else if((rotation > 135) && (rotation <= 225)) {
+                  mRotation = Core.ROTATE_90_COUNTERCLOCKWISE;
+              }
+              else {
+                  mRotation = -1;
+              }
+              Log.d(TAG, "orientation = " + mRotation);
             }
         };
 
@@ -153,7 +162,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
           InputStream is = mContext.getAssets().open(cascadeClassifier + ".xml");
 
           if (is == null) {
-            MakeAToast("Input stream is nullified!");
+              //MakeAToast("Input stream is nullified!");
+              Log.e(TAG, "Input stream is nullified!");
           }
 
           //int res = mContext.getResources().getIdentifier("icon", "drawable", mContext.getPackageName());
@@ -222,22 +232,18 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         return Base64.encodeToString(toJpeg(currentRepresentation, jpegQualityPercent), Base64.NO_WRAP);
     }
 
-    private void MakeAToast(String message) {
-        Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-    }
+    // Just use for testing ...
+    //private void MakeAToast(String message) {
+    //    Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+    //}
 
     private void rotateImage(Mat image) {
-        if (((mRotation >= 0) && (mRotation <= 45)) || (mRotation > 315)){
-            Core.rotate(image, image, Core.ROTATE_90_CLOCKWISE);
-        }
-        else if ((mRotation > 45) && (mRotation <= 135))  {
-            Core.rotate(image, image, Core.ROTATE_180);
-        }
-        else if((mRotation > 135) && (mRotation <= 225)) {
-            Core.rotate(image, image, Core.ROTATE_90_COUNTERCLOCKWISE);
+        if (mRotation != -1) {
+            Core.rotate(image, image, mRotation);
         }
     }
 
+    /** dummy function to write out files ...
     static int whatever = 0;
     private void writeImage(Bitmap bmp) {
         try {
@@ -259,6 +265,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             e.printStackTrace();
         }
     }
+     */
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
@@ -300,17 +307,48 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                 StringBuffer sb = new StringBuffer();
                 sb.append("{\"faces\":[");
                 for (int i = 0; i < facesArray.length; i++) {
-                    float x = (float)facesArray[i].tl().x/(float)ingray.cols();
-                    float y = (float)facesArray[i].tl().y/(float)ingray.rows();
-                    float w = (float)(facesArray[i].br().x - facesArray[i].tl().x)/(float)ingray.cols();
-                    float h = (float)(facesArray[i].br().y - facesArray[i].tl().y)/(float)ingray.rows();
+
+                    double widthToUse = ingray.cols();
+                    double heightToUse = ingray.rows();
+
+                    double X0 = facesArray[i].tl().x;
+                    double Y0 = facesArray[i].tl().y;
+                    double X1 = facesArray[i].br().x;
+                    double Y1 = facesArray[i].br().y;
+
+                    double x = X0/widthToUse;
+                    double y = Y0/heightToUse;
+                    double w = (X1 - X0)/widthToUse;
+                    double h = (Y1 - Y0)/heightToUse;
+
+                    switch(mRotation) {
+                      case Core.ROTATE_90_CLOCKWISE:
+                          x = Y0/heightToUse;
+                          y = 1.0 - X1/widthToUse;
+                          w = (X1 - X0)/heightToUse;
+                          h = (Y1 - Y0)/widthToUse;
+                          break;
+                      case Core.ROTATE_180:
+                          x = 1.0 - X1/widthToUse;
+                          y = 1.0 - Y1/heightToUse;
+                          break;
+                      case Core.ROTATE_90_COUNTERCLOCKWISE:
+                          x = 1.0 - Y1/heightToUse;
+                          y = X0/widthToUse;
+                          w = (X1 - X0)/heightToUse;
+                          h = (Y1 - Y0)/widthToUse;
+                          break;
+                      default:
+                          break;
+                    }
+
                     String id = "faceId" + i;
                     sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h+",\"faceId\":\""+id+"\"}");
                     if (i != (facesArray.length - 1)) {
                       sb.append(",");
                     }
                     //good for testing ...
-                    Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+                    //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
                 }
                 sb.append("]}");
                 faceInfo = sb.toString();
@@ -321,6 +359,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
               .emit("onFacesDetected", response);
         }
         // hardcoded for right now to make sure it iw working ...
+        // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
         //Log.d(TAG, "functions: " + this.functions.getString(1) + " paramsArr: " + this.paramsArr.getString(1));
         //Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2));
