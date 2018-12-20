@@ -9,12 +9,18 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.content.Context;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 import android.util.Base64;
+import android.app.Activity;
+import android.hardware.SensorManager;
+import android.view.OrientationEventListener;
 
 import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
@@ -37,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.File;
+import java.lang.Runnable;
 
 // useful for popping up an alert if need be ...
 import android.widget.Toast;
@@ -59,6 +66,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private boolean                mUseFaceDetection   = false;
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
+    private int                    mRotation = 0;
 
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -75,6 +83,18 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
       // this is for older devices might as well keep it in here ...
       mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+      OrientationEventListener orientationEventListener = new OrientationEventListener(mContext) {
+            @Override
+            public void onOrientationChanged(int orientation) {
+                if (mRotation != orientation) {
+                    mRotation = orientation;
+                }
+                Log.d(TAG, "orientation = " + orientation);
+            }
+        };
+
+        orientationEventListener.enable();
     }
 
     @Override
@@ -109,11 +129,9 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mCameraFacing != facing) {
             mCameraFacing = facing;
             // TODO: restart camera preview
-            //releaseCamera();
             disableView();
             setCameraIndex(mCameraFacing);
             enableView();
-            //initializeCamera(1080, 720);
         }
     }
 
@@ -201,11 +219,45 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 
     public String toBase64(Bitmap currentRepresentation, int jpegQualityPercent) {
-      return Base64.encodeToString(toJpeg(currentRepresentation, jpegQualityPercent), Base64.NO_WRAP);
+        return Base64.encodeToString(toJpeg(currentRepresentation, jpegQualityPercent), Base64.NO_WRAP);
     }
 
     private void MakeAToast(String message) {
-      Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void rotateImage(Mat image) {
+        if (((mRotation >= 0) && (mRotation <= 45)) || (mRotation > 315)){
+            Core.rotate(image, image, Core.ROTATE_90_CLOCKWISE);
+        }
+        else if ((mRotation > 45) && (mRotation <= 135))  {
+            Core.rotate(image, image, Core.ROTATE_180);
+        }
+        else if((mRotation > 135) && (mRotation <= 225)) {
+            Core.rotate(image, image, Core.ROTATE_90_COUNTERCLOCKWISE);
+        }
+    }
+
+    static int whatever = 0;
+    private void writeImage(Bitmap bmp) {
+        try {
+        String file_path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath() +
+                          "/testimgs";
+        File dir = new File(file_path);
+        if(!dir.exists())
+          dir.mkdirs();
+        File file = new File(dir, "whatever" + whatever + ".jpg");
+        whatever++;
+        FileOutputStream fOut = new FileOutputStream(file);
+
+        bmp.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+        fOut.flush();
+        fOut.close();
+        }
+        catch (Exception e) {
+            // whatever ...
+            e.printStackTrace();
+        }
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
@@ -233,11 +285,13 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             }
 
             Imgproc.equalizeHist(ingray, ingray);
+            rotateImage(ingray);
 
             //-- Detect faces
             MatOfRect faces = new MatOfRect();
             if (mJavaDetector != null && ingray != null)
-                mJavaDetector.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                mJavaDetector.detectMultiScale(ingray, faces, 1.3, 5);
+                //mJavaDetector.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
 
             Rect[] facesArray = faces.toArray();
 
@@ -256,7 +310,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                       sb.append(",");
                     }
                     //good for testing ...
-                    //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+                    Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
                 }
                 sb.append("]}");
                 faceInfo = sb.toString();
@@ -290,6 +344,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         // AKA bowel movement!
         Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(in, bm);
+        //writeImage(bm);
         String encodedData = toBase64(bm, 60);
         WritableMap response = new WritableNativeMap();
         response.putString("payload", encodedData);
