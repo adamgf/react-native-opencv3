@@ -57,10 +57,32 @@ CascadeClassifier face_cascade;
     [self.videoCamera stop];
 }
 
+-(void)rotateImage:(cv::Mat&)image width:(float&)width height:(float&)height deviceOrientation:(UIDeviceOrientation)deviceOrientation {
+    width = image.cols;
+    height = image.rows;
+    
+    switch (deviceOrientation) {
+        case UIDeviceOrientationLandscapeLeft:
+            rotate(image, image, ROTATE_90_COUNTERCLOCKWISE);
+            width = image.rows;
+            height = image.cols;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            rotate(image, image, ROTATE_180);
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            rotate(image, image, ROTATE_90_CLOCKWISE);
+            width = image.rows;
+            height = image.cols;
+            break;
+        default:
+            break;
+    }
+}
+
 - (void)processImage:(cv::Mat&)image {
 
     // Do some OpenCV stuff with the image
-
     cv::Mat image_copy;
     cvtColor(image, image_copy, COLOR_BGR2RGBA);
 
@@ -69,16 +91,49 @@ CascadeClassifier face_cascade;
         Mat gray;
         cvtColor(image, gray, COLOR_BGR2GRAY);
         equalizeHist(gray, gray);
+        float widthToUse, heightToUse;
+        UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+        [self rotateImage:gray width:widthToUse height:heightToUse deviceOrientation:deviceOrientation];
         //face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(50, 50));
-
+        
         face_cascade.detectMultiScale(gray, faces, 1.3, 5);
+        
+        NSString *payloadJSON = @"";
         if (faces.size() > 0) {
-            NSString *payloadJSON = @"{\"faces\":[";
+            payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
             for(size_t i = 0; i < faces.size(); i++) {
-                float x = (float)faces[i].tl().x/(float)gray.cols;
-                float y = (float)faces[i].tl().y/(float)gray.rows;
-                float w = (float)(faces[i].br().x - faces[i].tl().x)/(float)gray.cols;
-                float h = (float)(faces[i].br().y - faces[i].tl().y)/(float)gray.rows;
+                float X0 = faces[i].tl().x;
+                float Y0 = faces[i].tl().y;
+                float X1 = faces[i].br().x;
+                float Y1 = faces[i].br().y;
+                
+                float x = X0/widthToUse;
+                float y = Y0/heightToUse;
+                float w = (X1 - X0)/widthToUse;
+                float h = (Y1 - Y0)/heightToUse;
+                switch(deviceOrientation) {
+                    case UIDeviceOrientationLandscapeLeft:
+                        x = 1.0 - Y1/widthToUse;
+                        y = X0/heightToUse;
+                        w = (Y1 - Y0)/widthToUse;
+                        h = (X1 - X0)/heightToUse;
+                        break;
+                    case UIDeviceOrientationPortraitUpsideDown:
+                        x = 1.0 - X1/widthToUse;
+                        y = 1.0 - Y1/heightToUse;
+                        w = (X1 - X0)/widthToUse;
+                        h = (Y1 - Y0)/heightToUse;
+                        break;
+                    case UIDeviceOrientationLandscapeRight:
+                        x = Y0/widthToUse;
+                        y = 1.0 - X1/heightToUse;
+                        w = (Y1 - Y0)/widthToUse;
+                        h = (X1 - X0)/heightToUse;
+                        break;
+                    default:
+                    case UIDeviceOrientationPortrait:
+                        break;
+                }
                 
                 NSString *faceIdStr = [NSString stringWithFormat:@"faceId%d", (int)i];
                 NSString *faceData = [NSString stringWithFormat:@"{\"x\":%f,\"y\":%f,\"width\":%f,\"height\":%f,\"faceId\":\"%@\"}",
@@ -87,11 +142,11 @@ CascadeClassifier face_cascade;
                 if (i != (faces.size() - 1)) {
                     payloadJSON = [payloadJSON stringByAppendingString:@","];
                 }
-                rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
+                //rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
             }
             payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
-            self.onFacesDetected(@{@"payload":payloadJSON});
         }
+        self.onFacesDetected(@{@"payload":payloadJSON});
     }
 
     // invert image
