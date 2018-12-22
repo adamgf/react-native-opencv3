@@ -13,6 +13,8 @@
 
 bool mUseFaceDetection;
 
+NSString *mFacing;
+
 CascadeClassifier face_cascade;
 
 - (id)initWithBridge:(RCTBridge *)bridge
@@ -46,6 +48,20 @@ CascadeClassifier face_cascade;
         }
     }
     return self;
+}
+
+- (void)changeFacing:(NSString*)facing {
+    if (![facing isEqualToString:mFacing]) {
+        mFacing = facing;
+        [self.videoCamera stop];
+        if ([mFacing isEqualToString:@"back"]) {
+            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionBack];
+        }
+        else {
+            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionFront];
+        }
+        [self.videoCamera start];
+    }
 }
 
 /** TODO: implement notifcations so these methods get called */

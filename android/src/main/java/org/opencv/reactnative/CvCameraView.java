@@ -270,6 +270,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
+
         Mat ingray = null;
 
         if (mUseFaceDetection) {

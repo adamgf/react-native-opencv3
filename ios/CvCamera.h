@@ -29,6 +29,8 @@
 
 - (id)initWithBridge:(RCTBridge *)bridge;
 
+- (void)changeFacing:(NSString*)facing;
+
 @end
 
 #endif

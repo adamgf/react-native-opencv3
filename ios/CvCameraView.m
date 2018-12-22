@@ -21,8 +21,8 @@ RCT_EXPORT_MODULE(CvCameraView);
 
 RCT_EXPORT_VIEW_PROPERTY(onFacesDetected, RCTBubblingEventBlock)
 
-RCT_CUSTOM_VIEW_PROPERTY(facing, NSString *, CvCamera) {
-
+RCT_CUSTOM_VIEW_PROPERTY(facing, NSString*, CvCamera) {
+    [view changeFacing:json];
 }
 
 // And you sent event you want from objectC to react-native
