@@ -48,6 +48,13 @@ import java.lang.Runnable;
 // useful for popping up an alert if need be ...
 //import android.widget.Toast;
 
+enum whichOne {
+    FACE_CLASSIFIER,
+    EYES_CLASSIFIER,
+    NOSE_CLASSIFIER,
+    MOUTH_CLASSIFIER
+}
+
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
     private static final String TAG = CvCameraView.class.getSimpleName();
@@ -60,13 +67,17 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private ReadableArray          mParamsArr;
     private int                    mCameraFacing;
     private File                   mCascadeFile;
+    private CascadeClassifier      mFaceClassifier;
+    private CascadeClassifier      mEyesClassifier;
+    private CascadeClassifier      mNoseClassifier;
+    private CascadeClassifier      mMouthClassifier;
+    private boolean                mSuckUpFrames; // snarf, scoop?
 
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(255, 255, 0, 255);
-    private CascadeClassifier      mJavaDetector;
     private boolean                mUseFaceDetection   = false;
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
-    private int                    mRotation = -1;
+    private int                    mRotation           = -1;
 
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -145,16 +156,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 
     public void setFunctions(ReadableArray functions) {
-      Log.d(TAG, "In setFunctions functions is: " + functions.getString(0));
-      this.mFunctions = functions;
+        Log.d(TAG, "In setFunctions functions is: " + functions.getString(0));
+        this.mFunctions = functions;
     }
 
     public void setParamsArr(ReadableArray paramsArr) {
-      Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.getString(0));
-      this.mParamsArr = paramsArr;
+        Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.getString(0));
+        this.mParamsArr = paramsArr;
     }
 
-    public void setCascadeClassifier(String cascadeClassifier) {
+    public void setCascadeClassifier(String cascadeClassifier, whichOne classifierType) {
       try {
           mUseFaceDetection = true;
 
@@ -186,18 +197,28 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
           is.close();
           os.close();
 
-          mJavaDetector = new CascadeClassifier(mCascadeFile.getAbsolutePath());
-          if (mJavaDetector.empty()) {
+          CascadeClassifier classifier = new CascadeClassifier(mCascadeFile.getAbsolutePath());
+          if (classifier.empty()) {
               //MakeAToast("Failed to load cascade classifier: " + mCascadeFile.getAbsolutePath());
               Log.e(TAG, "Failed to load cascade classifier");
-              mJavaDetector = null;
+              classifier = null;
           }
           else {
               //MakeAToast("Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
-              Log.i(TAG, "Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
+              Log.i(TAG, "Loaded classifier from " + mCascadeFile.getAbsolutePath());
           }
 
           mCascadeFile.delete();
+
+          switch (classifierType) {
+              case EYES_CLASSIFIER:
+                  mEyesClassifier = classifier;
+                  break;
+              default:
+              case FACE_CLASSIFIER:
+                  mFaceClassifier = classifier;
+                  break;
+          }
       }
       catch (IOException ioe) {
           Log.e(TAG, "Failed to load cascade. IOException thrown: " + ioe.getMessage());
@@ -205,25 +226,27 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 
     public void onCameraViewStarted(int width, int height) {
-      Log.d(TAG, "In onCameraViewStarted ... width is: " + width + " height is: " + height);
+        Log.d(TAG, "In onCameraViewStarted ... width is: " + width + " height is: " + height);
     }
 
     public void onCameraViewStopped() {
-      Log.d(TAG, "In onCameraViewStopped ...");
-      this.disableView();
+        Log.d(TAG, "In onCameraViewStopped ...");
+        this.disableView();
     }
 
     private static byte[] toJpeg(Bitmap bitmap, int quality) throws OutOfMemoryError {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+        ByteArrayOutputStream BAOS = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, BAOS);
 
         try {
-            return outputStream.toByteArray();
-        } finally {
+            return BAOS.toByteArray();
+        }
+        finally {
             try {
-                outputStream.close();
-            } catch (IOException e) {
-                Log.e(TAG, "problem compressing jpeg", e);
+                BAOS.close();
+            }
+            catch (IOException e) {
+                Log.e(TAG, "In toJpeg problem compressing jpeg: ", e);
             }
         }
     }
@@ -266,6 +289,54 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         }
     }
      */
+    private String getPartJSON(Mat dFace, String partKey, Rect part, boolean parentObj) {
+
+        StringBuffer sb = new StringBuffer();
+        if (!parentObj) {
+          sb.append(",");
+        }
+        sb.append("\"" + partKey + "\":");
+
+        double widthToUse = dFace.cols();
+        double heightToUse = dFace.rows();
+
+        double X0 = part.tl().x;
+        double Y0 = part.tl().y;
+        double X1 = part.br().x;
+        double Y1 = part.br().y;
+
+        double x = X0/widthToUse;
+        double y = Y0/heightToUse;
+        double w = (X1 - X0)/widthToUse;
+        double h = (Y1 - Y0)/heightToUse;
+
+        switch(mRotation) {
+          case Core.ROTATE_90_CLOCKWISE:
+              x = Y0/heightToUse;
+              y = 1.0 - X1/widthToUse;
+              w = (X1 - X0)/heightToUse;
+              h = (Y1 - Y0)/widthToUse;
+              break;
+          case Core.ROTATE_180:
+              x = 1.0 - X1/widthToUse;
+              y = 1.0 - Y1/heightToUse;
+              break;
+          case Core.ROTATE_90_COUNTERCLOCKWISE:
+              x = 1.0 - Y1/heightToUse;
+              y = X0/widthToUse;
+              w = (X1 - X0)/heightToUse;
+              h = (Y1 - Y0)/widthToUse;
+              break;
+          default:
+              break;
+        }
+
+        sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h);
+        if (!parentObj) {
+          sb.append("}");
+        }
+        return sb.toString();
+    }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
@@ -297,9 +368,9 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
             //-- Detect faces
             MatOfRect faces = new MatOfRect();
-            if (mJavaDetector != null && ingray != null)
-                mJavaDetector.detectMultiScale(ingray, faces, 1.3, 5);
-                //mJavaDetector.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+            if (mFaceClassifier != null && ingray != null)
+                mFaceClassifier.detectMultiScale(ingray, faces, 1.3, 5);
+                //mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
 
             Rect[] facesArray = faces.toArray();
 
@@ -344,9 +415,24 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                     }
 
                     String id = "faceId" + i;
-                    sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h+",\"faceId\":\""+id+"\"}");
+                    sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h+",\"faceId\":\""+id+"\"");
+
+                    Rect faceROI = facesArray[i];
+                    Mat dFace = ingray.submat(faceROI);
+
+                    MatOfRect eyes = new MatOfRect();
+                    mEyesClassifier.detectMultiScale(dFace, eyes, 1.3, 5);
+                    //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
+                    Rect[] eyesArray = eyes.toArray();
+                    if (eyesArray.length > 0) {
+                        sb.append(getPartJSON(dFace, "firstEye", eyesArray[0], false));
+                    }
+
                     if (i != (facesArray.length - 1)) {
-                      sb.append(",");
+                        sb.append("},");
+                    }
+                    else {
+                        sb.append("}");
                     }
                     //good for testing ...
                     //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
