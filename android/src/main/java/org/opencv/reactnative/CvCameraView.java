@@ -214,6 +214,12 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
               case EYES_CLASSIFIER:
                   mEyesClassifier = classifier;
                   break;
+              case NOSE_CLASSIFIER:
+                  mNoseClassifier = classifier;
+                  break;
+              case MOUTH_CLASSIFIER:
+                  mMouthClassifier = classifier;
+                  break;
               default:
               case FACE_CLASSIFIER:
                   mFaceClassifier = classifier;
@@ -289,13 +295,12 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         }
     }
      */
-    private String getPartJSON(Mat dFace, String partKey, Rect part, boolean parentObj) {
+    private String getPartJSON(Mat dFace, String partKey, Rect part) {
 
         StringBuffer sb = new StringBuffer();
-        if (!parentObj) {
-          sb.append(",");
+        if (partKey != null) {
+          sb.append(",\"" + partKey + "\":");
         }
-        sb.append("\"" + partKey + "\":");
 
         double widthToUse = dFace.cols();
         double heightToUse = dFace.rows();
@@ -314,8 +319,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
           case Core.ROTATE_90_CLOCKWISE:
               x = Y0/heightToUse;
               y = 1.0 - X1/widthToUse;
-              w = (X1 - X0)/heightToUse;
-              h = (Y1 - Y0)/widthToUse;
+              w = (Y1 - Y0)/heightToUse;
+              h = (X1 - X0)/widthToUse;
               break;
           case Core.ROTATE_180:
               x = 1.0 - X1/widthToUse;
@@ -324,15 +329,15 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
           case Core.ROTATE_90_COUNTERCLOCKWISE:
               x = 1.0 - Y1/heightToUse;
               y = X0/widthToUse;
-              w = (X1 - X0)/heightToUse;
-              h = (Y1 - Y0)/widthToUse;
+              w = (Y1 - Y0)/heightToUse;
+              h = (X1 - X0)/widthToUse;
               break;
           default:
               break;
         }
 
         sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h);
-        if (!parentObj) {
+        if (partKey != null) {
           sb.append("}");
         }
         return sb.toString();
@@ -379,53 +384,53 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                 StringBuffer sb = new StringBuffer();
                 sb.append("{\"faces\":[");
                 for (int i = 0; i < facesArray.length; i++) {
-
-                    double widthToUse = ingray.cols();
-                    double heightToUse = ingray.rows();
-
-                    double X0 = facesArray[i].tl().x;
-                    double Y0 = facesArray[i].tl().y;
-                    double X1 = facesArray[i].br().x;
-                    double Y1 = facesArray[i].br().y;
-
-                    double x = X0/widthToUse;
-                    double y = Y0/heightToUse;
-                    double w = (X1 - X0)/widthToUse;
-                    double h = (Y1 - Y0)/heightToUse;
-
-                    switch(mRotation) {
-                      case Core.ROTATE_90_CLOCKWISE:
-                          x = Y0/heightToUse;
-                          y = 1.0 - X1/widthToUse;
-                          w = (X1 - X0)/heightToUse;
-                          h = (Y1 - Y0)/widthToUse;
-                          break;
-                      case Core.ROTATE_180:
-                          x = 1.0 - X1/widthToUse;
-                          y = 1.0 - Y1/heightToUse;
-                          break;
-                      case Core.ROTATE_90_COUNTERCLOCKWISE:
-                          x = 1.0 - Y1/heightToUse;
-                          y = X0/widthToUse;
-                          w = (X1 - X0)/heightToUse;
-                          h = (Y1 - Y0)/widthToUse;
-                          break;
-                      default:
-                          break;
-                    }
-
+                    sb.append(getPartJSON(ingray, null, facesArray[i]));
                     String id = "faceId" + i;
-                    sb.append("{\"x\":"+x+",\"y\":"+y+",\"width\":"+w+",\"height\":"+h+",\"faceId\":\""+id+"\"");
+                    sb.append(",\"faceId\":\""+id+"\"");
 
-                    Rect faceROI = facesArray[i];
-                    Mat dFace = ingray.submat(faceROI);
+                    if (mEyesClassifier != null ||
+                        mNoseClassifier != null ||
+                        mMouthClassifier != null) {
 
-                    MatOfRect eyes = new MatOfRect();
-                    mEyesClassifier.detectMultiScale(dFace, eyes, 1.3, 5);
-                    //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
-                    Rect[] eyesArray = eyes.toArray();
-                    if (eyesArray.length > 0) {
-                        sb.append(getPartJSON(dFace, "firstEye", eyesArray[0], false));
+                        Rect faceROI = facesArray[i];
+                        Mat dFace = ingray.submat(faceROI);
+
+                        if (mEyesClassifier != null) {
+                            MatOfRect eyes = new MatOfRect();
+                            mEyesClassifier.detectMultiScale(dFace, eyes, 1.3, 5);
+                            //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
+                            Rect[] eyesArray = eyes.toArray();
+                            if (eyesArray.length > 0) {
+                                sb.append(getPartJSON(dFace, "firstEye", eyesArray[0]));
+                            }
+                            if (eyesArray.length > 1) {
+                                sb.append(getPartJSON(dFace, "secondEye", eyesArray[1]));
+                            }
+                        }
+
+                        if (mNoseClassifier != null) {
+                            MatOfRect noses = new MatOfRect();
+                            mNoseClassifier.detectMultiScale(dFace, noses, 1.3, 5);
+                            //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
+                            Rect[] nosesArray = noses.toArray();
+                            if (nosesArray.length > 0) {
+                                sb.append(getPartJSON(dFace, "nose", nosesArray[0]));
+                            }
+                        }
+
+                        if (mMouthClassifier != null) {
+                            Rect mouthROI = new Rect(0,(int)Math.round(dFace.rows()*0.6),dFace.cols(),(int)Math.round(dFace.rows()*0.4));
+                            Mat dFaceForMouthDetecting = dFace.submat(mouthROI);
+
+                            MatOfRect mouths = new MatOfRect();
+                            mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.3, 5);
+                            //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
+                            Rect[] mouthsArray = mouths.toArray();
+                            if (mouthsArray.length > 0) {
+                                Rect dRect = new Rect(mouthsArray[0].x,(int)Math.round(mouthsArray[0].y + dFace.rows()*0.6),mouthsArray[0].width,mouthsArray[0].height);
+                                sb.append(getPartJSON(dFace, "mouth", dRect));
+                            }
+                        }
                     }
 
                     if (i != (facesArray.length - 1)) {
@@ -467,15 +472,17 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
          */
 
         //Core.flip(src.t(), src, 1);
-        // AKA bowel movement!
-        Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(in, bm);
-        //writeImage(bm);
-        String encodedData = toBase64(bm, 60);
-        WritableMap response = new WritableNativeMap();
-        response.putString("payload", encodedData);
-        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-          .emit("onCameraFrame", response);
+        if (mSuckUpFrames) {
+            // AKA bowel movement!
+            Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(in, bm);
+            //writeImage(bm);
+            String encodedData = toBase64(bm, 60);
+            WritableMap response = new WritableNativeMap();
+            response.putString("payload", encodedData);
+            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("onCameraFrame", response);
+        }
 
         return in;
     }

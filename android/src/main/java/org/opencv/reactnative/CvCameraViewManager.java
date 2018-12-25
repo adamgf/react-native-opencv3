@@ -43,4 +43,14 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
     public void setEyesClassifier(CvCameraView view, String cascadeClassifier) {
         view.setCascadeClassifier(cascadeClassifier, whichOne.EYES_CLASSIFIER);
     }
+
+    @ReactProp(name = "noseClassifier")
+    public void setNoseClassifier(CvCameraView view, String cascadeClassifier) {
+        view.setCascadeClassifier(cascadeClassifier, whichOne.NOSE_CLASSIFIER);
+    }
+
+    @ReactProp(name = "mouthClassifier")
+    public void setMouthClassifier(CvCameraView view, String cascadeClassifier) {
+        view.setCascadeClassifier(cascadeClassifier, whichOne.MOUTH_CLASSIFIER);
+    }
 }
