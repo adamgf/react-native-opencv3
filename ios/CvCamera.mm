@@ -11,11 +11,17 @@
 
 @implementation CvCamera
 
+// private properties
 bool mUseFaceDetection;
-
+bool mUseEyesDetection;
+bool mUseNoseDetection;
+bool mUseMouthDetection;
 NSString *mFacing;
 
 CascadeClassifier face_cascade;
+CascadeClassifier eyes_cascade;
+CascadeClassifier mouth_cascade;
+CascadeClassifier nose_cascade;
 
 - (id)initWithBridge:(RCTBridge *)bridge
 {
@@ -32,36 +38,8 @@ CascadeClassifier face_cascade;
         self.videoCamera = videoCamera;
 
         [self.videoCamera start];
-
-        NSBundle *podBundle = [NSBundle bundleForClass:CvCamera.class];
-        NSURL *bundleURL = [podBundle URLForResource:@"ocvdata" withExtension:@"bundle"];
-        NSBundle *dBundle = [NSBundle bundleWithURL:bundleURL];
-        NSString *faceCascadePath = [dBundle pathForResource:@"haarcascade_frontalface_alt" ofType:@"xml"];
-
-        if (faceCascadePath) {
-            if (!face_cascade.load( std::string([faceCascadePath UTF8String]))) {
-                NSLog(@"Unable to load cascade classifier at: %@", faceCascadePath);
-            }
-            else {
-                mUseFaceDetection = true;
-            }
-        }
     }
     return self;
-}
-
-- (void)changeFacing:(NSString*)facing {
-    if (![facing isEqualToString:mFacing]) {
-        mFacing = facing;
-        [self.videoCamera stop];
-        if ([mFacing isEqualToString:@"back"]) {
-            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionBack];
-        }
-        else {
-            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionFront];
-        }
-        [self.videoCamera start];
-    }
 }
 
 /** TODO: implement notifcations so these methods get called */
@@ -90,6 +68,60 @@ CascadeClassifier face_cascade;
     }
 }
 
+-(NSString*) getPartJSON:(cv::Mat&)dFace partKey:(NSString*)partKey part:(cv::Rect)part {
+    
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    NSString* sb = @"";
+    
+    if (partKey && ![partKey isEqualToString:@""]) {
+        NSString *partKeyStr = [NSString stringWithFormat:@",\"%@\":", partKey];
+        sb = [sb stringByAppendingString:partKeyStr];
+    }
+    
+    double widthToUse = dFace.cols;
+    double heightToUse = dFace.rows;
+    
+    double X0 = part.tl().x;
+    double Y0 = part.tl().y;
+    double X1 = part.br().x;
+    double Y1 = part.br().y;
+    
+    double x = X0/widthToUse;
+    double y = Y0/heightToUse;
+    double w = (X1 - X0)/widthToUse;
+    double h = (Y1 - Y0)/heightToUse;
+    
+    switch(deviceOrientation) {
+        case UIDeviceOrientationLandscapeLeft:
+            x = 1.0 - Y1/widthToUse;
+            y = X0/heightToUse;
+            w = (Y1 - Y0)/widthToUse;
+            h = (X1 - X0)/heightToUse;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            x = 1.0 - X1/widthToUse;
+            y = 1.0 - Y1/heightToUse;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            x = Y0/widthToUse;
+            y = 1.0 - X1/heightToUse;
+            w = (Y1 - Y0)/widthToUse;
+            h = (X1 - X0)/heightToUse;
+            break;
+        default:
+        case UIDeviceOrientationPortrait:
+            break;
+    }
+    
+    NSString *partStr = [NSString stringWithFormat:@"{\"x\":%f,\"y\":%f,\"width\":%f,\"height\":%f", x, y, w, h];
+    sb = [sb stringByAppendingString:partStr];
+    
+    if (partKey && ![partKey isEqualToString:@""]) {
+        sb = [sb stringByAppendingString:@"}"];
+    }
+    return sb;
+}
+
 - (void)processImage:(cv::Mat&)image {
 
     // Do some OpenCV stuff with the image
@@ -111,46 +143,63 @@ CascadeClassifier face_cascade;
         if (faces.size() > 0) {
             payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
             for(size_t i = 0; i < faces.size(); i++) {
-                float widthToUse = image.cols;
-                float heightToUse = image.rows;
                 
-                float X0 = faces[i].tl().x;
-                float Y0 = faces[i].tl().y;
-                float X1 = faces[i].br().x;
-                float Y1 = faces[i].br().y;
+                NSString *faceJSON = [self getPartJSON:gray partKey:@"" part:faces[i]];
+                payloadJSON = [payloadJSON stringByAppendingString:faceJSON];
                 
-                float x = X0/widthToUse;
-                float y = Y0/heightToUse;
-                float w = (X1 - X0)/widthToUse;
-                float h = (Y1 - Y0)/heightToUse;
-                switch(deviceOrientation) {
-                    case UIDeviceOrientationLandscapeLeft:
-                        x = 1.0 - Y1/widthToUse;
-                        y = X0/heightToUse;
-                        w = (Y1 - Y0)/widthToUse;
-                        h = (X1 - X0)/heightToUse;
-                        break;
-                    case UIDeviceOrientationPortraitUpsideDown:
-                        x = 1.0 - X1/widthToUse;
-                        y = 1.0 - Y1/heightToUse;
-                        break;
-                    case UIDeviceOrientationLandscapeRight:
-                        x = Y0/widthToUse;
-                        y = 1.0 - X1/heightToUse;
-                        w = (Y1 - Y0)/widthToUse;
-                        h = (X1 - X0)/heightToUse;
-                        break;
-                    default:
-                    case UIDeviceOrientationPortrait:
-                        break;
+                NSString *faceIdStr = [NSString stringWithFormat:@",\"faceId\":\"%d\"", (int)i];
+                payloadJSON = [payloadJSON stringByAppendingString:faceIdStr];
+                
+                if (mUseEyesDetection || mUseNoseDetection || mUseMouthDetection) {
+                    
+                    Mat dFace = gray.adjustROI(faces[i].y, faces[i].y + faces[i].height, faces[i].x, faces[i].x + faces[i].width);
+                    
+                    if (mUseEyesDetection) {
+                        std::vector<cv::Rect> eyes;
+                        eyes_cascade.detectMultiScale(dFace, eyes, 1.3, 5);
+                        //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
+                        if (eyes.size() > 0) {
+                            NSString *firstEyeJSON = [self getPartJSON:dFace partKey:@"firstEye" part:eyes[0]];
+                            payloadJSON = [payloadJSON stringByAppendingString:firstEyeJSON];
+                        }
+                        if (eyes.size() > 1) {
+                            NSString *secondEyeJSON = [self getPartJSON:dFace partKey:@"secondEye" part:eyes[1]];
+                            payloadJSON = [payloadJSON stringByAppendingString:secondEyeJSON];
+                        }
+                    }
+                    
+                    if (mUseNoseDetection) {
+                        std::vector<cv::Rect> noses;
+                        nose_cascade.detectMultiScale(dFace, noses, 1.3, 5);
+                        
+                        if (noses.size() > 0) {
+                            NSString *noseJSON = [self getPartJSON:dFace partKey:@"nose" part:noses[0]];
+                            payloadJSON = [payloadJSON stringByAppendingString:noseJSON];
+                        }
+                    }
+                    
+                    if (mUseMouthDetection) {
+                        Mat dFaceForMouthDetecting = dFace.adjustROI((int)((double)dFace.rows*0.6), dFace.rows, 0, dFace.cols);
+                        std::vector<cv::Rect> mouths;
+                        nose_cascade.detectMultiScale(dFaceForMouthDetecting, mouths, 1.3, 5);
+                        if (mouths.size() > 0) {
+                            cv::Rect dRect;
+                            dRect.x = mouths[0].x;
+                            dRect.y = mouths[0].y + (int)((double)dFace.rows * 0.6f);
+                            dRect.width = mouths[0].width;
+                            dRect.height = mouths[0].height - dRect.y;
+                            
+                            NSString *mouthJSON = [self getPartJSON:dFace partKey:@"mouth" part:dRect];
+                            payloadJSON = [payloadJSON stringByAppendingString:mouthJSON];
+                        }
+                    }
                 }
                 
-                NSString *faceIdStr = [NSString stringWithFormat:@"faceId%d", (int)i];
-                NSString *faceData = [NSString stringWithFormat:@"{\"x\":%f,\"y\":%f,\"width\":%f,\"height\":%f,\"faceId\":\"%@\"}",
-                    x,y,w,h,faceIdStr];
-                payloadJSON = [payloadJSON stringByAppendingString:faceData];
                 if (i != (faces.size() - 1)) {
-                    payloadJSON = [payloadJSON stringByAppendingString:@","];
+                    payloadJSON = [payloadJSON stringByAppendingString:@"},"];
+                }
+                else {
+                    payloadJSON = [payloadJSON stringByAppendingString:@"}"];
                 }
                 //rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
             }
@@ -172,6 +221,56 @@ CascadeClassifier face_cascade;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setImage:videoImage];
     });
+}
+
+#pragma Properties
+
+- (void)changeFacing:(NSString*)facing {
+    if (![facing isEqualToString:mFacing]) {
+        mFacing = facing;
+        [self.videoCamera stop];
+        if ([mFacing isEqualToString:@"back"]) {
+            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionBack];
+        }
+        else {
+            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionFront];
+        }
+        [self.videoCamera start];
+    }
+}
+
+- (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne {
+    NSBundle *podBundle = [NSBundle bundleForClass:CvCamera.class];
+    NSURL *bundleURL = [podBundle URLForResource:@"ocvdata" withExtension:@"bundle"];
+    NSBundle *dBundle = [NSBundle bundleWithURL:bundleURL];
+    NSString *cascadePath = [dBundle pathForResource:cascadeClassifier ofType:@"xml"];
+    
+    CascadeClassifier cascade;
+    if (cascadePath) {
+        if (!cascade.load( std::string([cascadePath UTF8String]))) {
+            NSLog(@"Unable to load cascade classifier at: %@", cascadePath);
+        }
+        else {
+            switch (whichOne) {
+                case ClassifierFace:
+                    face_cascade = cascade;
+                    mUseFaceDetection = true;
+                    break;
+                case ClassifierEyes:
+                    eyes_cascade = cascade;
+                    mUseEyesDetection = true;
+                    break;
+                case ClassifierNose:
+                    nose_cascade = cascade;
+                    mUseNoseDetection = true;
+                    break;
+                case ClassifierMouth:
+                    mouth_cascade = cascade;
+                    mUseMouthDetection = true;
+                    break;
+            }
+        }
+    }
 }
 
 @end

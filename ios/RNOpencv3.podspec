@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   s.subspec "CvCamera" do |ss|
     ss.source_files = "CvCamera/**/*.{h,m,mm}"
-    ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/**/*.xml' }
+    ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/*.xml' }
   end
 
   s.dependency "React"

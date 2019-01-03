@@ -15,6 +15,15 @@
 #import <UIKit/UIKit.h>
 #import <React/UIView+React.h>
 
+enum {
+    ClassifierFace,
+    ClassifierEyes,
+    ClassifierNose,
+    ClassifierMouth
+};
+
+typedef NSInteger Classifier;
+
 @class CvVideoCamera;
 
 @protocol CvVideoCameraDelegate;
@@ -30,6 +39,8 @@
 - (id)initWithBridge:(RCTBridge *)bridge;
 
 - (void)changeFacing:(NSString*)facing;
+
+- (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne;
 
 @end
 

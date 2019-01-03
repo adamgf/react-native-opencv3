@@ -21,13 +21,25 @@ RCT_EXPORT_MODULE(CvCameraView);
 
 RCT_EXPORT_VIEW_PROPERTY(onFacesDetected, RCTBubblingEventBlock)
 
-RCT_CUSTOM_VIEW_PROPERTY(facing, NSString*, CvCamera) {
-    [view changeFacing:json];
-}
-
 // And you sent event you want from objectC to react-native
 - (UIView *)view {
     return [[CvCamera alloc] initWithBridge:self.bridge];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(faceClassifier, NSString*, CvCamera) {
+    [view setCascadeClassifier:json whichOne:ClassifierFace];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(eyesClassifier, NSString*, CvCamera) {
+    [view setCascadeClassifier:json whichOne:ClassifierEyes];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(noseClassifier, NSString*, CvCamera) {
+    [view setCascadeClassifier:json whichOne:ClassifierNose];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(mouthClassifier, NSString*, CvCamera) {
+    [view setCascadeClassifier:json whichOne:ClassifierMouth];
 }
 
 @end
