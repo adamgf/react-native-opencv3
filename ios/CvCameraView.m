@@ -26,6 +26,10 @@ RCT_EXPORT_VIEW_PROPERTY(onFacesDetected, RCTBubblingEventBlock)
     return [[CvCamera alloc] initWithBridge:self.bridge];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(facing, NSString*, CvCamera) {
+    [view changeFacing:json];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(faceClassifier, NSString*, CvCamera) {
     [view setCascadeClassifier:json whichOne:ClassifierFace];
 }
