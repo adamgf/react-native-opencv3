@@ -2,7 +2,7 @@
 # OSX
 #
 .DS_Store
-ios/Podfile.lock
+ios/Index/
 
 # node.js
 #

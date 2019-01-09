@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
     ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/*.xml' }
   end
 
-  s.dependency "React"
+  # s.dependency "React"
   s.dependency "OpenCV",'~> 3.4.2'
   #s.dependency "others"
 

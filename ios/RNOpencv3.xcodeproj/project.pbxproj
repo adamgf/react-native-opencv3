@@ -35,8 +35,6 @@
 		50FC7429219953C800A48FE3 /* CvCamera.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7426219953C800A48FE3 /* CvCamera.mm */; };
 		50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7427219953C800A48FE3 /* CvCameraView.m */; };
 		50FC747321997CC000A48FE3 /* FileUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50FC747221997CC000A48FE3 /* FileUtils.mm */; };
-		D97D1EC0A947A5FD0657EAA2 /* libPods-ocvdata.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5FC76BA14A22881515E5DE /* libPods-ocvdata.a */; };
-		EF9CEA46372DE808BF90F867 /* Pods_RNOpencv3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C8A0A3EC841BD0D4081DD1E /* Pods_RNOpencv3.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,12 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0ABEA43AB69DEBAB0A6D4E36 /* Pods-RNOpencv3.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNOpencv3.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RNOpencv3/Pods-RNOpencv3.debug.xcconfig"; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		3B5FC76BA14A22881515E5DE /* libPods-ocvdata.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ocvdata.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4D88CF12072992415DAAD886 /* Pods-ocvdata.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ocvdata.release.xcconfig"; path = "Pods/Target Support Files/Pods-ocvdata/Pods-ocvdata.release.xcconfig"; sourceTree = "<group>"; };
-		4FB453D624DC485CC620B311 /* Pods-RNOpencv3.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNOpencv3.release.xcconfig"; path = "Pods/Target Support Files/Pods-RNOpencv3/Pods-RNOpencv3.release.xcconfig"; sourceTree = "<group>"; };
-		4FF6E5551A9BA61E5511CE3F /* Pods-ocvdata.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ocvdata.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ocvdata/Pods-ocvdata.debug.xcconfig"; sourceTree = "<group>"; };
 		5043A75921DDBA3D000BC241 /* right_ear.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = right_ear.xml; sourceTree = "<group>"; };
 		5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_upperbody.xml; sourceTree = "<group>"; };
 		5043A75B21DDBA3D000BC241 /* left_eye.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = left_eye.xml; sourceTree = "<group>"; };
@@ -104,7 +97,6 @@
 		50FC7428219953C800A48FE3 /* CvCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvCamera.h; sourceTree = "<group>"; };
 		50FC747221997CC000A48FE3 /* FileUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileUtils.mm; sourceTree = "<group>"; };
 		50FC747421997D4000A48FE3 /* FileUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
-		5C8A0A3EC841BD0D4081DD1E /* Pods_RNOpencv3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RNOpencv3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpencv3.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -113,7 +105,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D97D1EC0A947A5FD0657EAA2 /* libPods-ocvdata.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,7 +112,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EF9CEA46372DE808BF90F867 /* Pods_RNOpencv3.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,29 +174,7 @@
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				50B7C94721C89E3F00A43F6B /* ocvdata.bundle */,
-				741BA0B53F4564F9106806A0 /* Pods */,
-				E6C8AA6DA48341C74008ADC5 /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		741BA0B53F4564F9106806A0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				0ABEA43AB69DEBAB0A6D4E36 /* Pods-RNOpencv3.debug.xcconfig */,
-				4FB453D624DC485CC620B311 /* Pods-RNOpencv3.release.xcconfig */,
-				4FF6E5551A9BA61E5511CE3F /* Pods-ocvdata.debug.xcconfig */,
-				4D88CF12072992415DAAD886 /* Pods-ocvdata.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		E6C8AA6DA48341C74008ADC5 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				3B5FC76BA14A22881515E5DE /* libPods-ocvdata.a */,
-				5C8A0A3EC841BD0D4081DD1E /* Pods_RNOpencv3.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,7 +184,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 50B7C94A21C89E3F00A43F6B /* Build configuration list for PBXNativeTarget "ocvdata" */;
 			buildPhases = (
-				06B2D08955254D2192509646 /* [CP] Check Pods Manifest.lock */,
 				50B7C94321C89E3F00A43F6B /* Sources */,
 				50B7C94421C89E3F00A43F6B /* Frameworks */,
 				50B7C94521C89E3F00A43F6B /* Resources */,
@@ -234,7 +201,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNOpencv3" */;
 			buildPhases = (
-				2BC2C63D4E6145AECD1859C1 /* [CP] Check Pods Manifest.lock */,
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
 				58B511D91A9E6C8500147676 /* CopyFiles */,
@@ -319,53 +285,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		06B2D08955254D2192509646 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ocvdata-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2BC2C63D4E6145AECD1859C1 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RNOpencv3-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		50B7C94321C89E3F00A43F6B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -398,7 +317,6 @@
 /* Begin XCBuildConfiguration section */
 		50B7C94B21C89E3F00A43F6B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4FF6E5551A9BA61E5511CE3F /* Pods-ocvdata.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -435,7 +353,6 @@
 		};
 		50B7C94C21C89E3F00A43F6B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4D88CF12072992415DAAD886 /* Pods-ocvdata.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -507,7 +424,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -544,7 +461,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -553,7 +470,6 @@
 		};
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0ABEA43AB69DEBAB0A6D4E36 /* Pods-RNOpencv3.debug.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/OpenCV";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
@@ -572,7 +488,6 @@
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4FB453D624DC485CC620B311 /* Pods-RNOpencv3.release.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/OpenCV";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
