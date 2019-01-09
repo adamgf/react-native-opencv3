@@ -36,6 +36,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
+import org.opencv.face.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -66,14 +67,15 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private ReadableArray          mFunctions;
     private ReadableArray          mParamsArr;
     private int                    mCameraFacing;
-    private File                   mCascadeFile;
     private CascadeClassifier      mFaceClassifier;
     private CascadeClassifier      mEyesClassifier;
     private CascadeClassifier      mNoseClassifier;
     private CascadeClassifier      mMouthClassifier;
     private boolean                mSuckUpFrames; // snarf, scoop?
+    private Facemark               mLandmarks;
 
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(255, 255, 0, 255);
+    private boolean                mUseLandmarks       = false;
     private boolean                mUseFaceDetection   = false;
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
@@ -87,6 +89,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
       this.setVisibility(SurfaceView.VISIBLE);
       this.setCvCameraViewListener(this);
+
       System.loadLibrary("opencv_java3");
 
       mHolder = getHolder();
@@ -115,6 +118,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         };
 
         orientationEventListener.enable();
+
+        Facemark fm = Face.createFacemarkKazemi();
     }
 
     @Override
@@ -165,12 +170,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         this.mParamsArr = paramsArr;
     }
 
-    public void setCascadeClassifier(String cascadeClassifier, whichOne classifierType) {
+    private File readClassifierFile(String cascadeClassifier) {
+      File cascadeFile = null;
       try {
-          mUseFaceDetection = true;
-
           // load cascade file from application resources
-          InputStream is = mContext.getAssets().open(cascadeClassifier + ".xml");
+          InputStream is = mContext.getAssets().open(cascadeClassifier);
 
           if (is == null) {
               //MakeAToast("Input stream is nullified!");
@@ -186,8 +190,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
           File cacheDir = mContext.getCacheDir();
 
-          mCascadeFile = new File(cacheDir, cascadeClassifier + ".xml");
-          FileOutputStream os = new FileOutputStream(mCascadeFile);
+          cascadeFile = new File(cacheDir, cascadeClassifier + ".xml");
+          FileOutputStream os = new FileOutputStream(cascadeFile);
 
           byte[] buffer = new byte[4096];
           int bytesRead;
@@ -196,39 +200,47 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
           }
           is.close();
           os.close();
-
-          CascadeClassifier classifier = new CascadeClassifier(mCascadeFile.getAbsolutePath());
-          if (classifier.empty()) {
-              //MakeAToast("Failed to load cascade classifier: " + mCascadeFile.getAbsolutePath());
-              Log.e(TAG, "Failed to load cascade classifier");
-              classifier = null;
-          }
-          else {
-              //MakeAToast("Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
-              Log.i(TAG, "Loaded classifier from " + mCascadeFile.getAbsolutePath());
-          }
-
-          mCascadeFile.delete();
-
-          switch (classifierType) {
-              case EYES_CLASSIFIER:
-                  mEyesClassifier = classifier;
-                  break;
-              case NOSE_CLASSIFIER:
-                  mNoseClassifier = classifier;
-                  break;
-              case MOUTH_CLASSIFIER:
-                  mMouthClassifier = classifier;
-                  break;
-              default:
-              case FACE_CLASSIFIER:
-                  mFaceClassifier = classifier;
-                  break;
-          }
       }
-      catch (IOException ioe) {
+      catch (java.io.IOException ioe) {
           Log.e(TAG, "Failed to load cascade. IOException thrown: " + ioe.getMessage());
       }
+      finally {
+          return cascadeFile;
+      }
+    }
+
+    public void setCascadeClassifier(String cascadeClassifier, whichOne classifierType) {
+        mUseFaceDetection = true;
+        File cascadeFile = readClassifierFile(cascadeClassifier + ".xml");
+        if (cascadeFile != null) {
+            CascadeClassifier classifier = new CascadeClassifier(cascadeFile.getAbsolutePath());
+            if (classifier.empty()) {
+                //MakeAToast("Failed to load cascade classifier: " + mCascadeFile.getAbsolutePath());
+                Log.e(TAG, "Failed to load cascade classifier");
+                classifier = null;
+            }
+            else {
+                //MakeAToast("Loaded cascade classifier from " + mCascadeFile.getAbsolutePath());
+                Log.i(TAG, "Loaded classifier from " + cascadeFile.getAbsolutePath());
+            }
+            cascadeFile.delete();
+
+            switch (classifierType) {
+                case EYES_CLASSIFIER:
+                    mEyesClassifier = classifier;
+                    break;
+                case NOSE_CLASSIFIER:
+                    mNoseClassifier = classifier;
+                    break;
+                case MOUTH_CLASSIFIER:
+                    mMouthClassifier = classifier;
+                    break;
+                default:
+                case FACE_CLASSIFIER:
+                    mFaceClassifier = classifier;
+                    break;
+            }
+        }
     }
 
     public void onCameraViewStarted(int width, int height) {
@@ -374,8 +386,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             //-- Detect faces
             MatOfRect faces = new MatOfRect();
             if (mFaceClassifier != null && ingray != null)
-                mFaceClassifier.detectMultiScale(ingray, faces, 1.3, 5);
-                //mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 2/*0|Objdetect.CASCADE_SCALE_IMAGE*/, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
 
             Rect[] facesArray = faces.toArray();
 
