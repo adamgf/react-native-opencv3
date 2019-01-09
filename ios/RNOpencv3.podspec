@@ -20,7 +20,6 @@ Pod::Spec.new do |s|
   end
 
   s.dependency "React"
-  s.dependency "OpenCV"
   #s.dependency "others"
 
 end
