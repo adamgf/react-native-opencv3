@@ -211,7 +211,9 @@ CascadeClassifier nose_cascade;
             }
             payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
         }
-        self.onFacesDetected(@{@"payload":payloadJSON});
+        if (![payloadJSON isEqualToString:@""]) {
+            self.onFacesDetected(@{@"payload":payloadJSON});
+        }
     }
 
     // invert image
