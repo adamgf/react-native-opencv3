@@ -27,6 +27,8 @@ import org.opencv.android.JavaCameraView;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Core;
@@ -36,7 +38,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
-import org.opencv.face.*;
+import org.opencv.face.Face;
+import org.opencv.face.Facemark;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.File;
 import java.lang.Runnable;
+import java.util.ArrayList;
 
 // useful for popping up an alert if need be ...
 //import android.widget.Toast;
@@ -118,8 +122,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         };
 
         orientationEventListener.enable();
-
-        Facemark fm = Face.createFacemarkKazemi();
     }
 
     @Override
@@ -190,7 +192,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
           File cacheDir = mContext.getCacheDir();
 
-          cascadeFile = new File(cacheDir, cascadeClassifier + ".xml");
+          cascadeFile = new File(cacheDir, cascadeClassifier);
           FileOutputStream os = new FileOutputStream(cascadeFile);
 
           byte[] buffer = new byte[4096];
@@ -207,6 +209,15 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
       finally {
           return cascadeFile;
       }
+    }
+
+    public void setLandmarksModel(String landmarksModel) {
+        mUseLandmarks = true;
+        File landmarksFile = readClassifierFile(landmarksModel + ".yaml");
+        // setup landmarks detector
+        mLandmarks = Face.createFacemarkLBF();
+        //mLandmarks = Face.createFacemarkKazemi();
+        mLandmarks.loadModel(landmarksFile.getAbsolutePath());
     }
 
     public void setCascadeClassifier(String cascadeClassifier, whichOne classifierType) {
@@ -513,6 +524,23 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                     }
                     //good for testing ...
                     //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
+                }
+
+                if (mUseLandmarks) {
+                    // fit landmarks for each found face
+                    ArrayList<MatOfPoint2f> landmarks = new ArrayList<MatOfPoint2f>();
+                    mLandmarks.fit(ingray, faces, landmarks);
+
+                    // draw them
+                    for (int i = 0; i < landmarks.size(); i++) {
+                        MatOfPoint2f lm = landmarks.get(i);
+                        for (int j = 0; j < lm.rows(); j++) {
+                            // AKA double penetration
+                            double[] dp = lm.get(j, 0);
+                            Point pt = new Point(dp[0], dp[1]);
+                            Imgproc.circle(in, pt, 2, new Scalar(222), 1);
+                        }
+                    }
                 }
                 sb.append("]}");
                 faceInfo = sb.toString();

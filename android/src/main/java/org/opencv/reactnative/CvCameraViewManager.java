@@ -53,4 +53,10 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
     public void setMouthClassifier(CvCameraView view, String cascadeClassifier) {
         view.setCascadeClassifier(cascadeClassifier, whichOne.MOUTH_CLASSIFIER);
     }
+
+    @ReactProp(name = "landmarksModel")
+    public void setLandmarksModel(CvCameraView view, String landmarksModel) {
+        view.setLandmarksModel(landmarksModel);
+    }
+
 }
