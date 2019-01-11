@@ -355,6 +355,15 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         return sb.toString();
     }
 
+    private double calcDistance(double centerX, double centerY, double pointX, double pointY) {
+        double distX = pointX - centerX;
+        double distY = pointY - centerY;
+
+        distX = (distX < 0.0) ? -distX : distX;
+        distY = (distY < 0.0) ? -distY : distY;
+        return (distX + distY);
+    }
+
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
@@ -373,20 +382,19 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         }
 
         if (mUseFaceDetection) {
-          if (mAbsoluteFaceSize == 0) {
-                int height = ingray.rows();
-                if (Math.round(height * mRelativeFaceSize) > 0) {
-                    mAbsoluteFaceSize = Math.round(height * mRelativeFaceSize);
-                }
-            }
 
             Imgproc.equalizeHist(ingray, ingray);
             rotateImage(ingray);
 
+            int height = ingray.rows();
+            if (Math.round(height * mRelativeFaceSize) > 0) {
+                mAbsoluteFaceSize = Math.round(height * mRelativeFaceSize);
+            }
+
             //-- Detect faces
             MatOfRect faces = new MatOfRect();
             if (mFaceClassifier != null && ingray != null)
-                mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 2/*0|Objdetect.CASCADE_SCALE_IMAGE*/, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
 
             Rect[] facesArray = faces.toArray();
 
@@ -408,24 +416,64 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
                         if (mEyesClassifier != null) {
                             MatOfRect eyes = new MatOfRect();
-                            mEyesClassifier.detectMultiScale(dFace, eyes, 1.3, 5);
+                            mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2);
                             //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
                             Rect[] eyesArray = eyes.toArray();
+
+                            int eye1Index = -1;
+                            double centerX = 0.0;
+                            double centerY = (double)facesArray[i].height*0.2;
                             if (eyesArray.length > 0) {
-                                sb.append(getPartJSON(dFace, "firstEye", eyesArray[0]));
+                                double minDist = 10000.0;
+                                for(int j = 0; j < eyesArray.length; j++) {
+                                    centerX = (double)facesArray[i].width*0.3;
+                                    double eyeX = (double)eyesArray[j].x + (double)eyesArray[j].width*0.5;
+                                    double eyeY = (double)eyesArray[j].y + (double)eyesArray[j].height*0.5;
+                                    double dist = calcDistance(centerX, centerY, eyeX, eyeY);
+                                    if (dist < minDist) {
+                                        minDist = dist;
+                                        eye1Index = j;
+                                    }
+                                }
+                                sb.append(getPartJSON(dFace, "firstEye", eyesArray[eye1Index]));
                             }
                             if (eyesArray.length > 1) {
-                                sb.append(getPartJSON(dFace, "secondEye", eyesArray[1]));
+                                double minDist = 10000.0;
+                                int eye2Index = -1;
+                                for(int j = 0; j < eyesArray.length; j++) {
+                                    centerX = (double)facesArray[i].width*0.7;
+                                    double eyeX = (double)eyesArray[j].x + (double)eyesArray[j].width*0.5;
+                                    double eyeY = (double)eyesArray[j].y + (double)eyesArray[j].height*0.5;
+                                    double dist = calcDistance(centerX, centerY, eyeX, eyeY);
+                                    if (dist < minDist && eye1Index != j) {
+                                        minDist = dist;
+                                        eye2Index = j;
+                                    }
+                                }
+                                sb.append(getPartJSON(dFace, "secondEye", eyesArray[eye2Index]));
                             }
                         }
 
                         if (mNoseClassifier != null) {
                             MatOfRect noses = new MatOfRect();
-                            mNoseClassifier.detectMultiScale(dFace, noses, 1.3, 5);
+                            mNoseClassifier.detectMultiScale(dFace, noses, 1.1, 2);
                             //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
                             Rect[] nosesArray = noses.toArray();
                             if (nosesArray.length > 0) {
-                                sb.append(getPartJSON(dFace, "nose", nosesArray[0]));
+                                double minDist = 10000.0;
+                                int noseIndex = -1;
+                                for(int j = 0; j < nosesArray.length; j++) {
+                                    double centerX = (double)facesArray[i].width*0.5;
+                                    double centerY = (double)facesArray[i].height*0.5;
+                                    double noseX = (double)nosesArray[j].x + (double)nosesArray[j].width*0.5;
+                                    double noseY = (double)nosesArray[j].y + (double)nosesArray[j].height*0.5;
+                                    double dist = calcDistance(centerX, centerY, noseX, noseY);
+                                    if (dist < minDist) {
+                                        minDist = dist;
+                                        noseIndex = j;
+                                    }
+                                }
+                                sb.append(getPartJSON(dFace, "nose", nosesArray[noseIndex]));
                             }
                         }
 
@@ -434,11 +482,24 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                             Mat dFaceForMouthDetecting = dFace.submat(mouthROI);
 
                             MatOfRect mouths = new MatOfRect();
-                            mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.3, 5);
+                            mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2);
                             //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
                             Rect[] mouthsArray = mouths.toArray();
                             if (mouthsArray.length > 0) {
-                                Rect dRect = new Rect(mouthsArray[0].x,(int)Math.round(mouthsArray[0].y + dFace.rows()*0.6),mouthsArray[0].width,mouthsArray[0].height);
+                                double minDist = 10000.0;
+                                int mouthIndex = -1;
+                                for(int j = 0; j < mouthsArray.length; j++) {
+                                    double centerX = (double)facesArray[i].width*0.5;
+                                    double centerY = (double)facesArray[i].height*0.8;
+                                    double mouthX = (double)mouthsArray[j].x + (double)mouthsArray[j].width*0.5;
+                                    double mouthY = (double)mouthsArray[j].y + (double)mouthsArray[j].height*0.5 + (double)facesArray[i].height*0.6;
+                                    double dist = calcDistance(centerX, centerY, mouthX, mouthY);
+                                    if (dist < minDist) {
+                                        minDist = dist;
+                                        mouthIndex = j;
+                                    }
+                                }
+                                Rect dRect = new Rect(mouthsArray[mouthIndex].x,(int)Math.round(mouthsArray[mouthIndex].y + dFace.rows()*0.6),mouthsArray[mouthIndex].width,mouthsArray[mouthIndex].height);
                                 sb.append(getPartJSON(dFace, "mouth", dRect));
                             }
                         }
