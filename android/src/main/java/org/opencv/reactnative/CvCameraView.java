@@ -366,6 +366,31 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         return sb.toString();
     }
 
+    private Point rotatePoint(Mat dFace, Point pt) {
+        double newX, newY;
+        double widthToUse = dFace.cols();
+        double heightToUse = dFace.rows();
+        switch(mRotation) {
+            case Core.ROTATE_90_CLOCKWISE:
+                newX = pt.y/heightToUse;
+                newY = 1.0 - pt.x/widthToUse;
+                break;
+            case Core.ROTATE_180:
+                newX = 1.0 - pt.x/widthToUse;
+                newY = 1.0 - pt.y/heightToUse;
+                break;
+            case Core.ROTATE_90_COUNTERCLOCKWISE:
+                newX = 1.0 - pt.y/heightToUse;
+                newY = pt.x/widthToUse;
+                break;
+            default:
+                newX = pt.x/widthToUse;
+                newY = pt.y/heightToUse;
+                break;
+        }
+        return new Point(newX, newY);
+    }
+
     private double calcDistance(double centerX, double centerY, double pointX, double pointY) {
         double distX = pointX - centerX;
         double distY = pointY - centerY;
@@ -382,7 +407,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         Mat ingray = null;
 
         if (mUseFaceDetection) {
-          ingray = inputFrame.gray();
+            ingray = inputFrame.gray();
         }
 
         if (mCameraFacing == 1) {
@@ -404,15 +429,21 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
             //-- Detect faces
             MatOfRect faces = new MatOfRect();
-            if (mFaceClassifier != null && ingray != null)
-                mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
-
+            if (mFaceClassifier != null && ingray != null) {
+                if (mUseLandmarks) {
+                    // less sensitive if determining landmarks
+                    mFaceClassifier.detectMultiScale(ingray, faces, 1.3, 5, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                }
+                else {
+                    mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                }
+            }
             Rect[] facesArray = faces.toArray();
 
             String faceInfo = "";
             if (facesArray.length > 0) {
                 StringBuffer sb = new StringBuffer();
-                sb.append("{\"faces\":[");
+                sb.append("{\"features\":{\"faces\":[");
                 for (int i = 0; i < facesArray.length; i++) {
                     sb.append(getPartJSON(ingray, null, facesArray[i]));
                     String id = "faceId" + i;
@@ -525,27 +556,53 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                     //good for testing ...
                     //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
                 }
-
+                sb.append("]");
                 if (mUseLandmarks) {
                     // fit landmarks for each found face
                     ArrayList<MatOfPoint2f> landmarks = new ArrayList<MatOfPoint2f>();
                     mLandmarks.fit(ingray, faces, landmarks);
 
-                    // draw them
-                    for (int i = 0; i < landmarks.size(); i++) {
-                        MatOfPoint2f lm = landmarks.get(i);
-                        for (int j = 0; j < lm.rows(); j++) {
-                            // AKA double penetration
-                            double[] dp = lm.get(j, 0);
-                            Point pt = new Point(dp[0], dp[1]);
-                            Imgproc.circle(in, pt, 2, new Scalar(222), 1);
+                    if (landmarks.size() > 0) {
+                        int vertexNumber = 0;
+                        sb.append(",\"landmarks\":[");
+                        // draw them
+                        for (int i = 0; i < landmarks.size(); i++) {
+                            MatOfPoint2f lm = landmarks.get(i);
+                            for (int j = 0; j < lm.rows(); j++) {
+                                double[] dp = lm.get(j, 0);
+                                Point thePt = new Point(dp[0], dp[1]);
+                                Point newPt = rotatePoint(ingray, thePt);
+                                String vertexNumberStr = "Vertex" + vertexNumber++;
+                                sb.append("{\"x\":" + newPt.x + ",\"y\":" + newPt.y + "}");
+                                if (j != lm.rows() - 1) {
+                                    sb.append(",");
+                                }
+                                /** drawing test code ...
+                                if (mRotation == Core.ROTATE_90_CLOCKWISE || mRotation == Core.ROTATE_90_COUNTERCLOCKWISE) {
+                                    newPt.x *= ingray.rows();
+                                    newPt.y *= ingray.cols();
+                                }
+                                else {
+                                    newPt.x *= ingray.cols();
+                                    newPt.y *= ingray.rows();
+                                }
+                                Point pt0 = new Point(newPt.x, newPt.y);
+                                Point pt1 = new Point(newPt.x + 1.0, newPt.y + 1.0);
+                                Imgproc.rectangle(in, pt0, pt1, FACE_RECT_COLOR, 1);
+                                 */
+                            }
+                            if (i != landmarks.size() - 1) {
+                                sb.append(",");
+                            }
                         }
+                        sb.append("]");
                     }
                 }
-                sb.append("]}");
+                sb.append("}}");
                 faceInfo = sb.toString();
             }
             WritableMap response = new WritableNativeMap();
+            //Log.d(TAG, "payload is: " + faceInfo);
             response.putString("payload", faceInfo);
             mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
               .emit("onFacesDetected", response);
