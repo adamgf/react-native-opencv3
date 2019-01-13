@@ -2,9 +2,9 @@
 Pod::Spec.new do |s|
   s.name         = "RNOpencv3"
   s.version      = "1.0.0"
-  s.summary      = "OpenCV 3.4.2 ported to React-Native for both iOS and Android"
+  s.summary      = "OpenCV 3.4.5 minified plus face landmarks  ported to React-Native for both iOS and Android"
   s.description  = <<-DESC
-                  react-native-opencv3 wraps functionality from OpenCV Java SDK 3.4.3 and iOS OpenCV pod 3.4.2 for use in React-Native apps.  Please enjoy!
+                  react-native-opencv3 wraps functionality from OpenCV Java SDK 3.4.5 + face landmarks and iOS OpenCV 3.4.5 for use in React-Native apps.  Please enjoy!
                    DESC
   s.homepage     = "https://github.com/adamgf/react-native-opencv3"
   s.license      = { :type => "BSD-3", :file => "LICENSE" }
