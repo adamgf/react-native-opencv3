@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
                   react-native-opencv3 wraps functionality from OpenCV Java SDK 3.4.3 and iOS OpenCV pod 3.4.2 for use in React-Native apps.  Please enjoy!
                    DESC
   s.homepage     = "https://github.com/adamgf/react-native-opencv3"
-  s.license      = { :type => "BSD", :file => "LICENSE" }
+  s.license      = { :type => "BSD-3", :file => "LICENSE" }
   s.author             = { "Adam G. Freeman" => "adamgf@gmail.com" }
   s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/adamgf/react-native-opencv3.git", :tag => "master" }
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   end
 
   # s.dependency "React"
-  s.dependency "OpenCV",'~> 3.4.2'
-  #s.dependency "others"
+  # s.dependency "OpenCV",'~> 3.4.2' # OLD SKOOL SANS LANDMARKS!!
+  # s.dependency "others"
 
 end

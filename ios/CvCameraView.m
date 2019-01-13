@@ -46,4 +46,8 @@ RCT_CUSTOM_VIEW_PROPERTY(mouthClassifier, NSString*, CvCamera) {
     [view setCascadeClassifier:json whichOne:ClassifierMouth];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(landmarksModel, NSString*, CvCamera) {
+    [view setLandmarksModel:json];
+}
+
 @end

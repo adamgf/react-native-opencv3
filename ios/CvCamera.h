@@ -42,6 +42,8 @@ typedef NSInteger Classifier;
 
 - (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne;
 
+- (void)setLandmarksModel:(NSString*)landmarksModel;
+
 @end
 
 #endif

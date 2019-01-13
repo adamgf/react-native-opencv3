@@ -16,6 +16,7 @@ bool mUseFaceDetection;
 bool mUseEyesDetection;
 bool mUseNoseDetection;
 bool mUseMouthDetection;
+bool mUseLandmarks;
 NSString *mFacing;
 CGFloat mRelativeFaceSize = 0.2f;
 int mAbsoluteFaceSize = 0;
@@ -24,6 +25,7 @@ CascadeClassifier face_cascade;
 CascadeClassifier eyes_cascade;
 CascadeClassifier mouth_cascade;
 CascadeClassifier nose_cascade;
+Ptr<face::Facemark> landmarks;
 
 - (id)initWithBridge:(RCTBridge *)bridge
 {
@@ -121,6 +123,36 @@ CascadeClassifier nose_cascade;
     return sb;
 }
 
+// What is the point?
+- (void)rotatePoint:(Mat)dFace thePoint:(cv::Point&)thePoint {
+    UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+
+    double widthToUse = dFace.cols;
+    double heightToUse = dFace.rows;
+    double tempX;
+    
+    switch(deviceOrientation) {
+        case UIDeviceOrientationLandscapeLeft:
+            tempX = thePoint.x;
+            thePoint.x = widthToUse - thePoint.y;
+            thePoint.y = tempX;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            thePoint.x = widthToUse - thePoint.x;
+            thePoint.y = heightToUse - thePoint.y;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            tempX = thePoint.x;
+            thePoint.x = thePoint.y;
+            thePoint.y = heightToUse - tempX;
+            break;
+        default:
+        case UIDeviceOrientationPortrait:
+            // don't do nuthin'
+            break;
+    }
+}
+
 - (CGFloat)calcDistance:(CGFloat)centerX centerY:(CGFloat)centerY pointX:(CGFloat)pointX pointY:(CGFloat)pointY {
     CGFloat distX = pointX - centerX;
     CGFloat distY = pointY - centerY;
@@ -155,12 +187,18 @@ CascadeClassifier nose_cascade;
             }
         }
         
-        face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
+        if (mUseLandmarks) {
+            // less sensitive if determining landmarks
+            face_cascade.detectMultiScale(gray, faces, 1.3, 5, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
+        }
+        else {
+            face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
+        }
         //face_cascade.detectMultiScale(gray, faces, 1.3, 5);
         
         NSString *payloadJSON = @"";
         if (faces.size() > 0) {
-            payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
+            payloadJSON = [payloadJSON stringByAppendingString:@"{\"features\":{\"faces\":["];
             for(size_t i = 0; i < faces.size(); i++) {
                 
                 NSString *faceJSON = [self getPartJSON:gray partKey:@"" part:faces[i] widthToUse:image.cols heightToUse:image.rows];
@@ -283,7 +321,31 @@ CascadeClassifier nose_cascade;
                 }
                 //rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
             }
-            payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
+            payloadJSON = [payloadJSON stringByAppendingString:@"]"];
+            if (mUseLandmarks) {
+                std::vector<std::vector<Point2f>> fits;
+                bool ok = landmarks->fit(gray, faces, fits);
+                
+                if (ok && fits.size() > 0) {
+                    payloadJSON = [payloadJSON stringByAppendingString:@",\"landmarks\":["];
+                    for (int i=0; i < fits.size(); i++) { // persons
+                        for (int j=0; j < 68; j++) { // points
+                            cv::Point thePt = fits[i][j];
+                            [self rotatePoint:gray thePoint:thePt];
+                            payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.cols,(double)thePt.y/(double)gray.rows]];
+                            if (j != 67) {
+                                payloadJSON = [payloadJSON stringByAppendingString:@","];
+                            }
+                            //circle(image, fits[p][i], 3, Scalar(200,0,0), 2);
+                        }
+                        if (i != fits.size() - 1) {
+                            payloadJSON = [payloadJSON stringByAppendingString:@","];
+                        }
+                    }
+                    payloadJSON = [payloadJSON stringByAppendingString:@"]"];
+                }
+            }
+            payloadJSON = [payloadJSON stringByAppendingString:@"}}"];
         }
         
         if (self && self.onFacesDetected) {
@@ -319,6 +381,19 @@ CascadeClassifier nose_cascade;
             [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionFront];
         }
         [self.videoCamera start];
+    }
+}
+
+- (void)setLandmarksModel:(NSString*)landmarksModel {
+    NSBundle *podBundle = [NSBundle bundleForClass:CvCamera.class];
+    NSURL *bundleURL = [podBundle URLForResource:@"ocvdata" withExtension:@"bundle"];
+    NSBundle *dBundle = [NSBundle bundleWithURL:bundleURL];
+    NSString *landmarksPath = [dBundle pathForResource:landmarksModel ofType:@"yaml"];
+    
+    if (landmarksPath) {
+        landmarks = face::createFacemarkLBF();
+        landmarks->loadModel( std::string([landmarksPath UTF8String]));
+        mUseLandmarks = true;
     }
 }
 
