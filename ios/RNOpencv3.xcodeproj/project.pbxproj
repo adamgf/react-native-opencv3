@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5034F34E21EAF99000F0F7B4 /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5034F34D21EAF99000F0F7B4 /* opencv2.framework */; };
+		5034F35021EAF9BD00F0F7B4 /* lbfmodel.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */; };
 		5043A77121DDBA3F000BC241 /* right_ear.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75921DDBA3D000BC241 /* right_ear.xml */; };
 		5043A77221DDBA3F000BC241 /* haarcascade_mcs_upperbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */; };
 		5043A77321DDBA3F000BC241 /* left_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75B21DDBA3D000BC241 /* left_eye.xml */; };
@@ -62,6 +64,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		5034F34D21EAF99000F0F7B4 /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = "frameworks/OpenCVmin+face-3.4.5/opencv2.framework"; sourceTree = "<group>"; };
+		5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lbfmodel.yaml; sourceTree = "<group>"; };
 		5043A75921DDBA3D000BC241 /* right_ear.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = right_ear.xml; sourceTree = "<group>"; };
 		5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_upperbody.xml; sourceTree = "<group>"; };
 		5043A75B21DDBA3D000BC241 /* left_eye.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = left_eye.xml; sourceTree = "<group>"; };
@@ -112,6 +116,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5034F34E21EAF99000F0F7B4 /* opencv2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,9 +131,18 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		5034F34C21EAF99000F0F7B4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5034F34D21EAF99000F0F7B4 /* opencv2.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		50B7C94821C89E3F00A43F6B /* ocvdata */ = {
 			isa = PBXGroup;
 			children = (
+				5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */,
 				5043A76321DDBA3E000BC241 /* eye.xml */,
 				5043A76021DDBA3E000BC241 /* face.xml */,
 				5043A76821DDBA3E000BC241 /* haarcascade_eye_tree_eyeglasses.xml */,
@@ -174,6 +188,7 @@
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				50B7C94721C89E3F00A43F6B /* ocvdata.bundle */,
+				5034F34C21EAF99000F0F7B4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -260,6 +275,7 @@
 				5043A77521DDBA3F000BC241 /* haarcascade_mcs_righteye.xml in Resources */,
 				5043A78321DDBA3F000BC241 /* nose.xml in Resources */,
 				5043A77121DDBA3F000BC241 /* right_ear.xml in Resources */,
+				5034F35021EAF9BD00F0F7B4 /* lbfmodel.yaml in Resources */,
 				5043A77C21DDBA3F000BC241 /* haarcascade_righteye_2splits.xml in Resources */,
 				5043A77A21DDBA3F000BC241 /* haarcascade_frontalface_alt2.xml in Resources */,
 				5043A78121DDBA3F000BC241 /* haarcascade_profileface.xml in Resources */,
@@ -471,7 +487,10 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/OpenCV";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../../ios/Pods/OpenCV",
+					"$(PROJECT_DIR)/frameworks/OpenCVmin+face-3.4.5",
+				);
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -489,7 +508,10 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/OpenCV";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../../../ios/Pods/OpenCV",
+					"$(PROJECT_DIR)/frameworks/OpenCVmin+face-3.4.5",
+				);
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
