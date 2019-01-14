@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		501CF19D21EC3529008AF83E /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 501CF19C21EC3529008AF83E /* opencv2.framework */; };
+		501CF1FB21EC66AE008AF83E /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 501CF1FA21EC66AE008AF83E /* opencv2.framework */; };
 		5034F35021EAF9BD00F0F7B4 /* lbfmodel.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */; };
 		5043A77121DDBA3F000BC241 /* right_ear.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75921DDBA3D000BC241 /* right_ear.xml */; };
 		5043A77221DDBA3F000BC241 /* haarcascade_mcs_upperbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */; };
@@ -64,6 +64,7 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		501CF19C21EC3529008AF83E /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = "frameworks/OpenCVmin+face-3.4.5/opencv2.framework"; sourceTree = "<group>"; };
+		501CF1FA21EC66AE008AF83E /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = opencv2.framework; path = "frameworks/OpenCVmin-face/opencv2.framework"; sourceTree = "<group>"; };
 		5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lbfmodel.yaml; sourceTree = "<group>"; };
 		5043A75921DDBA3D000BC241 /* right_ear.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = right_ear.xml; sourceTree = "<group>"; };
 		5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_upperbody.xml; sourceTree = "<group>"; };
@@ -111,7 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				501CF19D21EC3529008AF83E /* opencv2.framework in Frameworks */,
+				501CF1FB21EC66AE008AF83E /* opencv2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -124,6 +125,14 @@
 				134814201AA4EA6300B7C361 /* libRNOpencv3.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		501CF1F921EC66AD008AF83E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				501CF1FA21EC66AE008AF83E /* opencv2.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		50B7C94821C89E3F00A43F6B /* ocvdata */ = {
@@ -172,6 +181,7 @@
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				50B7C94721C89E3F00A43F6B /* ocvdata.bundle */,
+				501CF1F921EC66AD008AF83E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -472,6 +482,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../../ios/Pods/OpenCV",
 					"$(PROJECT_DIR)/frameworks/OpenCVmin+face-3.4.5",
+					"$(PROJECT_DIR)/frameworks/OpenCVmin-face",
 				);
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
@@ -493,6 +504,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../../ios/Pods/OpenCV",
 					"$(PROJECT_DIR)/frameworks/OpenCVmin+face-3.4.5",
+					"$(PROJECT_DIR)/frameworks/OpenCVmin-face",
 				);
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (

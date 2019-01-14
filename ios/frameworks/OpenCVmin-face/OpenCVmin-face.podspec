@@ -10,5 +10,6 @@ Pod::Spec.new do |s|
   s.license      = { :type => "BSD-3", :file => "LICENSE" }
   s.author       = { "Adam G. Freeman" => "adamgf@gmail.com" }
   s.platform     = :ios, "9.0"
-  s.source       = :git => "https://github.com/adamgf/OpenCVmin-face.git"
+  s.source       = { :git => 'https://github.com/adamgf/OpenCVmin-face.git', :tag => 'master' }
+  s.vendored_frameworks =  "opencv2.framework"
 end
