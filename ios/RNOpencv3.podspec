@@ -20,8 +20,6 @@ Pod::Spec.new do |s|
   end
 
   # s.dependency "React"
-  # s.dependency "OpenCV",'~> 3.4.2' # OLD SKOOL SANS LANDMARKS!!
-  s.dependency "OpenCVmin-face", { :git => 'https://github.com/adamgf/OpenCVmin-face.git', :tag => "master" }
   # s.dependency "others"
 
 end
