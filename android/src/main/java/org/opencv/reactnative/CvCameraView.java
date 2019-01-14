@@ -429,10 +429,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
             //-- Detect faces
             MatOfRect faces = new MatOfRect();
+            ArrayList<MatOfPoint2f> landmarks = new ArrayList<MatOfPoint2f>();
+            boolean landmarksFound = false;
             if (mFaceClassifier != null && ingray != null) {
                 if (mUseLandmarks) {
                     // less sensitive if determining landmarks
                     mFaceClassifier.detectMultiScale(ingray, faces, 1.3, 5, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
+                    mLandmarks.fit(ingray, faces, landmarks);
+                    if (landmarks.size() > 0) {
+                        landmarksFound = true;
+                    }
                 }
                 else {
                     mFaceClassifier.detectMultiScale(ingray, faces, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
@@ -443,7 +449,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             String faceInfo = "";
             if (facesArray.length > 0) {
                 StringBuffer sb = new StringBuffer();
-                sb.append("{\"features\":{\"faces\":[");
+                sb.append("{\"faces\":[");
                 for (int i = 0; i < facesArray.length; i++) {
                     sb.append(getPartJSON(ingray, null, facesArray[i]));
                     String id = "faceId" + i;
@@ -546,33 +552,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                             }
                         }
                     }
-
-                    if (i != (facesArray.length - 1)) {
-                        sb.append("},");
-                    }
-                    else {
-                        sb.append("}");
-                    }
-                    //good for testing ...
-                    //Imgproc.rectangle(in, facesArray[i].tl(), facesArray[i].br(), FACE_RECT_COLOR, 3);
-                }
-                sb.append("]");
-                if (mUseLandmarks) {
-                    // fit landmarks for each found face
-                    ArrayList<MatOfPoint2f> landmarks = new ArrayList<MatOfPoint2f>();
-                    mLandmarks.fit(ingray, faces, landmarks);
-
-                    if (landmarks.size() > 0) {
-                        int vertexNumber = 0;
-                        sb.append(",\"landmarks\":[");
-                        // draw them
-                        for (int i = 0; i < landmarks.size(); i++) {
+                    if (mUseLandmarks) {
+                        // fit landmarks for each found face
+                        if (landmarksFound) {
+                            sb.append(",\"landmarks\":[");
+                            // draw them
                             MatOfPoint2f lm = landmarks.get(i);
                             for (int j = 0; j < lm.rows(); j++) {
                                 double[] dp = lm.get(j, 0);
                                 Point thePt = new Point(dp[0], dp[1]);
                                 Point newPt = rotatePoint(ingray, thePt);
-                                String vertexNumberStr = "Vertex" + vertexNumber++;
                                 sb.append("{\"x\":" + newPt.x + ",\"y\":" + newPt.y + "}");
                                 if (j != lm.rows() - 1) {
                                     sb.append(",");
@@ -591,14 +580,17 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                                 Imgproc.rectangle(in, pt0, pt1, FACE_RECT_COLOR, 1);
                                  */
                             }
-                            if (i != landmarks.size() - 1) {
-                                sb.append(",");
-                            }
+                            sb.append("]");
                         }
-                        sb.append("]");
+                    }
+                    if (i != (facesArray.length - 1)) {
+                        sb.append("},");
+                    }
+                    else {
+                        sb.append("}");
                     }
                 }
-                sb.append("}}");
+                sb.append("]}");
                 faceInfo = sb.toString();
             }
             WritableMap response = new WritableNativeMap();

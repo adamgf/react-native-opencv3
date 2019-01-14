@@ -134,7 +134,7 @@ Ptr<face::Facemark> landmarks;
     switch(deviceOrientation) {
         case UIDeviceOrientationLandscapeLeft:
             tempX = thePoint.x;
-            thePoint.x = widthToUse - thePoint.y;
+            thePoint.x = heightToUse - thePoint.y;
             thePoint.y = tempX;
             break;
         case UIDeviceOrientationPortraitUpsideDown:
@@ -144,7 +144,7 @@ Ptr<face::Facemark> landmarks;
         case UIDeviceOrientationLandscapeRight:
             tempX = thePoint.x;
             thePoint.x = thePoint.y;
-            thePoint.y = heightToUse - tempX;
+            thePoint.y = widthToUse - tempX;
             break;
         default:
         case UIDeviceOrientationPortrait:
@@ -187,18 +187,20 @@ Ptr<face::Facemark> landmarks;
             }
         }
         
+        std::vector<std::vector<Point2f>> fits;
+        bool landmarksFound = false;
         if (mUseLandmarks) {
             // less sensitive if determining landmarks
             face_cascade.detectMultiScale(gray, faces, 1.3, 5, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
+            landmarksFound = landmarks->fit(gray, faces, fits);
         }
         else {
             face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
         }
-        //face_cascade.detectMultiScale(gray, faces, 1.3, 5);
         
         NSString *payloadJSON = @"";
         if (faces.size() > 0) {
-            payloadJSON = [payloadJSON stringByAppendingString:@"{\"features\":{\"faces\":["];
+            payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
             for(size_t i = 0; i < faces.size(); i++) {
                 
                 NSString *faceJSON = [self getPartJSON:gray partKey:@"" part:faces[i] widthToUse:image.cols heightToUse:image.rows];
@@ -207,9 +209,8 @@ Ptr<face::Facemark> landmarks;
                 NSString *faceIdStr = [NSString stringWithFormat:@",\"faceId\":\"%d\"", (int)i];
                 payloadJSON = [payloadJSON stringByAppendingString:faceIdStr];
                 
-                if (mUseEyesDetection || mUseNoseDetection || mUseMouthDetection) {
+                if (mUseEyesDetection || mUseNoseDetection || mUseMouthDetection || mUseLandmarks) {
                     
-                    //Mat dFace = gray.adjustROI();
                     cv::Mat dFace = cv::Mat(gray, faces[i]).clone();
                     
                     if (mUseEyesDetection) {
@@ -311,6 +312,27 @@ Ptr<face::Facemark> landmarks;
                             payloadJSON = [payloadJSON stringByAppendingString:mouthJSON];
                         }
                     }
+                    
+                    if (landmarksFound) {
+                        if (fits.size() > 0) {
+                            payloadJSON = [payloadJSON stringByAppendingString:@",\"landmarks\":["];
+                            for (int j=0; j < 68; j++) { // 68 landmark points
+                                cv::Point thePt = fits[i][j];
+                                [self rotatePoint:gray thePoint:thePt];
+                                if (UIDeviceOrientationIsLandscape(deviceOrientation)) {
+                                    payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.rows,(double)thePt.y/(double)gray.cols]];
+                                }
+                                else {
+                                    payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.cols,(double)thePt.y/(double)gray.rows]];
+                                }
+                                if (j != 67) {
+                                    payloadJSON = [payloadJSON stringByAppendingString:@","];
+                                }
+                                //circle(gray, fits[i][j], 3, Scalar(200,0,0), 2);
+                            }
+                            payloadJSON = [payloadJSON stringByAppendingString:@"]"];
+                        }
+                    }
                 }
                 
                 if (i != (faces.size() - 1)) {
@@ -321,31 +343,7 @@ Ptr<face::Facemark> landmarks;
                 }
                 //rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
             }
-            payloadJSON = [payloadJSON stringByAppendingString:@"]"];
-            if (mUseLandmarks) {
-                std::vector<std::vector<Point2f>> fits;
-                bool ok = landmarks->fit(gray, faces, fits);
-                
-                if (ok && fits.size() > 0) {
-                    payloadJSON = [payloadJSON stringByAppendingString:@",\"landmarks\":["];
-                    for (int i=0; i < fits.size(); i++) { // persons
-                        for (int j=0; j < 68; j++) { // points
-                            cv::Point thePt = fits[i][j];
-                            [self rotatePoint:gray thePoint:thePt];
-                            payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.cols,(double)thePt.y/(double)gray.rows]];
-                            if (j != 67) {
-                                payloadJSON = [payloadJSON stringByAppendingString:@","];
-                            }
-                            //circle(image, fits[p][i], 3, Scalar(200,0,0), 2);
-                        }
-                        if (i != fits.size() - 1) {
-                            payloadJSON = [payloadJSON stringByAppendingString:@","];
-                        }
-                    }
-                    payloadJSON = [payloadJSON stringByAppendingString:@"]"];
-                }
-            }
-            payloadJSON = [payloadJSON stringByAppendingString:@"}}"];
+            payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
         }
         
         if (self && self.onFacesDetected) {
