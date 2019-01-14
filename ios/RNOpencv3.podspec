@@ -16,12 +16,12 @@ Pod::Spec.new do |s|
 
   s.subspec "CvCamera" do |ss|
     ss.source_files = "CvCamera/**/*.{h,m,mm}"
-    ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/*.*' }
+    ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/*.*ml' }
   end
 
   # s.dependency "React"
   # s.dependency "OpenCV",'~> 3.4.2' # OLD SKOOL SANS LANDMARKS!!
-  s.dependency "OpenCV", { :git => 'https://github.com/adamgf/OpenCVmin-face', :tag => "master" }
+  s.dependency "OpenCVmin-face", { :git => 'https://github.com/adamgf/OpenCVmin-face.git', :tag => "master" }
   # s.dependency "others"
 
 end
