@@ -7,9 +7,20 @@
 //
 
 #import "FileUtils.h"
+#import "CvCamera.h"
 #import <Foundation/Foundation.h>
 
 @implementation FileUtils
+
++ (NSString*)loadBundleResource:(NSString*)filename extension:(NSString*)extension {
+
+    NSBundle *podBundle = [NSBundle bundleForClass:CvCamera.class];
+    NSURL *bundleURL = [podBundle URLForResource:@"ocvdata" withExtension:@"bundle"];
+    NSBundle *dBundle = [NSBundle bundleWithURL:bundleURL];
+    NSString *landmarksPath = [dBundle pathForResource:filename ofType:extension];
+
+    return landmarksPath;
+}
 
 + (cv::Mat)cvMatFromUIImage:(UIImage *)image
 {

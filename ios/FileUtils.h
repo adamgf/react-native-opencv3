@@ -13,6 +13,8 @@
 
 @interface FileUtils : NSObject
 
++ (NSString*)loadBundleResource:(NSString*)filename extension:(NSString*)extension;
+
 + (cv::Mat)cvMatFromUIImage:(UIImage *)image;
 
 + (UIImage *)UIImageFromCVMat:(cv::Mat)cvMat;
