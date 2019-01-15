@@ -56,7 +56,7 @@ Ptr<face::Facemark> landmarks;
 }
 
 -(void)rotateImage:(cv::Mat&)image deviceOrientation:(UIDeviceOrientation)deviceOrientation {
-    
+
     switch (deviceOrientation) {
         case UIDeviceOrientationLandscapeLeft:
             rotate(image, image, ROTATE_90_COUNTERCLOCKWISE);
@@ -73,25 +73,25 @@ Ptr<face::Facemark> landmarks;
 }
 
 -(NSString*) getPartJSON:(cv::Mat&)dFace partKey:(NSString*)partKey part:(cv::Rect)part widthToUse:(double)widthToUse heightToUse:(double)heightToUse {
-    
+
     UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
     NSString* sb = @"";
-    
+
     if (partKey && ![partKey isEqualToString:@""]) {
         NSString *partKeyStr = [NSString stringWithFormat:@",\"%@\":", partKey];
         sb = [sb stringByAppendingString:partKeyStr];
     }
-    
+
     double X0 = part.tl().x;
     double Y0 = part.tl().y;
     double X1 = part.br().x;
     double Y1 = part.br().y;
-    
+
     double x = X0/widthToUse;
     double y = Y0/heightToUse;
     double w = (X1 - X0)/widthToUse;
     double h = (Y1 - Y0)/heightToUse;
-    
+
     switch(deviceOrientation) {
         case UIDeviceOrientationLandscapeLeft:
             x = 1.0 - Y1/widthToUse;
@@ -113,10 +113,10 @@ Ptr<face::Facemark> landmarks;
         case UIDeviceOrientationPortrait:
             break;
     }
-    
+
     NSString *partStr = [NSString stringWithFormat:@"{\"x\":%f,\"y\":%f,\"width\":%f,\"height\":%f", x, y, w, h];
     sb = [sb stringByAppendingString:partStr];
-    
+
     if (partKey && ![partKey isEqualToString:@""]) {
         sb = [sb stringByAppendingString:@"}"];
     }
@@ -130,7 +130,7 @@ Ptr<face::Facemark> landmarks;
     double widthToUse = dFace.cols;
     double heightToUse = dFace.rows;
     double tempX;
-    
+
     switch(deviceOrientation) {
         case UIDeviceOrientationLandscapeLeft:
             tempX = thePoint.x;
@@ -156,7 +156,7 @@ Ptr<face::Facemark> landmarks;
 - (CGFloat)calcDistance:(CGFloat)centerX centerY:(CGFloat)centerY pointX:(CGFloat)pointX pointY:(CGFloat)pointY {
     CGFloat distX = pointX - centerX;
     CGFloat distY = pointY - centerY;
-    
+
     distX = (distX < 0.0) ? -distX : distX;
     distY = (distY < 0.0) ? -distY : distY;
     return (distX + distY);
@@ -173,10 +173,10 @@ Ptr<face::Facemark> landmarks;
         Mat gray;
         cvtColor(image, gray, COLOR_BGR2GRAY);
         equalizeHist(gray, gray);
-        
+
         UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
         [self rotateImage:gray deviceOrientation:deviceOrientation];
-        
+
         CGFloat height = gray.rows;
         if (height * mRelativeFaceSize > 0.0f) {
             CGFloat absoluteFaceSizeF = height * mRelativeFaceSize;
@@ -186,7 +186,7 @@ Ptr<face::Facemark> landmarks;
                 mAbsoluteFaceSize++;
             }
         }
-        
+
         std::vector<std::vector<Point2f>> fits;
         bool landmarksFound = false;
         if (mUseLandmarks) {
@@ -197,22 +197,22 @@ Ptr<face::Facemark> landmarks;
         else {
             face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
         }
-        
+
         NSString *payloadJSON = @"";
         if (faces.size() > 0) {
             payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
             for(size_t i = 0; i < faces.size(); i++) {
-                
+
                 NSString *faceJSON = [self getPartJSON:gray partKey:@"" part:faces[i] widthToUse:image.cols heightToUse:image.rows];
                 payloadJSON = [payloadJSON stringByAppendingString:faceJSON];
-                
+
                 NSString *faceIdStr = [NSString stringWithFormat:@",\"faceId\":\"%d\"", (int)i];
                 payloadJSON = [payloadJSON stringByAppendingString:faceIdStr];
-                
+
                 if (mUseEyesDetection || mUseNoseDetection || mUseMouthDetection || mUseLandmarks) {
-                    
+
                     cv::Mat dFace = cv::Mat(gray, faces[i]).clone();
-                    
+
                     if (mUseEyesDetection) {
                         std::vector<cv::Rect> eyes;
                         eyes_cascade.detectMultiScale(dFace, eyes, 1.1, 2);
@@ -252,11 +252,11 @@ Ptr<face::Facemark> landmarks;
                             payloadJSON = [payloadJSON stringByAppendingString:secondEyeJSON];
                         }
                     }
-                    
+
                     if (mUseNoseDetection) {
                         std::vector<cv::Rect> noses;
                         nose_cascade.detectMultiScale(dFace, noses, 1.1, 2);
-                        
+
                         if (noses.size() > 0) {
                             CGFloat minDist = 10000.0f;
                             int noseIndex = -1;
@@ -275,7 +275,7 @@ Ptr<face::Facemark> landmarks;
                             payloadJSON = [payloadJSON stringByAppendingString:noseJSON];
                         }
                     }
-                    
+
                     if (mUseMouthDetection) {
 
                         cv::Rect dRectMouthROI;
@@ -283,9 +283,9 @@ Ptr<face::Facemark> landmarks;
                         dRectMouthROI.y = (int)((double)dFace.rows * 0.6f);
                         dRectMouthROI.width = dFace.cols;
                         dRectMouthROI.height = (int)((double)dFace.rows * 0.4f);
-                        
+
                         Mat dFaceForMouthDetecting = cv::Mat(dFace, dRectMouthROI).clone();
-                        
+
                         std::vector<cv::Rect> mouths;
                         nose_cascade.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2);
                         if (mouths.size() > 0) {
@@ -307,12 +307,12 @@ Ptr<face::Facemark> landmarks;
                             dRect.y = mouths[mouthIndex].y + (int)((CGFloat)dFace.rows * 0.6f);
                             dRect.width = mouths[mouthIndex].width;
                             dRect.height = mouths[mouthIndex].height*0.8f;
-                            
+
                             NSString *mouthJSON = [self getPartJSON:dFace partKey:@"mouth" part:dRect widthToUse:dFace.cols heightToUse:dFace.rows];
                             payloadJSON = [payloadJSON stringByAppendingString:mouthJSON];
                         }
                     }
-                    
+
                     if (landmarksFound) {
                         if (fits.size() > 0) {
                             payloadJSON = [payloadJSON stringByAppendingString:@",\"landmarks\":["];
@@ -334,7 +334,7 @@ Ptr<face::Facemark> landmarks;
                         }
                     }
                 }
-                
+
                 if (i != (faces.size() - 1)) {
                     payloadJSON = [payloadJSON stringByAppendingString:@"},"];
                 }
@@ -345,7 +345,7 @@ Ptr<face::Facemark> landmarks;
             }
             payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
         }
-        
+
         if (self && self.onFacesDetected) {
             self.onFacesDetected(@{@"payload":payloadJSON});
         }
@@ -383,11 +383,8 @@ Ptr<face::Facemark> landmarks;
 }
 
 - (void)setLandmarksModel:(NSString*)landmarksModel {
-    NSBundle *podBundle = [NSBundle bundleForClass:CvCamera.class];
-    NSURL *bundleURL = [podBundle URLForResource:@"ocvdata" withExtension:@"bundle"];
-    NSBundle *dBundle = [NSBundle bundleWithURL:bundleURL];
-    NSString *landmarksPath = [dBundle pathForResource:landmarksModel ofType:@"yaml"];
-    
+    NSString *landmarksPath = [FileUtils loadBundleResource:landmarksModel extension:@"yaml"];
+
     if (landmarksPath) {
         landmarks = face::createFacemarkLBF();
         landmarks->loadModel( std::string([landmarksPath UTF8String]));
@@ -396,11 +393,8 @@ Ptr<face::Facemark> landmarks;
 }
 
 - (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne {
-    NSBundle *podBundle = [NSBundle bundleForClass:CvCamera.class];
-    NSURL *bundleURL = [podBundle URLForResource:@"ocvdata" withExtension:@"bundle"];
-    NSBundle *dBundle = [NSBundle bundleWithURL:bundleURL];
-    NSString *cascadePath = [dBundle pathForResource:cascadeClassifier ofType:@"xml"];
-    
+    NSString *cascadePath = [FileUtils loadBundleResource:cascadeClassifier extension:@"xml"];
+
     CascadeClassifier cascade;
     if (cascadePath) {
         if (!cascade.load( std::string([cascadePath UTF8String]))) {
