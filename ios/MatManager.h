@@ -11,17 +11,17 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-@interface MatWrapper : NSObject
-
-@property (nonatomic, assign) cv::Mat myMat;
-
-@end
-
 @interface MatManager : NSObject
 
 @property (nonatomic, strong) NSMutableArray *mats;
 
 + (id)sharedMgr;
+
+-(int)createEmptyMat;
+
+-(int)addMat:(cv::Mat&)matToAdd;
+
+-(cv::Mat)matAtIndex:(int)matIndex;
 
 @end
 

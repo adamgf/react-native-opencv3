@@ -65,6 +65,14 @@ class CvInvoke extends Component {
 class Mat {
   constructor() {
     RNOpencv3.createEmptyMat()
+    .then((res) => {
+      //alert('matIndex is: ' + res.matIndex)
+      console.log("Successfully instantiated empty fuckin' Mat")
+    })
+    .catch((err) => {
+      console.error("Could not instantiate an empty fuckin' Mat")
+      console.error(err)
+    })
   }
 }
 
