@@ -62,6 +62,12 @@ class CvInvoke extends Component {
   }
 }
 
+class Mat {
+  constructor() {
+    RNOpencv3.createEmptyMat()
+  }
+}
+
 const RNCv = RNOpencv3
 
-export { RNCv, CvCamera, CvInvoke };
+export { RNCv, CvCamera, CvInvoke, Mat };

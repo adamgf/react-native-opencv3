@@ -80,4 +80,42 @@ RCT_EXPORT_METHOD(cvtColorGray:(NSString*)inPath outPath:(NSString*)outPath
     }
 }
 
+RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    
+    // Check input and output parameters validity
+    if (inPath == nil || [inPath isEqualToString:@""]) {
+        return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: invalid parameter, param '%@'", inPath], nil);
+    }
+    // make sure input exists and is not a directory and output not a dir
+    if (![[NSFileManager defaultManager] fileExistsAtPath: inPath]) {
+        return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", inPath], nil);
+    }
+    BOOL isDir = NO;
+    if([[NSFileManager defaultManager] fileExistsAtPath:inPath isDirectory:&isDir] && isDir) {
+        return reject(@"EISDIR", [NSString stringWithFormat:@"EISDIR: illegal operation on a directory, open '%@'", inPath], nil);
+    }
+    
+    UIImage *sourceImage = [UIImage imageWithContentsOfFile:inPath];
+    if (sourceImage == nil) {
+        return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", inPath], nil);
+    }
+    
+    cv::Mat outputMat;
+    UIImageToMat(sourceImage, outputMat);
+    int matIndex = MatManager.sharedMgr.addMat(outputMat);
+    
+    NSString *matIndexStr = [NSString stringWithFormat:@"%d", MatManager.sharedMgr.addMat(outputMat)];
+    NSString *widStr = [NSString stringWithFormat:@"%d", (int)sourceImage.size.width];
+    NSString *heiStr = [NSString stringWithFormat:@"%d", (int)sourceImage.size.height];
+    
+    NSDictionary *returnDict = @{ @"width" : (int)sourceImage.size.width, @"height" : (int)sourceImage.size.height, @"matIndex" : matIndexStr };
+    resolve(returnDict)
+}
+
+RCT_EXPORT_METHOD(matToImage:(id)jsonObject resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    
+    cv::Mat inputMat = MatManager.sharedMgr.matAtIndex(matIndex);
+
+}
+
 @end
