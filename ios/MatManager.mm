@@ -10,14 +10,11 @@
 #import <Foundation/Foundation.h>
 
 @interface MatWrapper : NSObject
-
 @property (nonatomic, assign) cv::Mat myMat;
-
 @end
 
 // simple opaque object that wraps a cv::Mat
 @implementation MatWrapper
-
 -(id)init {
     if (self = [super init]) {
     }
@@ -73,6 +70,10 @@
         MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
         MW.myMat = matToSet;
     }
+}
+
+-(void)removeMatAtIndex:(int)matIndex {
+
 }
 
 -(void)dealloc {

@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.ReadableMap;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -99,8 +100,8 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
             Mat img = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC4);
             Utils.bitmapToMat(bitmap, img);
 
-            Mat gryimg =  new Mat(img.size(), CvType.CV_8U);
-            Imgproc.cvtColor(img, gryimg, Imgproc.COLOR_RGB2GRAY);
+            Mat gryimg = new Mat();
+            Imgproc.cvtColor(img, gryimg, Imgproc.COLOR_BGR2GRAY);
             Bitmap bm = Bitmap.createBitmap(gryimg.cols(), gryimg.rows(), Bitmap.Config.ARGB_8888);
             Utils.matToBitmap(gryimg, bm);
 
@@ -116,9 +117,9 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
                     fileType = outPath.substring(i+1).toLowerCase();
                 }
                 else {
-                  rejectInvalidParam(promise, outPath);
-                  file.close();
-                  return;
+                    rejectInvalidParam(promise, outPath);
+                    file.close();
+                    return;
                 }
 
                 if (fileType.equals("png")) {
@@ -147,5 +148,135 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         catch (Exception ex) {
             reject(promise, "EGENERIC", ex);
         }
+    }
+
+    @ReactMethod
+    public void imageToMat(String inPath, final Promise promise) {
+        try {
+            if (inPath == null || inPath.length() == 0) {
+                rejectInvalidParam(promise, inPath);
+                return;
+            }
+
+            java.io.File inFileTest = new java.io.File(inPath);
+            if(!inFileTest.exists()) {
+                rejectFileNotFound(promise, inPath);
+                return;
+            }
+            if (inFileTest.isDirectory()) {
+                rejectFileIsDirectory(promise, inPath);
+                return;
+            }
+
+            Bitmap bitmap = BitmapFactory.decodeFile(inPath);
+            if (bitmap == null) {
+                throw new IOException("Decoding error unable to decode: " + inPath);
+            }
+            Mat img = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC4);
+            Utils.bitmapToMat(bitmap, img);
+            int matIndex = MatManager.getInstance().addMat(img);
+
+            WritableNativeMap result = new WritableNativeMap();
+            result.putInt("cols", img.cols());
+            result.putInt("rows", img.rows());
+            result.putInt("matIndex", matIndex);
+            promise.resolve(result);
+        }
+        catch (Exception ex) {
+            reject(promise, "EGENERIC", ex);
+        }
+    }
+
+    @ReactMethod
+    public void matToImage(ReadableMap srcMat, String outPath, final Promise promise) {
+        try {
+            if (outPath == null || outPath.length() == 0) {
+                rejectInvalidParam(promise, outPath);
+                return;
+            }
+
+            int matIndex = srcMat.getInt("matIndex");
+            Mat mat = MatManager.getInstance().matAtIndex(matIndex);
+            Bitmap bm = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(mat, bm);
+
+            int width = bm.getWidth();
+            int height = bm.getHeight();
+
+            FileOutputStream file = new FileOutputStream(outPath);
+
+            if (file != null) {
+                String fileType = "";
+                int i = outPath.lastIndexOf('.');
+                if (i > 0) {
+                    fileType = outPath.substring(i+1).toLowerCase();
+                }
+                else {
+                    rejectInvalidParam(promise, outPath);
+                    file.close();
+                    return;
+                }
+
+                if (fileType.equals("png")) {
+                    bm.compress(Bitmap.CompressFormat.PNG, 100, file);
+                }
+                else if (fileType.equals("jpg") || fileType.equals("jpeg")) {
+                    bm.compress(Bitmap.CompressFormat.JPEG, 92, file);
+                }
+                else {
+                    rejectInvalidParam(promise, outPath);
+                    file.close();
+                    return;
+                }
+                file.close();
+            }
+            else {
+                rejectFileNotFound(promise, outPath);
+                return;
+            }
+
+            WritableNativeMap result = new WritableNativeMap();
+            result.putInt("width", width);
+            result.putInt("height", height);
+            result.putString("uri", outPath);
+            promise.resolve(result);
+        }
+        catch (Exception ex) {
+            reject(promise, "EGENERIC", ex);
+        }
+    }
+
+    @ReactMethod
+    public void cvtColor(ReadableMap sourceMat, ReadableMap destMat, int convColorCode) {
+        int srcMatIndex = sourceMat.getInt("matIndex");
+        int dstMatIndex = destMat.getInt("matIndex");
+
+        Mat srcMat = MatManager.getInstance().matAtIndex(srcMatIndex);
+        Mat dstMat = MatManager.getInstance().matAtIndex(dstMatIndex);
+
+        Imgproc.cvtColor(srcMat, dstMat, convColorCode);
+        MatManager.getInstance().setMat(dstMat, dstMatIndex);
+    }
+
+    @ReactMethod
+    public void Mat(final Promise promise) {
+        int matIndex = MatManager.getInstance().createEmptyMat();
+
+        WritableNativeMap result = new WritableNativeMap();
+        result.putInt("cols", 0);
+        result.putInt("rows", 0);
+        result.putInt("matIndex", matIndex);
+        promise.resolve(result);
+    }
+
+    @ReactMethod
+    public void deleteMat(ReadableMap mat) {
+        int matIndex = mat.getInt("matIndex");
+        MatManager.getInstance().deleteMatAtIndex(matIndex);
+    }
+
+    @ReactMethod
+    public void deleteMats() {
+        MatManager.getInstance().deleteAllMats();
     }
 }

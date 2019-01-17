@@ -104,14 +104,13 @@ RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)
 
     cv::Mat outputMat;
     UIImageToMat(sourceImage, outputMat);
-
     int matIndex = [(MatManager*)MatManager.sharedMgr addMat:outputMat];
 
-    NSString *matIndexStr = [NSString stringWithFormat:@"%d", matIndex];
-    NSString *widStr = [NSString stringWithFormat:@"%d", (int)sourceImage.size.width];
-    NSString *heiStr = [NSString stringWithFormat:@"%d", (int)sourceImage.size.height];
+    NSNumber *wid = [NSNumber numberWithInt:(int)sourceImage.size.width];
+    NSNumber *hei = [NSNumber numberWithInt:(int)sourceImage.size.height];
+    NSNumber *matI = [NSNumber numberWithInt:matIndex];
 
-    NSDictionary *returnDict = @{ @"cols" : widStr, @"rows" : heiStr, @"matIndex" : matIndexStr };
+    NSDictionary *returnDict = @{ @"cols" : wid, @"rows" : hei, @"matIndex" : matI };
     resolve(returnDict);
 }
 
@@ -125,7 +124,7 @@ RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resol
     int matIndex = (int)[srcMatNum integerValue];
 
     cv::Mat inputMat = [(MatManager*)MatManager.sharedMgr matAtIndex:matIndex];
-    
+
     UIImage *destImage = MatToUIImage(inputMat);
     if (destImage == nil) {
         return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", destImage], nil);
@@ -141,34 +140,34 @@ RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resol
     else {
         return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: unsupported file type, write '%@'", fileType], nil);
     }
-    
-    NSString *widStr = [NSString stringWithFormat:@"%d", (int)destImage.size.width];
-    NSString *heiStr = [NSString stringWithFormat:@"%d", (int)destImage.size.height];
-    
-    NSDictionary *returnDict = @{ @"width" : widStr, @"height" : heiStr,
+
+    NSNumber *wid = [NSNumber numberWithInt:(int)destImage.size.width];
+    NSNumber *hei = [NSNumber numberWithInt:(int)destImage.size.height];
+
+    NSDictionary *returnDict = @{ @"width" : wid, @"height" : hei,
                                   @"uri" : outPath };
-    
+
     resolve(returnDict);
 
 }
 
 RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColorCode:(int)convColorCode) {
-    
+
     NSNumber *srcMatNum = [src valueForKey:@"matIndex"];
     NSNumber *dstMatNum = [dst valueForKey:@"matIndex"];
-    
+
     int srcMatIndex = (int)[srcMatNum integerValue];
     int dstMatIndex = (int)[dstMatNum integerValue];
-    
+
     cv::Mat srcMat = [(MatManager*)MatManager.sharedMgr matAtIndex:srcMatIndex];
     cv::Mat dstMat = [(MatManager*)MatManager.sharedMgr matAtIndex:dstMatIndex];
-    
+
     cv::cvtColor(srcMat, dstMat, convColorCode);
-    
+
     [(MatManager*)MatManager.sharedMgr setMat:dstMat atIndex:dstMatIndex];
 }
 
-RCT_EXPORT_METHOD(createEmptyMat:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(Mat:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     int matIndex = [(MatManager*)MatManager.sharedMgr createEmptyMat];
     NSString *matIndexStr = [NSString stringWithFormat:@"%d", matIndex];
     NSDictionary *returnDict = @{ @"matIndex" : matIndexStr, @"cols" : @0, @"rows" : @0 };

@@ -3,10 +3,9 @@ import { NativeModules, requireNativeComponent, View } from 'react-native';
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-const { RNOpencv3 } = NativeModules;
+const  { RNOpencv3 } = NativeModules;
 import { ColorConv } from './constants';
 
-//const CvCameraModule = NativeModules.CvCameraModule;
 const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
 
 class CvCamera extends Component {
