@@ -23,6 +23,8 @@
 
 -(cv::Mat)matAtIndex:(int)matIndex;
 
+-(void)setMat:(cv::Mat&)matToSet atIndex:(int)matIndex;
+
 @end
 
 #endif

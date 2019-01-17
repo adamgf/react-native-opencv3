@@ -68,6 +68,13 @@
     return MW.myMat;
 }
 
+-(void)setMat:(cv::Mat&)matToSet atIndex:(int)matIndex {
+    if (matIndex >= 0 && matIndex < self.mats.count) {
+        MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
+        MW.myMat = matToSet;
+    }
+}
+
 -(void)dealloc {
     [self.mats removeAllObjects];
     self.mats = nil;

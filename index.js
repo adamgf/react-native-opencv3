@@ -4,6 +4,7 @@ import { NativeModules, requireNativeComponent, View } from 'react-native';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 const { RNOpencv3 } = NativeModules;
+import { ColorConv } from './constants';
 
 //const CvCameraModule = NativeModules.CvCameraModule;
 const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
@@ -62,20 +63,6 @@ class CvInvoke extends Component {
   }
 }
 
-class Mat {
-  constructor() {
-    RNOpencv3.createEmptyMat()
-    .then((res) => {
-      //alert('matIndex is: ' + res.matIndex)
-      console.log("Successfully instantiated empty fuckin' Mat")
-    })
-    .catch((err) => {
-      console.error("Could not instantiate an empty fuckin' Mat")
-      console.error(err)
-    })
-  }
-}
-
 const RNCv = RNOpencv3
 
-export { RNCv, CvCamera, CvInvoke, Mat };
+export { RNCv, CvCamera, CvInvoke, ColorConv };
