@@ -15,9 +15,7 @@
 
 + (NSString*)loadBundleResource:(NSString*)filename extension:(NSString*)extension;
 
-+ (cv::Mat)cvMatFromUIImage:(UIImage *)image;
-
-+ (UIImage *)UIImageFromCVMat:(cv::Mat)cvMat;
++ (UIImage*)normalizeImage:(UIImage*)image;
 
 @end
 #endif /* FileUtils_h */

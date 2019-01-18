@@ -25,6 +25,10 @@
 
 -(void)setMat:(cv::Mat&)matToSet atIndex:(int)matIndex;
 
+-(void)deleteMatAtIndex:(int)matIndex;
+
+-(void)deleteMats;
+
 @end
 
 #endif

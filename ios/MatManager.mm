@@ -15,16 +15,11 @@
 
 // simple opaque object that wraps a cv::Mat
 @implementation MatWrapper
--(id)init {
-    if (self = [super init]) {
-    }
-    return self;
-}
 @end
 
 // For react-native purposes cv::Mat is an opaque type that is contained in an NSMutableArray and
-// accessed by indexing into the array.  Eventually it has to be converted into an image to be useable
-// singleton class for retaining the mats for image processing operations
+// accessed by indexing into the array.  Eventually it has to be converted into an image to be useable anyways.
+// MatManager: singleton class for retaining the mats for image processing operations
 @implementation MatManager
 
 + (id)sharedMgr {
@@ -72,8 +67,12 @@
     }
 }
 
--(void)removeMatAtIndex:(int)matIndex {
+-(void)deleteMatAtIndex:(int)matIndex {
+    [self.mats removeObjectAtIndex:matIndex];
+}
 
+-(void)deleteMats {
+    [self.mats removeAllObjects];
 }
 
 -(void)dealloc {

@@ -359,8 +359,8 @@ Ptr<face::Facemark> landmarks;
     //cvtColor(image_copy, bgr, COLOR_GRAY2BGR);
 
     //cvtColor(bgr, image, COLOR_BGR2BGRA);
-    UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
-
+    //UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
+    UIImage *videoImage = MatToUIImage(image_copy);
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setImage:videoImage];
     });
