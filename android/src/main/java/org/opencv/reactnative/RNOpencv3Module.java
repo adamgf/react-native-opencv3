@@ -18,6 +18,8 @@ import android.os.Environment;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfFloat;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
@@ -196,7 +198,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
             }
 
             int matIndex = srcMat.getInt("matIndex");
-            Mat mat = MatManager.getInstance().matAtIndex(matIndex);
+            Mat mat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
             Bitmap bm = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
             Utils.matToBitmap(mat, bm);
 
@@ -251,11 +253,23 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         int srcMatIndex = sourceMat.getInt("matIndex");
         int dstMatIndex = destMat.getInt("matIndex");
 
-        Mat srcMat = MatManager.getInstance().matAtIndex(srcMatIndex);
-        Mat dstMat = MatManager.getInstance().matAtIndex(dstMatIndex);
+        Mat srcMat = (Mat)MatManager.getInstance().matAtIndex(srcMatIndex);
+        Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
 
         Imgproc.cvtColor(srcMat, dstMat, convColorCode);
         MatManager.getInstance().setMat(dstMat, dstMatIndex);
+    }
+
+    @ReactMethod
+    public void MatWithParams(int cols, int rows, int cvtype, final Promise promise) {
+        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype);
+
+        WritableNativeMap result = new WritableNativeMap();
+        result.putInt("cols", cols);
+        result.putInt("rows", rows);
+        result.putInt("matIndex", matIndex);
+        result.putInt("CvType", cvtype);
+        promise.resolve(result);
     }
 
     @ReactMethod
@@ -278,5 +292,15 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     @ReactMethod
     public void deleteMats() {
         MatManager.getInstance().deleteAllMats();
+    }
+
+    @ReactMethod
+    public void MatOfInt(int matInt) {
+        MatManager.getInstance().createMatOfInt(matInt);
+    }
+
+    @ReactMethod
+    public void MatOfFloat(float lomatfloat, float himatfloat) {
+        MatManager.getInstance().createMatOfFloat(lomatfloat, himatfloat);
     }
 }

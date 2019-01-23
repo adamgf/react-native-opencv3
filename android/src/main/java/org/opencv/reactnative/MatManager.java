@@ -13,10 +13,12 @@ import java.lang.Runnable;
 import java.util.ArrayList;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfFloat;
 
 class MatManager {
 
-    private ArrayList mats = new ArrayList<Mat>();
+  private ArrayList mats = new ArrayList<Object>();
 
     private static MatManager matManager = null;
 
@@ -32,6 +34,27 @@ class MatManager {
         return matManager;
     }
 
+    public int createMat(int cols, int rows, int cvtype) {
+        int matIndex = mats.size();
+        Mat matToAdd = new Mat(cols, rows, cvtype);
+        mats.add(matToAdd);
+        return matIndex;
+    }
+
+    public int createMatOfInt(int matval) {
+        int matIndex = mats.size();
+        MatOfInt matToAdd = new MatOfInt(matval);
+        mats.add(matToAdd);
+        return matIndex;
+    }
+
+    public int createMatOfFloat(float lomatval, float himatval) {
+        int matIndex = mats.size();
+        MatOfFloat matToAdd = new MatOfFloat(lomatval, himatval);
+        mats.add(matToAdd);
+        return matIndex;
+    }
+
     public int createEmptyMat() {
         int matIndex = mats.size();
         Mat emptyMat = new Mat();
@@ -39,21 +62,21 @@ class MatManager {
         return matIndex;
     }
 
-    public int addMat(Mat matToAdd) {
+    public int addMat(Object matToAdd) {
         int matIndex = mats.size();
         mats.add(matToAdd);
         return matIndex;
     }
 
-    public Mat matAtIndex(int matIndex) {
+    public Object matAtIndex(int matIndex) {
         if (matIndex >= 0 && matIndex < mats.size()) {
-            Mat mat = (Mat)mats.get(matIndex);
+            Object mat = mats.get(matIndex);
             return mat;
         }
         return null;
     }
 
-    public void setMat(Mat matToSet, int matIndex) {
+    public void setMat(Object matToSet, int matIndex) {
         mats.set(matIndex, matToSet);
     }
 

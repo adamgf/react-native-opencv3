@@ -7,6 +7,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.content.res.Configuration;
@@ -70,6 +72,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     // params
     private ReadableArray          mFunctions;
     private ReadableArray          mParamsArr;
+    private ReadableArray          mCallbacks;
     private int                    mCameraFacing;
     private CascadeClassifier      mFaceClassifier;
     private CascadeClassifier      mEyesClassifier;
@@ -168,8 +171,13 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 
     public void setParamsArr(ReadableArray paramsArr) {
-        Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.getString(0));
+        //Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.get
         this.mParamsArr = paramsArr;
+    }
+
+    public void setCallbacks(ReadableArray callbacks) {
+        Log.d(TAG, "In setCallbacks callbacks is: " + callbacks.getString(0));
+        this.mCallbacks = callbacks;
     }
 
     private File readClassifierFile(String cascadeClassifier) {
@@ -601,9 +609,17 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         }
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
-        //Log.d(TAG, "functions: " + this.functions.getString(0) + " paramsArr: " + this.paramsArr.getString(0));
-        //Log.d(TAG, "functions: " + this.functions.getString(1) + " paramsArr: " + this.paramsArr.getString(1));
-        //Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2));
+        Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
+        Log.d(TAG, "functions: " + this.mFunctions.getString(1) + " paramsArr: " + this.mParamsArr.getMap(1).toString() + " callbacks: " + this.mCallbacks.getString(1));
+
+        String dMap = this.mParamsArr.getMap(1).toString();
+
+        //ReadableMap secondObject = dMap.getMap("p2");
+        Log.d(TAG, "Mat index is: " + dMap);
+
+        //Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2) + " callbacks: " + this.callbacks.getString(2));
+        //Log.d(TAG, "functions: " + this.functions.getString(3) + " paramsArr: " + this.paramsArr.getString(3) + " callbacks: " + this.callbacks.getString(3));
+
 
         //Mat in1 = new Mat(src.rows(), src.cols(), CvType.CV_8UC4);
         /**

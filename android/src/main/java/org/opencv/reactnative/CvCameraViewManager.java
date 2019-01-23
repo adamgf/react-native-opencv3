@@ -34,6 +34,11 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         view.setParamsArr(paramsArr);
     }
 
+    @ReactProp(name = "callbacks")
+    public void setCallbacks(CvCameraView view, ReadableArray callbacks) {
+        view.setCallbacks(callbacks);
+    }
+
     @ReactProp(name = "faceClassifier")
     public void setFaceClassifier(CvCameraView view, String cascadeClassifier) {
         view.setCascadeClassifier(cascadeClassifier, whichOne.FACE_CLASSIFIER);
