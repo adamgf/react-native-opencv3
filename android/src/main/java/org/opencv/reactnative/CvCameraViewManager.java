@@ -5,6 +5,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 //import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
 
 public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
@@ -22,6 +23,16 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
     @ReactProp(name = "facing")
     public void setFacing(CvCameraView view, String facing) {
         view.changeFacing(facing.equals("front") ? 1 : -1);
+    }
+
+    @ReactProp(name = "cvinvoke")
+    public void setCvInvoke(CvCameraView view, ReadableMap cvinvoke) {
+        view.setCvInvokeGroup(cvinvoke);
+    }
+
+    @ReactProp(name = "cvinvoke2")
+    public void setCvInvoke2(CvCameraView view, ReadableMap cvinvoke2) {
+        view.setCvInvokeGroup(cvinvoke2);
     }
 
     @ReactProp(name = "functions")

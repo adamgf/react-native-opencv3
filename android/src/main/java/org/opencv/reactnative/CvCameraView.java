@@ -70,6 +70,10 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private ThemedReactContext     mContext;
 
     // params
+    private ReadableMap            mCvInvokeGroup2;
+    private ReadableMap            mCvInvokeGroup;
+    private ReadableMap            mCvInvokeGroup3;
+    private ReadableMap            mCvInvokeGroup4;
     private ReadableArray          mFunctions;
     private ReadableArray          mParamsArr;
     private ReadableArray          mCallbacks;
@@ -162,6 +166,22 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             disableView();
             setCameraIndex(mCameraFacing);
             enableView();
+        }
+    }
+
+    public void setCvInvokeGroup(ReadableMap cvinvoke) {
+        Log.d(TAG, "In setCvInvoke cvinvoke is: " + cvinvoke.toString());
+        if (this.mCvInvokeGroup == null) {
+            this.mCvInvokeGroup = cvinvoke;
+        }
+        else if (this.mCvInvokeGroup2 == null) {
+            this.mCvInvokeGroup2 = cvinvoke;
+        }
+        else if (this.mCvInvokeGroup3 == null) {
+            this.mCvInvokeGroup3 = cvinvoke;
+        }
+        else if (this.mCvInvokeGroup4 == null) {
+            this.mCvInvokeGroup4 = cvinvoke;
         }
     }
 
@@ -607,15 +627,26 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
               .emit("onFacesDetected", response);
         }
+        if (mCvInvokeGroup != null)
+            Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
+
+        if (mCvInvokeGroup2 != null)
+            Log.d(TAG, "Fuckin' mCvInvokeGroup2 is: " + mCvInvokeGroup2.toString());
+
+            if (mCvInvokeGroup3 != null)
+                Log.d(TAG, "Fuckin' mCvInvokeGroup3 is: " + mCvInvokeGroup3.toString());
+
+            if (mCvInvokeGroup4 != null)
+                Log.d(TAG, "Fuckin' mCvInvokeGroup4 is: " + mCvInvokeGroup4.toString());
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
-        Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
-        Log.d(TAG, "functions: " + this.mFunctions.getString(1) + " paramsArr: " + this.mParamsArr.getMap(1).toString() + " callbacks: " + this.mCallbacks.getString(1));
+        //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
+        //Log.d(TAG, "functions: " + this.mFunctions.getString(1) + " paramsArr: " + this.mParamsArr.getMap(1).toString() + " callbacks: " + this.mCallbacks.getString(1));
 
-        String dMap = this.mParamsArr.getMap(1).toString();
+        //String dMap = this.mParamsArr.getMap(1).toString();
 
         //ReadableMap secondObject = dMap.getMap("p2");
-        Log.d(TAG, "Mat index is: " + dMap);
+        //Log.d(TAG, "Mat index is: " + dMap);
 
         //Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2) + " callbacks: " + this.callbacks.getString(2));
         //Log.d(TAG, "functions: " + this.functions.getString(3) + " paramsArr: " + this.paramsArr.getString(3) + " callbacks: " + this.callbacks.getString(3));
