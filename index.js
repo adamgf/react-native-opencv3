@@ -39,11 +39,19 @@ class CvInvokeGroup extends Component {
     const mappedChildren = React.Children.map(children,
       (child, index) => {
 
-      if (child.type.displayName === 'CvInvokeGroup') {
-        stopMapping = true
-      }
-      else if (!stopMapping && child.type.displayName === 'CvInvoke') {
+      //if (child.type.displayName === 'CvInvokeGroup') {
+      //  stopMapping = true
+      //}
+      if (child.type.displayName === 'CvInvoke') {
         const { func, params, callback, children } = child.props
+
+        if (groupid === 'invokeGroup1') {
+          let childtypes = []
+          for (child in children) {
+            childtypes.push(JSON.stringify(child))
+          }
+          alert('children is: ' + childtypes)
+        }
         return <CvInvoke func={func} params={params} callback={callback} children={children} groupid={groupid}></CvInvoke>
       }
     })
@@ -52,7 +60,7 @@ class CvInvokeGroup extends Component {
   render() {
     return (
       <React.Fragment>
-        {this.renderChildren()}
+      {this.renderChildren()}
       </React.Fragment>
     )
   }
@@ -63,7 +71,8 @@ class CvInvoke extends Component {
     children: PropTypes.any.isRequired,
     func: PropTypes.string.isRequired,
     params: PropTypes.any.isRequired,
-    callback: PropTypes.string
+    callback: PropTypes.string,
+    groupid: PropTypes.string
   }
   constructor(props) {
     super(props)
@@ -93,28 +102,23 @@ class CvInvoke extends Component {
       newcallbacks.push("")
     }
 
-    let newKidsOnTheBlock
-    if (groupid || (cvinvoke && cvinvoke.groupid)) {
-      let usegroupid
-      if (groupid) {
-        usegroupid = groupid
-      }
-      else {
-        usegroupid = cvinvoke.groupid
-      }
-      newKidsOnTheBlock = React.Children.map(children,
-        (child, index) => React.cloneElement(child, {
-          ...child.props, "cvinvoke" : { "functions" : newfunctions, "paramsArr": newparams, "callbacks": newcallbacks, "groupid": usegroupid }
-        })
-      );
+    let groupids = []
+    if (cvinvoke && cvinvoke.groupids) {
+      groupids = cvinvoke.groupids
+    }
+    if (groupid) {
+      groupids.push(groupid)
     }
     else {
-      newKidsOnTheBlock = React.Children.map(children,
-        (child, index) => React.cloneElement(child, {
-          ...child.props, "cvinvoke" : { "functions" : newfunctions, "paramsArr": newparams, "callbacks": newcallbacks }
-        })
-      );
+      groupids.push("")
     }
+
+    const newKidsOnTheBlock = React.Children.map(children,
+      (child, index) => React.cloneElement(child, {
+        ...child.props, "cvinvoke" : { "functions" : newfunctions, "paramsArr": newparams, "callbacks": newcallbacks, "groupids": groupids }
+      })
+    );
+
     return newKidsOnTheBlock
   }
   render() {
