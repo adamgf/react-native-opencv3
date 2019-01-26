@@ -13,7 +13,6 @@ const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
 class CvCamera extends Component {
   constructor(props) {
     super(props)
-    //alert(JSON.stringify(props))
   }
   render() {
     return (<CvCameraView {...this.props} />);
@@ -22,7 +21,7 @@ class CvCamera extends Component {
 
 CvCamera.propTypes = {
   ...View.propTypes,
-  type: PropTypes.string
+  facing: PropTypes.string
 };
 
 class CvInvokeGroup extends Component {
@@ -34,91 +33,46 @@ class CvInvokeGroup extends Component {
     super(props)
   }
   renderChildren() {
-    let { children, groupid } = this.props
-    let stopMapping = false
-    const mappedChildren = React.Children.map(children,
-      (child, index) => {
+    const { children, groupid, cvinvoke } = this.props
 
-      //if (child.type.displayName === 'CvInvokeGroup') {
-      //  stopMapping = true
-      //}
-      if (child.type.displayName === 'CvInvoke') {
-        const { func, params, callback, children } = child.props
-
-        if (groupid === 'invokeGroup1') {
-          let childtypes = []
-          for (child in children) {
-            childtypes.push(JSON.stringify(child))
-          }
-          alert('children is: ' + childtypes)
-        }
-        return <CvInvoke func={func} params={params} callback={callback} children={children} groupid={groupid}></CvInvoke>
-      }
-    })
-    return mappedChildren
-  }
-  render() {
-    return (
-      <React.Fragment>
-      {this.renderChildren()}
-      </React.Fragment>
-    )
-  }
-}
-
-class CvInvoke extends Component {
-  static propTypes = {
-    children: PropTypes.any.isRequired,
-    func: PropTypes.string.isRequired,
-    params: PropTypes.any.isRequired,
-    callback: PropTypes.string,
-    groupid: PropTypes.string
-  }
-  constructor(props) {
-    super(props)
-    this.renderChildren = this.renderChildren.bind(this)
-  }
-  renderChildren() {
-    const { func, params, callback, children, cvinvoke, groupid } = this.props;
-    let newfunctions = []
-    if (cvinvoke && cvinvoke.functions) {
-      newfunctions = cvinvoke.functions
-    }
-    newfunctions.push(func)
-    let newparams = []
-    if (cvinvoke && cvinvoke.paramsArr) {
-      newparams = cvinvoke.paramsArr
-    }
-    newparams.push(params)
-
-    let newcallbacks = []
-    if (cvinvoke && cvinvoke.callbacks) {
-      newcallbacks = cvinvoke.callbacks
-    }
-    if (callback) {
-      newcallbacks.push(callback)
-    }
-    else {
-      newcallbacks.push("")
-    }
-
+    let functions = []
+    let paramsArr = []
+    let callbacks = []
     let groupids = []
+
+    if (cvinvoke && cvinvoke.functions) {
+      functions = cvinvoke.functions
+    }
+    if (cvinvoke && cvinvoke.paramsArr) {
+      paramsArr = cvinvoke.paramsArr
+    }
+    if (cvinvoke && cvinvoke.callbacks) {
+      callbacks = cvinvoke.callbacks
+    }
     if (cvinvoke && cvinvoke.groupids) {
       groupids = cvinvoke.groupids
     }
-    if (groupid) {
-      groupids.push(groupid)
-    }
-    else {
-      groupids.push("")
-    }
 
+    let maxIndex = React.Children.count(children)
     const newKidsOnTheBlock = React.Children.map(children,
-      (child, index) => React.cloneElement(child, {
-        ...child.props, "cvinvoke" : { "functions" : newfunctions, "paramsArr": newparams, "callbacks": newcallbacks, "groupids": groupids }
-      })
-    );
-
+      (child,i) => {
+        if (child.type.displayName === 'CvInvokeGroup') {
+            maxIndex = i
+        }
+        if (child.type.displayName === 'CvInvoke' && i < maxIndex) {
+          const {func, params, callback} = child.props
+          functions.push(func)
+          paramsArr.push(params)
+          callbacks.push(callback) // can be nil
+          groupids.push(groupid)
+        }
+        else if (i <= maxIndex) {
+          return React.cloneElement(child, {
+            // pass info down to the next CvInvokeGroup or to the CvCamera
+            ...child.props, "cvinvoke" : { "functions" : functions, "paramsArr": paramsArr, "callbacks": callbacks, "groupids": groupids }
+          })
+        }
+    })
     return newKidsOnTheBlock
   }
   render() {
@@ -126,6 +80,23 @@ class CvInvoke extends Component {
       <React.Fragment>
         {this.renderChildren()}
       </React.Fragment>
+    )
+  }
+}
+
+class CvInvoke extends Component {
+  static propTypes = {
+    func: PropTypes.string.isRequired,
+    params: PropTypes.any.isRequired,
+    callback: PropTypes.string
+  }
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    const { func, params, callback } = this.props
+    return (
+      <CvInvoke func={func} params={params} callback={callback}/>
     )
   }
 }

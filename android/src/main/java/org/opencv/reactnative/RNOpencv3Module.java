@@ -20,6 +20,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
+import org.opencv.imgproc.Imgproc.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
@@ -64,92 +65,6 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     private void rejectInvalidParam(Promise promise, String param) {
         promise.reject("EINVAL", "EINVAL: invalid parameter, read '" + param + "'");
-    }
-
-    /**
-     * PUBLIC REACT API
-     *
-     *  cvtColorGray   Converts to grayscale png or jpeg image using OpenCV
-     */
-    @ReactMethod
-    public void cvtColorGray(String inPath, String outPath, final Promise promise) {
-        try {
-            if (inPath == null || inPath.length() == 0) {
-                rejectInvalidParam(promise, inPath);
-                return;
-            }
-            if (outPath == null || outPath.length() == 0) {
-                rejectInvalidParam(promise, outPath);
-                return;
-            }
-
-            java.io.File inFileTest = new java.io.File(inPath);
-            if(!inFileTest.exists()) {
-                rejectFileNotFound(promise, inPath);
-                return;
-            }
-            if (inFileTest.isDirectory()) {
-                rejectFileIsDirectory(promise, inPath);
-                return;
-            }
-
-            WritableNativeMap result = new WritableNativeMap();
-
-            Bitmap bitmap = BitmapFactory.decodeFile(inPath);
-            if (bitmap == null) {
-                throw new IOException("Decoding error unable to decode: " + inPath);
-            }
-            Mat img = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC4);
-            Utils.bitmapToMat(bitmap, img);
-
-            Mat gryimg = new Mat();
-            Imgproc.cvtColor(img, gryimg, Imgproc.COLOR_BGR2GRAY);
-            Bitmap bm = Bitmap.createBitmap(gryimg.cols(), gryimg.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(gryimg, bm);
-
-            int width = bm.getWidth();
-            int height = bm.getHeight();
-
-            FileOutputStream file = new FileOutputStream(outPath);
-
-            if (file != null) {
-                String fileType = "";
-                int i = outPath.lastIndexOf('.');
-                if (i > 0) {
-                    fileType = outPath.substring(i+1).toLowerCase();
-                }
-                else {
-                    rejectInvalidParam(promise, outPath);
-                    file.close();
-                    return;
-                }
-
-                if (fileType.equals("png")) {
-                    bm.compress(Bitmap.CompressFormat.PNG, 100, file);
-                }
-                else if (fileType.equals("jpg") || fileType.equals("jpeg")) {
-                    bm.compress(Bitmap.CompressFormat.JPEG, 92, file);
-                }
-                else {
-                    rejectInvalidParam(promise, outPath);
-                    file.close();
-                    return;
-                }
-                file.close();
-            }
-            else {
-                rejectFileNotFound(promise, outPath);
-                return;
-            }
-
-            result.putInt("width", width);
-            result.putInt("height", height);
-            result.putString("uri", outPath);
-            promise.resolve(result);
-        }
-        catch (Exception ex) {
-            reject(promise, "EGENERIC", ex);
-        }
     }
 
     @ReactMethod
@@ -260,27 +175,27 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         MatManager.getInstance().setMat(dstMat, dstMatIndex);
     }
 
-    @ReactMethod
-    public void MatWithParams(int cols, int rows, int cvtype, final Promise promise) {
-        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype);
-
+    private void resolveMatPromise(int cols, int rows, int cvtype, int matIndex, final Promise promise) {
         WritableNativeMap result = new WritableNativeMap();
         result.putInt("cols", cols);
         result.putInt("rows", rows);
+        if (cvtype != -1) {
+            result.putInt("CvType", cvtype);
+        }
         result.putInt("matIndex", matIndex);
-        result.putInt("CvType", cvtype);
         promise.resolve(result);
+    }
+
+    @ReactMethod
+    public void MatWithParams(int cols, int rows, int cvtype, final Promise promise) {
+        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype);
+        resolveMatPromise(cols, rows, cvtype, matIndex, promise);
     }
 
     @ReactMethod
     public void Mat(final Promise promise) {
         int matIndex = MatManager.getInstance().createEmptyMat();
-
-        WritableNativeMap result = new WritableNativeMap();
-        result.putInt("cols", 0);
-        result.putInt("rows", 0);
-        result.putInt("matIndex", matIndex);
-        promise.resolve(result);
+        resolveMatPromise(0, 0, -1, matIndex, promise);
     }
 
     @ReactMethod

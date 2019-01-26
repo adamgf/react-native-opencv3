@@ -29,7 +29,7 @@ RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)
     }
 
     UIImage *sourceImage = [UIImage imageWithContentsOfFile:inPath];
-    
+
     if (sourceImage == nil) {
         return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", inPath], nil);
     }
@@ -96,7 +96,7 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
     cv::Mat srcMat = [(MatManager*)MatManager.sharedMgr matAtIndex:srcMatIndex];
     cv::Mat dstMat = [(MatManager*)MatManager.sharedMgr matAtIndex:dstMatIndex];
 
-    cv::cvtColor(srcMat, dstMat, convColorCode);
+    cvtColor(srcMat, dstMat, convColorCode);
 
     [(MatManager*)MatManager.sharedMgr setMat:dstMat atIndex:dstMatIndex];
 }
