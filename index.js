@@ -53,20 +53,16 @@ class CvInvokeGroup extends Component {
       groupids = cvinvoke.groupids
     }
 
-    let maxIndex = React.Children.count(children)
     const newKidsOnTheBlock = React.Children.map(children,
       (child,i) => {
-        if (child.type.displayName === 'CvInvokeGroup') {
-            maxIndex = i
-        }
-        if (child.type.displayName === 'CvInvoke' && i < maxIndex) {
+        if (child.type.displayName === 'CvInvoke') {
           const {func, params, callback} = child.props
           functions.push(func)
           paramsArr.push(params)
           callbacks.push(callback) // can be nil
           groupids.push(groupid)
         }
-        else if (i <= maxIndex) {
+        else {
           return React.cloneElement(child, {
             // pass info down to the next CvInvokeGroup or to the CvCamera
             ...child.props, "cvinvoke" : { "functions" : functions, "paramsArr": paramsArr, "callbacks": callbacks, "groupids": groupids }
@@ -93,10 +89,46 @@ class CvInvoke extends Component {
   constructor(props) {
     super(props)
   }
+  renderChildren() {
+    const { cvinvoke, func, params, callback, children } = this.props
+
+    if (children) {
+      let newfunctions = []
+      let newparamsarr = []
+      let newcallbacks = []
+
+      if (cvinvoke && cvinvoke.functions) {
+        newfunctions = cvinvoke.functions
+      }
+      if (cvinvoke && cvinvoke.paramsArr) {
+        newparamsarr = cvinvoke.paramsArr
+      }
+      if (cvinvoke && cvinvoke.callbacks) {
+        newcallbacks = cvinvoke.callbacks
+      }
+      newfunctions.push(func)
+      newparamsarr.push(params)
+      newcallbacks.push(callback)
+
+      const newKidsOnTheBlock = React.Children.map(children,
+        (child,i) => React.cloneElement(child, {
+          // pass info down to the CvCamera
+          ...child.props, "cvinvoke" : { "functions" : newfunctions, "paramsArr": newparamsarr, "callbacks": newcallbacks }
+        })
+      )
+      return newKidsOnTheBlock
+    }
+    else {
+      return (
+        <CvInvoke func={func} params={params} callback={callback}/>
+      )
+    }
+  }
   render() {
-    const { func, params, callback } = this.props
-    return (
-      <CvInvoke func={func} params={params} callback={callback}/>
+    return(
+      <React.Fragment>
+        {this.renderChildren()}
+      </React.Fragment>
     )
   }
 }
