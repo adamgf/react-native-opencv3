@@ -182,10 +182,10 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         CvInvoke.getInstance().invokeCvMethod(func, params);
     }
 
-    private void resolveMatPromise(int cols, int rows, int cvtype, int matIndex, final Promise promise) {
+    private void resolveMatPromise(int rows, int cols, int cvtype, int matIndex, final Promise promise) {
         WritableNativeMap result = new WritableNativeMap();
-        result.putInt("cols", cols);
         result.putInt("rows", rows);
+        result.putInt("cols", cols);
         if (cvtype != -1) {
             result.putInt("CvType", cvtype);
         }
@@ -194,9 +194,9 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void MatWithParams(int cols, int rows, int cvtype, final Promise promise) {
+    public void MatWithParams(int rows, int cols, int cvtype, final Promise promise) {
         int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype);
-        resolveMatPromise(cols, rows, cvtype, matIndex, promise);
+        resolveMatPromise(rows, cols, cvtype, matIndex, promise);
     }
 
     @ReactMethod
@@ -206,9 +206,13 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getMatData(ReadableMap mat, int rownum, int colnum, final Promise promise) {
+        promise.resolve(MatManager.getInstance().getMatData(rownum, colnum, mat.getInt("matIndex")));
+    }
+
+    @ReactMethod
     public void deleteMat(ReadableMap mat) {
-        int matIndex = mat.getInt("matIndex");
-        MatManager.getInstance().deleteMatAtIndex(matIndex);
+        MatManager.getInstance().deleteMatAtIndex(mat.getInt("matIndex"));
     }
 
     @ReactMethod

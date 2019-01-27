@@ -49,7 +49,6 @@ class CvInvoke {
 
         int i = 1;
         ArrayList retObjs = new ArrayList<Object>();
-        boolean secondMat = false;
 
         for (Class param : params) {
            String paramNum = "p" + i;
@@ -59,15 +58,9 @@ class CvInvoke {
                 int matIndex = matMap.getInt("matIndex");
                 Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
                 retObjs.add(dMat);
-                if (secondMat) {
-                    // have to update the dst mat after op ...
-                    arrMatIndex = i - 1;
-                    dstMatIndex = matIndex;
-                    secondMat = false;
-                }
-                else {
-                    secondMat = true;
-                }
+                // have to update the dst mat after op ...
+                arrMatIndex = i - 1;
+                dstMatIndex = matIndex;
            }
            else if (param == int.class) {
                 int dInt = RM.getInt(paramNum);
@@ -122,7 +115,6 @@ class CvInvoke {
         catch (InvocationTargetException IAE) {
             result = "Something fuckin' bad happened!  Invocation target exception!!  Fuck!!";
         }
-
         return result;
     }
 }

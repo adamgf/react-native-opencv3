@@ -70,13 +70,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private ThemedReactContext     mContext;
 
     // params
-    private ReadableMap            mCvInvokeGroup2;
     private ReadableMap            mCvInvokeGroup;
-    private ReadableMap            mCvInvokeGroup3;
-    private ReadableMap            mCvInvokeGroup4;
-    private ReadableArray          mFunctions;
-    private ReadableArray          mParamsArr;
-    private ReadableArray          mCallbacks;
     private int                    mCameraFacing;
     private CascadeClassifier      mFaceClassifier;
     private CascadeClassifier      mEyesClassifier;
@@ -171,33 +165,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
     public void setCvInvokeGroup(ReadableMap cvinvoke) {
         Log.d(TAG, "In setCvInvoke cvinvoke is: " + cvinvoke.toString());
-        if (this.mCvInvokeGroup == null) {
-            this.mCvInvokeGroup = cvinvoke;
-        }
-        else if (this.mCvInvokeGroup2 == null) {
-            this.mCvInvokeGroup2 = cvinvoke;
-        }
-        else if (this.mCvInvokeGroup3 == null) {
-            this.mCvInvokeGroup3 = cvinvoke;
-        }
-        else if (this.mCvInvokeGroup4 == null) {
-            this.mCvInvokeGroup4 = cvinvoke;
-        }
-    }
-
-    public void setFunctions(ReadableArray functions) {
-        Log.d(TAG, "In setFunctions functions is: " + functions.getString(0));
-        this.mFunctions = functions;
-    }
-
-    public void setParamsArr(ReadableArray paramsArr) {
-        //Log.d(TAG, "In setParamsArr paramsArr is: " + paramsArr.get
-        this.mParamsArr = paramsArr;
-    }
-
-    public void setCallbacks(ReadableArray callbacks) {
-        Log.d(TAG, "In setCallbacks callbacks is: " + callbacks.getString(0));
-        this.mCallbacks = callbacks;
+        this.mCvInvokeGroup = cvinvoke;
     }
 
     private File readClassifierFile(String cascadeClassifier) {
@@ -461,7 +429,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             boolean landmarksFound = false;
             if (mFaceClassifier != null && ingray != null) {
                 if (mUseLandmarks) {
-                    // less sensitive if determining landmarks
+                    // more sensitive if determining landmarks
                     mFaceClassifier.detectMultiScale(ingray, faces, 1.3, 5, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(mAbsoluteFaceSize, mAbsoluteFaceSize), new Size());
                     mLandmarks.fit(ingray, faces, landmarks);
                     if (landmarks.size() > 0) {
@@ -630,14 +598,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mCvInvokeGroup != null)
             Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
 
-        if (mCvInvokeGroup2 != null)
-            Log.d(TAG, "Fuckin' mCvInvokeGroup2 is: " + mCvInvokeGroup2.toString());
-
-            if (mCvInvokeGroup3 != null)
-                Log.d(TAG, "Fuckin' mCvInvokeGroup3 is: " + mCvInvokeGroup3.toString());
-
-            if (mCvInvokeGroup4 != null)
-                Log.d(TAG, "Fuckin' mCvInvokeGroup4 is: " + mCvInvokeGroup4.toString());
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
