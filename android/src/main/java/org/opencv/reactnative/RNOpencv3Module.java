@@ -8,12 +8,14 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.ReadableMap;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Environment;
+import android.util.Log;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -173,6 +175,11 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
         Imgproc.cvtColor(srcMat, dstMat, convColorCode);
         MatManager.getInstance().setMat(dstMat, dstMatIndex);
+    }
+
+    @ReactMethod
+    public void invokeMethod(String func, ReadableMap params) {
+        CvInvoke.getInstance().invokeCvMethod(func, params);
     }
 
     private void resolveMatPromise(int cols, int rows, int cvtype, int matIndex, final Promise promise) {

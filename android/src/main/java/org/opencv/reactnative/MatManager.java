@@ -18,7 +18,7 @@ import org.opencv.core.MatOfFloat;
 
 class MatManager {
 
-  private ArrayList mats = new ArrayList<Object>();
+    private ArrayList mats = new ArrayList<Object>();
 
     private static MatManager matManager = null;
 

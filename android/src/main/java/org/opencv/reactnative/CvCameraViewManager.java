@@ -30,11 +30,6 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         view.setCvInvokeGroup(cvinvoke);
     }
 
-    @ReactProp(name = "cvinvoke2")
-    public void setCvInvoke2(CvCameraView view, ReadableMap cvinvoke2) {
-        view.setCvInvokeGroup(cvinvoke2);
-    }
-
     @ReactProp(name = "functions")
     public void setFunctions(CvCameraView view, ReadableArray functions) {
         view.setFunctions(functions);
