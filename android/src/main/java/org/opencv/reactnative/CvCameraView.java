@@ -595,9 +595,18 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
               .emit("onFacesDetected", response);
         }
-        if (mCvInvokeGroup != null)
-            Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
 
+        if (mCvInvokeGroup != null) {
+            Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
+            CvInvoke.getInstance().rgba = in;
+            int matIndex = CvInvoke.getInstance().invokeCvMethods(mCvInvokeGroup);
+            WritableMap response = new WritableNativeMap();
+            WritableArray retArr = MatManager.getInstance().getMatData(0, 0, matIndex);
+            response.putArray("payload", retArr);
+
+            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit("onHistogram1", response);
+        }
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));

@@ -7,9 +7,12 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableNativeMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -178,6 +181,18 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void invokeMethods(ReadableMap cvInvokeMap) {
+        // not sure how this should be handled yet for different return objects ...
+        int matIndex = (int)CvInvoke.getInstance().invokeCvMethods(cvInvokeMap);
+        WritableMap response = new WritableNativeMap();
+        WritableArray retArr = MatManager.getInstance().getMatData(0, 0, matIndex);
+        response.putArray("payload", retArr);
+
+        this.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("onHistogram1", response);
+    }
+
+    @ReactMethod
     public void invokeMethod(String func, ReadableMap params) {
         CvInvoke.getInstance().invokeCvMethod(func, params);
     }
@@ -221,12 +236,18 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void MatOfInt(int matInt) {
-        MatManager.getInstance().createMatOfInt(matInt);
+    public void MatOfInt(int matInt, final Promise promise) {
+        int matIndex = MatManager.getInstance().createMatOfInt(matInt);
+        WritableNativeMap result = new WritableNativeMap();
+        result.putInt("matIndex", matIndex);
+        promise.resolve(result);
     }
 
     @ReactMethod
-    public void MatOfFloat(float lomatfloat, float himatfloat) {
-        MatManager.getInstance().createMatOfFloat(lomatfloat, himatfloat);
+    public void MatOfFloat(float lomatfloat, float himatfloat, final Promise promise) {
+        int matIndex = MatManager.getInstance().createMatOfFloat(lomatfloat, himatfloat);
+        WritableNativeMap result = new WritableNativeMap();
+        result.putInt("matIndex", matIndex);
+        promise.resolve(result);
     }
 }

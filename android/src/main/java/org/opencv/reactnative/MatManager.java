@@ -13,11 +13,15 @@ import java.io.File;
 import java.lang.Runnable;
 import java.util.ArrayList;
 
+import android.util.Log;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
 
 class MatManager {
+
+    private static final String TAG = "FUCKUPTHISSHITFORREAL";
 
     private static ArrayList mats = new ArrayList<Object>();
 
@@ -35,9 +39,9 @@ class MatManager {
         return matManager;
     }
 
-    public static int createMat(int cols, int rows, int cvtype) {
+    public static int createMat(int rows, int cols, int cvtype) {
         int matIndex = mats.size();
-        Mat matToAdd = new Mat(cols, rows, cvtype);
+        Mat matToAdd = new Mat(rows, cols, cvtype);
         mats.add(matToAdd);
         return matIndex;
     }
@@ -83,11 +87,13 @@ class MatManager {
 
     public static WritableArray getMatData(int rownum, int colnum, int matIndex) {
         Mat mat = (Mat)matAtIndex(matIndex);
-        double[] retDoubles = new double[mat.rows() * mat.cols()];
-        mat.get(rownum, colnum, retDoubles);
+        // TODO: check CvType to determine what type of data is stored in Mat ... Adam
+        float[] retFloats = new float[mat.rows() * mat.cols()];
+        mat.get(rownum, colnum, retFloats);
+
         WritableArray retArr = new WritableNativeArray();
-        for (double retDouble : retDoubles) {
-          retArr.pushDouble(retDouble);
+        for (float retFloat : retFloats) {
+          retArr.pushDouble((double)retFloat);
         }
         return retArr;
     }
