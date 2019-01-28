@@ -23,6 +23,8 @@ import java.util.List;
 
 class CvInvoke {
 
+    private static final String TAG = CvInvoke.class.getSimpleName();
+
     private static CvInvoke cvInvoke = null;
 
     private static int arrMatIndex = -1;
@@ -195,12 +197,7 @@ class CvInvoke {
                 method = findMethod(func, params, Core.class);
             }
             Class<?>[] methodParams = method.getParameterTypes();
-            //try {
-                objects = getObjectArr(params, methodParams);
-            Log.d("FUCKOSUCKOBLISTER", "Object count is: " + objects.length + " params.length is: " + methodParams.length);
-            //} catch (Exception e) {
-            //    e.printStackTrace();
-            //}
+            objects = getObjectArr(params, methodParams);
 
             if (method != null && objects != null) {
                 method.invoke(null, objects);

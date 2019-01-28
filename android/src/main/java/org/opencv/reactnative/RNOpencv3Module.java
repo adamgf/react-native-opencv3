@@ -35,6 +35,8 @@ import java.io.FileNotFoundException;
 
 public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
+    private static final String TAG = RNOpencv3Module.class.getSimpleName();
+
     static {
         System.loadLibrary("opencv_java3");
     }
@@ -113,6 +115,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     public void matToImage(ReadableMap srcMat, String outPath, final Promise promise) {
         try {
             if (outPath == null || outPath.length() == 0) {
+                // TODO: if no path sent in then auto-generate
                 rejectInvalidParam(promise, outPath);
                 return;
             }

@@ -10,6 +10,8 @@ import com.facebook.react.bridge.ReadableArray;
 
 public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
 
+    private static final String TAG = CvCameraViewManager.class.getSimpleName();
+
     @Override
     public String getName() {
         return "CvCameraView";

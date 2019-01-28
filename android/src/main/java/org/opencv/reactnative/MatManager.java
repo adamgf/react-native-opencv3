@@ -21,7 +21,7 @@ import org.opencv.core.MatOfFloat;
 
 class MatManager {
 
-    private static final String TAG = "FUCKUPTHISSHITFORREAL";
+    private static final String TAG = MatManager.class.getSimpleName();
 
     private static ArrayList mats = new ArrayList<Object>();
 
@@ -93,13 +93,13 @@ class MatManager {
 
         WritableArray retArr = new WritableNativeArray();
         for (float retFloat : retFloats) {
-          retArr.pushDouble((double)retFloat);
+            retArr.pushDouble((double)retFloat);
         }
         return retArr;
     }
 
     public static void deleteMatAtIndex(int matIndex) {
-        Mat mat = (Mat)matAtIndex(matIndex);
+        Object mat = matAtIndex(matIndex);
         mat.release();
         mats.remove(matIndex);
     }
@@ -107,7 +107,7 @@ class MatManager {
     public static void deleteAllMats() {
         int matsSize = mats.size();
         for (int i=0;i < matsSize;i++) {
-            Mat mat = (Mat)matAtIndex(i);
+            Object mat = (Mat)matAtIndex(i);
             mat.release();
         }
         mats.clear();
