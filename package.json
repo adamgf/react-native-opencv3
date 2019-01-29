@@ -1,17 +1,39 @@
-
 {
-  "name": "react-native-opencv3",
-  "version": "1.0.4",
-  "description": "OpenCV 3.4.* ported to React-Native for both iOS and Android",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "_from": "git+https://github.com/adamgf/react-native-opencv3.git",
+  "_id": "react-native-opencv3@1.0.4",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/react-native-opencv3",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "react-native-opencv3@git+https://github.com/adamgf/react-native-opencv3.git",
+    "name": "react-native-opencv3",
+    "escapedName": "react-native-opencv3",
+    "rawSpec": "git+https://github.com/adamgf/react-native-opencv3.git",
+    "saveSpec": "git+https://github.com/adamgf/react-native-opencv3.git",
+    "fetchSpec": "https://github.com/adamgf/react-native-opencv3.git",
+    "gitCommittish": null
   },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/adamgf/react-native-opencv3.git#b46c7bc760ce35019711b3ca6568ed4344dfdc28",
+  "_spec": "react-native-opencv3@git+https://github.com/adamgf/react-native-opencv3.git",
+  "_where": "/freelancing/Education/apps/react-native-opencv3-tests/SimpleGreyscale",
+  "author": {
+    "name": "Adam G. Freeman"
+  },
+  "bundleDependencies": false,
+  "dependencies": {},
+  "deprecated": false,
+  "description": "OpenCV 3.4.5 ported to React-Native for both iOS and Android",
   "keywords": [
     "react-native OpenCV"
   ],
-  "author": "Adam G. Freeman",
   "license": "BSD",
+  "main": "index.js",
+  "name": "react-native-opencv3",
   "peerDependencies": {
     "react-native": "^0.57.4"
   },
@@ -19,5 +41,9 @@
     "Assets": [
       "./assets/classifiers/"
     ]
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.4"
 }

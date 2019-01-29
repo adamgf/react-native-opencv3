@@ -3,8 +3,13 @@ package org.opencv.reactnative;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.bridge.ReactApplicationContext;
 
 import org.opencv.imgproc.Imgproc.*;
 import org.opencv.imgproc.Imgproc;
@@ -162,7 +167,7 @@ class CvInvoke {
         return retMethod;
     }
 
-    public static int invokeCvMethods(ReadableMap cvInvokeMap) {
+    public static int invokeCvMethods(ReactApplicationContext reactContext, ReadableMap cvInvokeMap) {
         int ret = -1;
         ReadableArray functions = cvInvokeMap.getArray("functions");
         ReadableArray paramsArr = cvInvokeMap.getArray("paramsArr");
@@ -172,11 +177,15 @@ class CvInvoke {
         for (int i=(functions.size()-1);i >= 0;i--) {
             String function = functions.getString(i);
             ReadableMap params = paramsArr.getMap(i);
-            String callback = callbacks.getString(i);
-            // TODO: throw error if more than one callback
-            // last method in invoke group should have callback ...
-            if (i == 0 && callback != null) {
-                ret = invokeCvMethod(function, params);
+
+            ReadableType callbackType = callbacks.getType(i);
+            if (callbackType == ReadableType.String) {
+                String callback = callbacks.getString(i);
+                // TODO: throw error if more than one callback
+                // last method in invoke group should have callback ...
+                if (i == 0 && reactContext != null && callback != null && !callback.equals("")) {
+                    ret = invokeCvMethod(reactContext, function, params, callback);
+                }
             }
             else {
                 invokeCvMethod(function, params);
@@ -186,6 +195,10 @@ class CvInvoke {
     }
 
     public static int invokeCvMethod(String func, ReadableMap params) {
+      return invokeCvMethod(null, func, params, null);
+    }
+
+    public static int invokeCvMethod(ReactApplicationContext reactContext, String func, ReadableMap params, String callback) {
 
         int result = -1;
         int numParams = getNumKeys(params);
@@ -209,6 +222,13 @@ class CvInvoke {
                 MatManager.getInstance().setMat(dstMat, dstMatIndex);
                 dstMatIndex = -1;
                 arrMatIndex = -1;
+                if (reactContext != null && callback != null && !callback.equals("")) {
+                    WritableMap response = new WritableNativeMap();
+                    WritableArray retArr = MatManager.getInstance().getMatData(0, 0, result);
+                    response.putArray("payload", retArr);
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                        .emit(callback, response);
+                }
             }
         }
         catch (SecurityException SE) {

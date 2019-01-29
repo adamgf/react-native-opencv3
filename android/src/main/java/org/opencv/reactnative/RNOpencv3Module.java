@@ -12,6 +12,8 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import android.graphics.Bitmap;
@@ -41,7 +43,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         System.loadLibrary("opencv_java3");
     }
 
-    private final ReactApplicationContext reactContext;
+    public static ReactApplicationContext reactContext;
 
     public RNOpencv3Module(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -186,13 +188,12 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     @ReactMethod
     public void invokeMethods(ReadableMap cvInvokeMap) {
         // not sure how this should be handled yet for different return objects ...
-        int matIndex = (int)CvInvoke.getInstance().invokeCvMethods(cvInvokeMap);
-        WritableMap response = new WritableNativeMap();
-        WritableArray retArr = MatManager.getInstance().getMatData(0, 0, matIndex);
-        response.putArray("payload", retArr);
+        CvInvoke.getInstance().invokeCvMethods(this.reactContext, cvInvokeMap);
+    }
 
-        this.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit("onHistogram1", response);
+    @ReactMethod
+    public void invokeMethodWithCallback(String func, ReadableMap params, String callback) {
+        CvInvoke.getInstance().invokeCvMethod(this.reactContext, func, params, callback);
     }
 
     @ReactMethod

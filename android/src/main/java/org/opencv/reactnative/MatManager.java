@@ -13,15 +13,11 @@ import java.io.File;
 import java.lang.Runnable;
 import java.util.ArrayList;
 
-import android.util.Log;
-
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
 
 class MatManager {
-
-    private static final String TAG = MatManager.class.getSimpleName();
 
     private static ArrayList mats = new ArrayList<Object>();
 
@@ -39,9 +35,9 @@ class MatManager {
         return matManager;
     }
 
-    public static int createMat(int rows, int cols, int cvtype) {
+    public static int createMat(int cols, int rows, int cvtype) {
         int matIndex = mats.size();
-        Mat matToAdd = new Mat(rows, cols, cvtype);
+        Mat matToAdd = new Mat(cols, rows, cvtype);
         mats.add(matToAdd);
         return matIndex;
     }
@@ -87,28 +83,26 @@ class MatManager {
 
     public static WritableArray getMatData(int rownum, int colnum, int matIndex) {
         Mat mat = (Mat)matAtIndex(matIndex);
-        // TODO: check CvType to determine what type of data is stored in Mat ... Adam
-        float[] retFloats = new float[mat.rows() * mat.cols()];
-        mat.get(rownum, colnum, retFloats);
-
+        double[] retDoubles = new double[mat.rows() * mat.cols()];
+        mat.get(rownum, colnum, retDoubles);
         WritableArray retArr = new WritableNativeArray();
-        for (float retFloat : retFloats) {
-            retArr.pushDouble((double)retFloat);
+        for (double retDouble : retDoubles) {
+          retArr.pushDouble(retDouble);
         }
         return retArr;
     }
 
     public static void deleteMatAtIndex(int matIndex) {
         Object mat = matAtIndex(matIndex);
-        mat.release();
+        mat = null;
         mats.remove(matIndex);
     }
 
     public static void deleteAllMats() {
         int matsSize = mats.size();
         for (int i=0;i < matsSize;i++) {
-            Object mat = (Mat)matAtIndex(i);
-            mat.release();
+            Object mat = matAtIndex(i);
+            mat = null;
         }
         mats.clear();
     }

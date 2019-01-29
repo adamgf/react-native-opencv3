@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 const  { RNOpencv3 } = NativeModules;
 import { ColorConv, CvType } from './constants';
 import { Mat, MatOfInt, MatOfFloat } from './mats';
+import { CvImage } from './cvimage';
 
 const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
 
@@ -53,7 +54,7 @@ class CvInvokeGroup extends Component {
       groupids = cvinvoke.groupids
     }
 
-    const newKidsOnTheBlock = React.Children.map(children,
+    const myKids = React.Children.map(children,
       (child,i) => {
         if (child.type.displayName === 'CvInvoke') {
           const {func, params, callback} = child.props
@@ -69,7 +70,7 @@ class CvInvokeGroup extends Component {
           })
         }
     })
-    return newKidsOnTheBlock
+    return myKids
   }
   render() {
     return (
@@ -137,6 +138,7 @@ const RNCv = RNOpencv3
 
 export {
   RNCv,
+  CvImage,
   CvCamera,
   CvInvoke,
   CvInvokeGroup,

@@ -1,6 +1,7 @@
 // @author Adam G. Freeman - adamgf@gmail.com
 package org.opencv.reactnative;
 
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableMap;
@@ -599,13 +600,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mCvInvokeGroup != null) {
             Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
             CvInvoke.getInstance().rgba = in;
-            int matIndex = CvInvoke.getInstance().invokeCvMethods(mCvInvokeGroup);
-            WritableMap response = new WritableNativeMap();
-            WritableArray retArr = MatManager.getInstance().getMatData(0, 0, matIndex);
-            response.putArray("payload", retArr);
-
-            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("onHistogram1", response);
+            CvInvoke.getInstance().grey = inputFrame.gray();
+            CvInvoke.getInstance().invokeCvMethods(RNOpencv3Module.reactContext, mCvInvokeGroup);
         }
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
