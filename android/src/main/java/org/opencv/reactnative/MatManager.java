@@ -13,6 +13,7 @@ import java.io.File;
 import java.lang.Runnable;
 import java.util.ArrayList;
 
+import org.opencv.core.Scalar;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
@@ -35,10 +36,18 @@ class MatManager {
         return matManager;
     }
 
-    public static int createMat(int cols, int rows, int cvtype) {
+    public static int createMat(int cols, int rows, int cvtype, Scalar scalarVal) {
         int matIndex = mats.size();
-        Mat matToAdd = new Mat(cols, rows, cvtype);
-        mats.add(matToAdd);
+        Mat matToAdd = null;
+
+        if (scalarVal != null) {
+            matToAdd = new Mat(cols, rows, cvtype, scalarVal);
+        }
+        else {
+            matToAdd = new Mat(cols, rows, cvtype);
+        }
+        mats.add(matToAdd);//cv::Mat mat(480, 640, CV_8UC3, cv::Scalar(255,0,255));
+
         return matIndex;
     }
 

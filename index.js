@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 const  { RNOpencv3 } = NativeModules;
 import { ColorConv, CvType } from './constants';
+import { CvScalar, CvPoint } from './coretypes';
 import { Mat, MatOfInt, MatOfFloat } from './mats';
 import { CvImage } from './cvimage';
 
@@ -146,5 +147,7 @@ export {
   CvType,
   Mat,
   MatOfInt,
-  MatOfFloat
+  MatOfFloat,
+  CvScalar,
+  CvPoint
 };

@@ -27,6 +27,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc.*;
 import org.opencv.imgproc.Imgproc;
 
@@ -230,8 +231,16 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void MatWithScalar(int rows, int cols, int cvtype, ReadableArray scalarVal, final Promise promise) {
+        Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
+          scalarVal.getDouble(2),scalarVal.getDouble(3));
+        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, dScalar);
+        resolveMatPromise(rows, cols, cvtype, matIndex, promise);
+    }
+
+    @ReactMethod
     public void MatWithParams(int rows, int cols, int cvtype, final Promise promise) {
-        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype);
+        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, null);
         resolveMatPromise(rows, cols, cvtype, matIndex, promise);
     }
 
