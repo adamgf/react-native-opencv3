@@ -83,11 +83,11 @@ class MatManager {
 
     public static WritableArray getMatData(int rownum, int colnum, int matIndex) {
         Mat mat = (Mat)matAtIndex(matIndex);
-        double[] retDoubles = new double[mat.rows() * mat.cols()];
-        mat.get(rownum, colnum, retDoubles);
+        float[] retFloats = new float[mat.rows() * mat.cols()];
+        mat.get(rownum, colnum, retFloats);
         WritableArray retArr = new WritableNativeArray();
-        for (double retDouble : retDoubles) {
-          retArr.pushDouble(retDouble);
+        for (float retFloat : retFloats) {
+          retArr.pushDouble(retFloat);
         }
         return retArr;
     }

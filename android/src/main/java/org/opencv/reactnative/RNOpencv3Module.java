@@ -43,7 +43,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         System.loadLibrary("opencv_java3");
     }
 
-    public static ReactApplicationContext reactContext;
+    private ReactApplicationContext reactContext;
 
     public RNOpencv3Module(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -187,13 +187,30 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void invokeMethods(ReadableMap cvInvokeMap) {
-        // not sure how this should be handled yet for different return objects ...
-        CvInvoke.getInstance().invokeCvMethods(this.reactContext, cvInvokeMap);
+        int dstMatIndex = CvInvoke.getInstance().invokeCvMethods(cvInvokeMap);
+        String callback = CvInvoke.getInstance().callback;
+        sendCallbackData(dstMatIndex, callback);
+    }
+
+    private void sendCallbackData(int dstMatIndex, String callback) {
+        if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+            // not sure how this should be handled yet for different return objects ...
+            Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
+            WritableArray retArr = MatManager.getInstance().getMatData(0, 0, dstMatIndex);
+            WritableMap response = new WritableNativeMap();
+            response.putArray("payload", retArr);
+            //reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            //    .emit(callback, response);
+        }
+        else {
+            // not necessarily error condition unless dstMatIndex >= 1000
+        }
     }
 
     @ReactMethod
     public void invokeMethodWithCallback(String func, ReadableMap params, String callback) {
-        CvInvoke.getInstance().invokeCvMethod(this.reactContext, func, params, callback);
+        int dstMatIndex = CvInvoke.getInstance().invokeCvMethod(func, params);
+        sendCallbackData(dstMatIndex, callback);
     }
 
     @ReactMethod

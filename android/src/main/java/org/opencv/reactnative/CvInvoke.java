@@ -8,7 +8,6 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 
 import org.opencv.imgproc.Imgproc.*;
@@ -37,6 +36,8 @@ class CvInvoke {
     // these mats come from the camera or image view ...
     public static Mat rgba = null;
     public static Mat grey = null;
+
+    public static String callback = null;
 
     private CvInvoke() {
     }
@@ -93,17 +94,13 @@ class CvInvoke {
            }
            // TODO: check the types to make sure they are compatible
            // more exhaustive type-checking and error reporting ...
-           else if (param == Mat.class || param == List.class) {
+           else if (param == Mat.class) {
                 if (itsType == ReadableType.Map) {
                     ReadableMap matMap = RM.getMap(paramNum);
                     int matIndex = matMap.getInt("matIndex");
                     Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-                    if (param == List.class) {
-                        retObjs.add(Arrays.asList(dMat));
-                    }
-                    else {
-                        retObjs.add(dMat);
-                    }
+                    retObjs.add(dMat);
+
                     // have to update the dst mat after op ...
                     // should be last mat in function parameters
                     arrMatIndex = i - 1;
@@ -140,7 +137,13 @@ class CvInvoke {
            }
            else if (param == List.class) {
                 // TODO: not sure how to check the objects here yet ... Adam
-                if (itsType == ReadableType.Array) {
+                if (itsType == ReadableType.Map) {
+                    ReadableMap matMap = RM.getMap(paramNum);
+                    int matIndex = matMap.getInt("matIndex");
+                    Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+                    retObjs.add(Arrays.asList(dMat));
+                }
+                else if (itsType == ReadableType.Array) {
                     ReadableArray arr = RM.getArray(paramNum);
                     retObjs.add(arr.toArrayList());
                 }
@@ -167,7 +170,8 @@ class CvInvoke {
         return retMethod;
     }
 
-    public static int invokeCvMethods(ReactApplicationContext reactContext, ReadableMap cvInvokeMap) {
+    public static int invokeCvMethods(ReadableMap cvInvokeMap) {
+
         int ret = -1;
         ReadableArray functions = cvInvokeMap.getArray("functions");
         ReadableArray paramsArr = cvInvokeMap.getArray("paramsArr");
@@ -179,12 +183,11 @@ class CvInvoke {
             ReadableMap params = paramsArr.getMap(i);
 
             ReadableType callbackType = callbacks.getType(i);
-            if (callbackType == ReadableType.String) {
-                String callback = callbacks.getString(i);
-                // TODO: throw error if more than one callback
+            if (i == 0 && callbackType == ReadableType.String) {
+                callback = callbacks.getString(i);
                 // last method in invoke group should have callback ...
-                if (i == 0 && reactContext != null && callback != null && !callback.equals("")) {
-                    ret = invokeCvMethod(reactContext, function, params, callback);
+                if (callback != null && !callback.equals("")) {
+                    ret = invokeCvMethod(function, params);
                 }
             }
             else {
@@ -195,10 +198,6 @@ class CvInvoke {
     }
 
     public static int invokeCvMethod(String func, ReadableMap params) {
-      return invokeCvMethod(null, func, params, null);
-    }
-
-    public static int invokeCvMethod(ReactApplicationContext reactContext, String func, ReadableMap params, String callback) {
 
         int result = -1;
         int numParams = getNumKeys(params);
@@ -218,17 +217,10 @@ class CvInvoke {
 
             if (dstMatIndex >= 0) {
                 Mat dstMat = (Mat)objects[arrMatIndex];
-                result = dstMatIndex;
                 MatManager.getInstance().setMat(dstMat, dstMatIndex);
+                result = dstMatIndex;
                 dstMatIndex = -1;
                 arrMatIndex = -1;
-                if (reactContext != null && callback != null && !callback.equals("")) {
-                    WritableMap response = new WritableNativeMap();
-                    WritableArray retArr = MatManager.getInstance().getMatData(0, 0, result);
-                    response.putArray("payload", retArr);
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                        .emit(callback, response);
-                }
             }
         }
         catch (SecurityException SE) {
