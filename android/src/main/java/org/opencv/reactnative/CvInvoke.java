@@ -142,6 +142,11 @@ class CvInvoke {
                     int matIndex = matMap.getInt("matIndex");
                     Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
                     retObjs.add(Arrays.asList(dMat));
+
+                    // have to update the dst mat after op ...
+                    // should be last mat in function parameters
+                    arrMatIndex = i - 1;
+                    dstMatIndex = matIndex;
                 }
                 else if (itsType == ReadableType.Array) {
                     ReadableArray arr = RM.getArray(paramNum);
