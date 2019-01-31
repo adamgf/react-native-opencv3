@@ -54,7 +54,7 @@ import java.lang.Runnable;
 import java.util.ArrayList;
 
 // useful for popping up an alert if need be ...
-import android.widget.Toast;
+//import android.widget.Toast;
 
 enum whichOne {
     FACE_CLASSIFIER,
@@ -282,9 +282,9 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 
     // Just use for testing ...
-    private void MakeAToast(String message) {
-        Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-    }
+    //private void MakeAToast(String message) {
+    //    Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+    //}
 
     private void rotateImage(Mat image) {
         if (mRotation != -1) {
@@ -601,18 +601,9 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
             CvInvoke.getInstance().rgba = in;
             CvInvoke.getInstance().grey = inputFrame.gray();
-            int dstMatIndex = CvInvoke.getInstance().invokeCvMethods(mCvInvokeGroup);
-            String callback = CvInvoke.getInstance().callback;
-
-            if (dstMatIndex >= 0) {
-                Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
-                WritableArray retArr = MatManager.getInstance().getMatData(0, 0, dstMatIndex);
-                WritableMap response = new WritableNativeMap();
-                response.putArray("payload", retArr);
-                mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(callback, response);
-            }
+            RNOpencv3Module.invokeMethods(mCvInvokeGroup);
         }
+
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
