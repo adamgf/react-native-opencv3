@@ -18,7 +18,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.WindowManager;
 import android.util.Base64;
 import android.app.Activity;
@@ -71,6 +71,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private ThemedReactContext     mContext;
 
     // params
+    private ReadableMap            mOverlay;
     private ReadableMap            mCvInvokeGroup;
     private int                    mCameraFacing;
     private CascadeClassifier      mFaceClassifier;
@@ -83,6 +84,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(255, 255, 0, 255);
     private boolean                mUseLandmarks       = false;
     private boolean                mUseFaceDetection   = false;
+    private boolean                mUpdateOverlay      = false;
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
     private int                    mRotation           = -1;
@@ -93,7 +95,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
       mCameraFacing = cameraFacing;
       mContext = context;
 
-      this.setVisibility(SurfaceView.VISIBLE);
+      this.setVisibility(TextureView.VISIBLE);
       this.setCvCameraViewListener(this);
 
       System.loadLibrary("opencv_java3");
@@ -206,6 +208,14 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
       finally {
           return cascadeFile;
       }
+    }
+
+    public void setOverlay(ReadableMap overlay) {
+        Log.d(TAG, "About to set overlay.");
+        if (overlay != null) {
+            mOverlay = overlay;
+            mUpdateOverlay = true;
+        }
     }
 
     public void setLandmarksModel(String landmarksModel) {
@@ -599,11 +609,31 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
         if (mCvInvokeGroup != null) {
             Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
-            CvInvoke.getInstance().rgba = in;
-            CvInvoke.getInstance().grey = inputFrame.gray();
-            RNOpencv3Module.invokeMethods(mCvInvokeGroup);
+            CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
+            int dstMatIndex = invoker.invokeCvMethods(mCvInvokeGroup);
+            String callback = invoker.callback;
+            RNOpencv3Module.sendCallbackData(dstMatIndex, callback);
         }
 
+        if (mOverlay != null) {
+          //synchronized(in) {
+                //mOverlay = null;
+                    int matIndex = mOverlay.getInt("matIndex");
+                    Mat smallMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+                    Mat dMat = new Mat();
+                    Size sz = new Size(in.cols(), in.rows());
+                    Imgproc.resize(smallMat, dMat, sz);
+                    Core.addWeighted(in, 1.0, dMat, 1.0, 0.0, in);
+                    //dMat.copyTo(in);
+                    //MatManager.getInstance().deleteMatAtIndex(matIndex);
+                    //newMat.release();
+                    //dMat.release();
+
+                    // reset the mat to be drawn on again ...
+                    //smallMat.setTo(Scalar.all(0));
+                    //MatManager.getInstance().setMat(smallMat, matIndex);
+            //}
+        }//}
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
@@ -645,7 +675,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit("onCameraFrame", response);
         }
-
         return in;
     }
 

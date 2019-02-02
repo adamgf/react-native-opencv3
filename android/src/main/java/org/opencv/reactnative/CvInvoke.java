@@ -17,10 +17,14 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
+import org.opencv.core.Scalar;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
 
 import android.util.Log;
 
 import java.lang.reflect.*;
+import java.lang.Exception;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,29 +33,28 @@ class CvInvoke {
 
     private static final String TAG = CvInvoke.class.getSimpleName();
 
-    private static CvInvoke cvInvoke = null;
-
-    private static int arrMatIndex = -1;
-    private static int dstMatIndex = -1;
+    //private static CvInvoke cvInvoke = null;
+    private int arrMatIndex = -1;
+    private int dstMatIndex = -1;
     // these mats come from the camera or image view ...
-    public static Mat rgba = null;
-    public static Mat grey = null;
+    private Mat rgba = null;
+    private Mat gray = null;
 
-    public static String callback = null;
+    public String callback = null;
 
-    private CvInvoke() {
+    public CvInvoke() {
     }
 
-    // static method to create instance of Singleton class
-    public static CvInvoke getInstance()
-    {
-        if (cvInvoke == null)
-            cvInvoke = new CvInvoke();
-
-        return cvInvoke;
+    public CvInvoke(Mat rgba, Mat gray) {
+        if (rgba != null) {
+            this.rgba = rgba;
+        }
+        if (gray != null) {
+            this.gray = gray;
+        }
     }
 
-    private static int getNumKeys(ReadableMap RM) {
+    private int getNumKeys(ReadableMap RM) {
         int numKeys = 0;
         ReadableMapKeySetIterator keyIterator = RM.keySetIterator();
         while (keyIterator.hasNextKey()) {
@@ -61,7 +64,7 @@ class CvInvoke {
         return numKeys;
     }
 
-    private static Object[] getObjectArr(ReadableMap RM, Class[] params) {
+    private Object[] getObjectArr(ReadableMap RM, Class[] params) {
 
         int i = 1;
         ArrayList retObjs = new ArrayList<Object>();
@@ -77,8 +80,8 @@ class CvInvoke {
                if (paramStr.equals("rgba")) {
                    dstMat = rgba;
                }
-               else if (paramStr.equals("grey")) {
-                   dstMat = grey;
+               else if (paramStr.equals("gray")) {
+                   dstMat = gray;
                }
                if (dstMat != null) {
                    if (param == Mat.class) {
@@ -123,15 +126,33 @@ class CvInvoke {
                     retObjs.add(dMatOfFloat);
                 }
            }
+           else if (param == Point.class) {
+              if (itsType == ReadableType.Map) {
+                  ReadableMap pointMap = RM.getMap(paramNum);
+                  double xval = pointMap.getDouble("x");
+                  double yval = pointMap.getDouble("y");
+                  Point dPoint = new Point(xval, yval);
+                  retObjs.add(dPoint);
+              }
+           }
+           else if (param == Scalar.class) {
+              if (itsType == ReadableType.Map) {
+                  ReadableMap scalarMap = RM.getMap(paramNum);
+                  ReadableArray scalarVal = scalarMap.getArray("vals");
+                  Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
+                      scalarVal.getDouble(2),scalarVal.getDouble(3));
+                  retObjs.add(dScalar);
+              }
+           }
            else if (param == int.class) {
                 if (itsType == ReadableType.Number) {
-                    int dInt = RM.getInt(paramNum);
-                    retObjs.add(dInt);
+                  int dInt = RM.getInt(paramNum);
+                  retObjs.add(dInt);
                 }
            }
            else if (param == double.class) {
                 if (itsType == ReadableType.Number) {
-                    double dDouble = RM.getDouble(paramNum);
+                  double dDouble = RM.getDouble(paramNum);
                     retObjs.add(dDouble);
                 }
            }
@@ -144,7 +165,7 @@ class CvInvoke {
                     retObjs.add(Arrays.asList(dMat));
 
                     // have to update the dst mat after op ...
-                    // should be last mat in function parameters
+                    // should be last mat in function parameters probably
                     arrMatIndex = i - 1;
                     dstMatIndex = matIndex;
                 }
@@ -159,7 +180,7 @@ class CvInvoke {
         return retArr;
     }
 
-    private static Method findMethod(String func, ReadableMap params, Class searchClass) {
+    private Method findMethod(String func, ReadableMap params, Class searchClass) {
         Method retMethod = null;
         int numParams = getNumKeys(params);
         Method[] methods = searchClass.getDeclaredMethods();
@@ -175,7 +196,7 @@ class CvInvoke {
         return retMethod;
     }
 
-    public static int invokeCvMethods(ReadableMap cvInvokeMap) {
+    public int invokeCvMethods(ReadableMap cvInvokeMap) {
 
         int ret = -1;
         ReadableArray functions = cvInvokeMap.getArray("functions");
@@ -202,7 +223,7 @@ class CvInvoke {
         return ret;
     }
 
-    public static int invokeCvMethod(String func, ReadableMap params) {
+    public int invokeCvMethod(String func, ReadableMap params) {
 
         int result = -1;
         int numParams = getNumKeys(params);
@@ -213,8 +234,16 @@ class CvInvoke {
             if (method == null) {
                 method = findMethod(func, params, Core.class);
             }
+
+            if (method == null) {
+                throw new Exception(func + " not found make sure method exists and is part of Opencv Imgproc or Core.");
+            }
             Class<?>[] methodParams = method.getParameterTypes();
             objects = getObjectArr(params, methodParams);
+
+            if (numParams != objects.length) {
+                throw new Exception("One of the parameters is invalid and " + func + " cannot be invoked.");
+            }
 
             if (method != null && objects != null) {
                 method.invoke(null, objects);
@@ -237,6 +266,12 @@ class CvInvoke {
         catch (InvocationTargetException IAE) {
             result = 1002;
         }
-        return result;
+        catch (Exception EXC) {
+            result = 1003;
+            Log.e(TAG, EXC.getMessage());
+        }
+        finally {
+            return result;
+        }
     }
 }

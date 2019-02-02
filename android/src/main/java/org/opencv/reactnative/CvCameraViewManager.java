@@ -27,6 +27,11 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         view.changeFacing(facing.equals("front") ? 1 : -1);
     }
 
+    @ReactProp(name = "overlay")
+    public void setOverlay(CvCameraView view, ReadableMap overlay) {
+        view.setOverlay(overlay);
+    }
+
     @ReactProp(name = "cvinvoke")
     public void setCvInvoke(CvCameraView view, ReadableMap cvinvoke) {
         view.setCvInvokeGroup(cvinvoke);

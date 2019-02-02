@@ -28,6 +28,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.Scalar;
+import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc.*;
 import org.opencv.imgproc.Imgproc;
 
@@ -35,6 +36,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+
+import android.widget.Toast;
 
 public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
@@ -45,6 +48,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     private static ReactApplicationContext reactContext;
+
 
     public RNOpencv3Module(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -75,6 +79,26 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     private void rejectInvalidParam(Promise promise, String param) {
         promise.reject("EINVAL", "EINVAL: invalid parameter, read '" + param + "'");
+    }
+
+    private void MakeAToast(String message) {
+        Toast.makeText(reactContext, message, Toast.LENGTH_LONG).show();
+    }
+
+    @ReactMethod
+    public void drawLine(ReadableMap inMat, ReadableMap pt1, ReadableMap pt2, ReadableMap scalarVal, int thickness) {
+
+      int matIndex = inMat.getInt("matIndex");
+      Mat testMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+      double x1 = pt1.getDouble("x");
+      double y1 = pt1.getDouble("y");
+      double x2 = pt2.getDouble("x");
+      double y2 = pt2.getDouble("y");
+      Point p1 = new Point(x1,y1);
+      Point p2 = new Point(x2,y2);
+      Scalar dScalar = Scalar.all(255);
+      Imgproc.line(testMat,p1,p2,dScalar,thickness);
+      MatManager.getInstance().setMat(testMat, matIndex);
     }
 
     @ReactMethod
@@ -187,13 +211,14 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public static void invokeMethods(ReadableMap cvInvokeMap) {
-        int dstMatIndex = CvInvoke.getInstance().invokeCvMethods(cvInvokeMap);
-        String callback = CvInvoke.getInstance().callback;
+    public void invokeMethods(ReadableMap cvInvokeMap) {
+        CvInvoke invoker = new CvInvoke();
+        int dstMatIndex = invoker.invokeCvMethods(cvInvokeMap);
+        String callback = invoker.callback;
         sendCallbackData(dstMatIndex, callback);
     }
 
-    private static void sendCallbackData(int dstMatIndex, String callback) {
+    public static void sendCallbackData(int dstMatIndex, String callback) {
         if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
             // not sure how this should be handled yet for different return objects ...
             Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
@@ -205,18 +230,27 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         }
         else {
             // not necessarily error condition unless dstMatIndex >= 1000
+            if (dstMatIndex == 1000) {
+                Log.e(TAG, "SecurityException thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+            }
+            else if (dstMatIndex == 1001) {
+                Log.e(TAG, "IllegalAccessException thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+            }
+            else if (dstMatIndex == 1002) {
+                Log.e(TAG, "InvocationTargetException thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+            }
         }
     }
 
     @ReactMethod
     public void invokeMethodWithCallback(String func, ReadableMap params, String callback) {
-        int dstMatIndex = CvInvoke.getInstance().invokeCvMethod(func, params);
+        int dstMatIndex = (new CvInvoke()).invokeCvMethod(func, params);
         sendCallbackData(dstMatIndex, callback);
     }
 
     @ReactMethod
     public void invokeMethod(String func, ReadableMap params) {
-        CvInvoke.getInstance().invokeCvMethod(func, params);
+        (new CvInvoke()).invokeCvMethod(func, params);
     }
 
     private void resolveMatPromise(int rows, int cols, int cvtype, int matIndex, final Promise promise) {
@@ -231,7 +265,9 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void MatWithScalar(int rows, int cols, int cvtype, ReadableArray scalarVal, final Promise promise) {
+    public void MatWithScalar(int rows, int cols, int cvtype, ReadableMap scalarMap, final Promise promise) {
+        ReadableArray scalarVal = scalarMap.getArray("vals");
+        //MakeAToast("Scalar values are: " + scalarVal.getDouble(0) + "," + scalarVal.getDouble(1) + "," + scalarVal.getDouble(2) + "," + scalarVal.getDouble(3)  );
         Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
           scalarVal.getDouble(2),scalarVal.getDouble(3));
         int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, dScalar);

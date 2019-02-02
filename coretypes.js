@@ -53,22 +53,28 @@ export class CvScalar {
 
 export class CvPoint {
   constructor(xval, yval) {
-    this.xval = xval
-    this.yval = yval
+    if (xval && yval) {
+      this.x = xval
+      this.y = yval
+    }
+    else {
+      this.x = 0.0
+      this.y = 0.0
+    }
   }
 
   set = (vals) => {
     if (vals) {
-      this.xval = vals.length > 0 ? vals[0] : 0.0
-      this.yval = vals.length > 1 ? vals[1] : 0.0
+      this.x = vals.length > 0 ? vals[0] : 0.0
+      this.y = vals.length > 1 ? vals[1] : 0.0
     }
     else {
-      this.xval = 0.0
-      this.yval = 0.0
+      this.x = 0.0
+      this.y = 0.0
     }
   }
 
   dot = (otherPt) => {
-    return (this.xval * otherPt.xval + this.yval * otherPt.yval)
+    return (this.x * otherPt.x + this.y * otherPt.y)
   }
 }

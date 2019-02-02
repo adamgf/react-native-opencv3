@@ -86,7 +86,7 @@ export class CvImage extends Component {
       return this.RNFS.DocumentDirectoryPath + filePortion
     }
     else {
-      alert('RNFS is null filePortion is: ' + filePortion)
+      console.error('RNFS is null filePortion is: ' + filePortion)
       return ''
     }
   }

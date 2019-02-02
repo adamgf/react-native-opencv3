@@ -6,17 +6,23 @@ const  { RNOpencv3 } = NativeModules;
 import { CvType } from './constants';
 
 export class Mat {
-  constructor(numRows, numCols, cvtype) {
+  constructor(numRows, numCols, cvtype, scalarval) {
     if (numRows && numCols && cvtype) {
       this.rows = numRows
       this.cols = numCols
       this.CvType = cvtype
     }
+    if (scalarval) {
+      this.CvScalar = scalarval
+    }
   }
 
   init = async() => {
     let res
-    if (this.rows && this.cols && this.CvType) {
+    if (this.rows && this.cols && this.CvType && this.CvScalar) {
+      res = await RNOpencv3.MatWithScalar(this.rows, this.cols, this.CvType, this.CvScalar)
+    }
+    else if (this.rows && this.cols && this.CvType) {
       res = await RNOpencv3.MatWithParams(this.rows, this.cols, this.CvType)
     }
     else {
