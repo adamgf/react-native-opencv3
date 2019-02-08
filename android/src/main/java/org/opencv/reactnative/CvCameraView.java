@@ -72,6 +72,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
     // params
     private ReadableMap            mOverlay;
+    private Mat                    mOverlayMat;
     private ReadableMap            mCvInvokeGroup;
     private int                    mCameraFacing;
     private CascadeClassifier      mFaceClassifier;
@@ -85,9 +86,12 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private boolean                mUseLandmarks       = false;
     private boolean                mUseFaceDetection   = false;
     private boolean                mUpdateOverlay      = false;
+    private boolean                mSendFrameSize      = true;
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
     private int                    mRotation           = -1;
+    private long                   mCurrentMillis      = -1;
+    private int                    mCurrOverlayIndex   = -1;
 
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -214,6 +218,15 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         Log.d(TAG, "About to set overlay.");
         if (overlay != null) {
             mOverlay = overlay;
+            int matIndex = overlay.getInt("matIndex");
+            Mat overlayMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+            if (mOverlayMat == null) {
+                mOverlayMat = new Mat(overlayMat.rows(), overlayMat.cols(), CvType.CV_8UC4);
+            }
+            overlayMat.copyTo(mOverlayMat);
+            Scalar clearColor = Scalar.all(0);
+            overlayMat.setTo(clearColor);
+            MatManager.getInstance().setMat(overlayMat, matIndex);
             mUpdateOverlay = true;
         }
     }
@@ -413,6 +426,19 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
         Mat ingray = null;
 
+        if (mCurrentMillis == -1) {
+            mCurrentMillis = System.currentTimeMillis();
+        }
+        //if (mSendFrameSize) {
+            mSendFrameSize = false;
+            WritableMap fsResponse = new WritableNativeMap();
+            //Log.d(TAG, "payload is: " + faceInfo);
+            String frameSizeStr = "{\"frameSize\":{\"frameWidth\":" + (double)in.size().width + ",\"frameHeight\":" + (double)in.size().height + "}}";
+            fsResponse.putString("payload", frameSizeStr);
+            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+              .emit("onFrameSize", fsResponse);
+        //}
+
         if (mUseFaceDetection) {
             ingray = inputFrame.gray();
         }
@@ -607,33 +633,32 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
               .emit("onFacesDetected", response);
         }
 
-        if (mCvInvokeGroup != null) {
-            Log.d(TAG, "Fuckin' mCvInvokeGroup is: " + mCvInvokeGroup.toString());
-            CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
-            int dstMatIndex = invoker.invokeCvMethods(mCvInvokeGroup);
-            String callback = invoker.callback;
-            RNOpencv3Module.sendCallbackData(dstMatIndex, callback);
+        boolean sendCallbackData = false;
+        if (mOverlay != null) {
+            int matIndex = mOverlay.getInt("matIndex");
+            Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+            if (mOverlayMat != null) {
+                Core.addWeighted(in, 1.0, mOverlayMat, 1.0, 0.0, in);
+            }
         }
 
-        if (mOverlay != null) {
-          //synchronized(in) {
-                //mOverlay = null;
-                    int matIndex = mOverlay.getInt("matIndex");
-                    Mat smallMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-                    Mat dMat = new Mat();
-                    Size sz = new Size(in.cols(), in.rows());
-                    Imgproc.resize(smallMat, dMat, sz);
-                    Core.addWeighted(in, 1.0, dMat, 1.0, 0.0, in);
-                    //dMat.copyTo(in);
-                    //MatManager.getInstance().deleteMatAtIndex(matIndex);
-                    //newMat.release();
-                    //dMat.release();
+        if (mCvInvokeGroup != null) {
+            long currMillis = System.currentTimeMillis();
+            long diff = (currMillis - mCurrentMillis);
+            if (diff >= 200) {
+                mCurrentMillis = currMillis;
+                CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
+                int dstMatIndex = invoker.invokeCvMethods(mCvInvokeGroup);
+                String callback = invoker.callback;
+                Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
+                WritableArray retArr = MatManager.getInstance().getMatData(0, 0, dstMatIndex);
+                WritableMap response = new WritableNativeMap();
+                response.putArray("payload", retArr);
+                mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(callback, response);
+            }
+        }
 
-                    // reset the mat to be drawn on again ...
-                    //smallMat.setTo(Scalar.all(0));
-                    //MatManager.getInstance().setMat(smallMat, matIndex);
-            //}
-        }//}
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));

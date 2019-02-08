@@ -1,5 +1,5 @@
 // author Adam G. Freeman, adamgf@gmail.com 01/26/2019
-// Of course this is just a tiny subset of all the junk ...
+// Of course this is just a tiny subset of all the junkola ...
 export class CvScalar {
 
     constructor(v0val, v1val, v2val, v3val) {

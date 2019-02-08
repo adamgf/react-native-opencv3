@@ -5,6 +5,14 @@ import { NativeModules } from 'react-native';
 const  { RNOpencv3 } = NativeModules;
 import { CvType } from './constants';
 
+export function setTo(cvmat, color) {
+  cvmat.setTo(color)
+}
+
+export async function get(cvmat, rownum, colnum, data) {
+  cvmat.get(rownum, colnum, data)
+}
+
 export class Mat {
   constructor(numRows, numCols, cvtype, scalarval) {
     if (numRows && numCols && cvtype) {
@@ -31,7 +39,15 @@ export class Mat {
     return res
   }
 
+  setTo = (color) => {
+    // of course this could be implemented as a CvInvoke but
+    // since it is probably such a common op ...
+    this.CvScalar = color
+    RNOpencv3.setTo(this, color)
+  }
+
   get = async(rownum, colnum, data) => {
+    // not sure if data needs to be returned here ...
     data = await RNOpencv3.getMatData(this, rownum, colnum)
   }
 }

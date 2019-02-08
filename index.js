@@ -1,20 +1,28 @@
 
 // @author Adam G. Freeman, adamgf@gmail.com
-import { NativeModules, requireNativeComponent, View } from 'react-native';
+import { NativeModules, requireNativeComponent, View, UIManager } from 'react-native';
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 const  { RNOpencv3 } = NativeModules;
 import { ColorConv, CvType } from './constants';
 import { CvScalar, CvPoint } from './coretypes';
-import { Mat, MatOfInt, MatOfFloat } from './mats';
+import { Mat, MatOfInt, MatOfFloat, setTo, get } from './mats';
 import { CvImage } from './cvimage';
+import { findNodeHandle } from 'react-native';
 
 const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
 
 class CvCamera extends Component {
   constructor(props) {
     super(props)
+  }
+  setOverlay(overlayMat) {
+    UIManager.dispatchViewManagerCommand(
+      findNodeHandle(this),
+      UIManager.CvCameraView.Commands.setOverlay,
+      [overlayMat],
+    )
   }
   render() {
     return (<CvCameraView {...this.props} />);
@@ -23,7 +31,7 @@ class CvCamera extends Component {
 
 CvCamera.propTypes = {
   ...View.propTypes,
-  facing: PropTypes.string
+  facing: PropTypes.string,
 };
 
 class CvInvokeGroup extends Component {
@@ -146,6 +154,8 @@ export {
   ColorConv,
   CvType,
   Mat,
+  setTo,
+  get,
   MatOfInt,
   MatOfFloat,
   CvScalar,

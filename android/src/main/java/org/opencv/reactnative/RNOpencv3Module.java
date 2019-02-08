@@ -47,7 +47,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         System.loadLibrary("opencv_java3");
     }
 
-    private static ReactApplicationContext reactContext;
+    private ReactApplicationContext reactContext;
 
 
     public RNOpencv3Module(ReactApplicationContext reactContext) {
@@ -218,7 +218,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         sendCallbackData(dstMatIndex, callback);
     }
 
-    public static void sendCallbackData(int dstMatIndex, String callback) {
+    public void sendCallbackData(int dstMatIndex, String callback) {
         if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
             // not sure how this should be handled yet for different return objects ...
             Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
@@ -289,6 +289,17 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getMatData(ReadableMap mat, int rownum, int colnum, final Promise promise) {
         promise.resolve(MatManager.getInstance().getMatData(rownum, colnum, mat.getInt("matIndex")));
+    }
+
+    @ReactMethod
+    public void setTo(ReadableMap mat, ReadableMap cvscalar) {
+        int matIndex = mat.getInt("matIndex");
+        Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+        ReadableArray scalarVal = cvscalar.getArray("vals");
+        Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
+          scalarVal.getDouble(2),scalarVal.getDouble(3));
+        dMat.setTo(dScalar);
+        MatManager.getInstance().setMat(dMat, matIndex);
     }
 
     @ReactMethod

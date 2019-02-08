@@ -5,12 +5,21 @@ import com.facebook.react.uimanager.ThemedReactContext;
 //import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.common.MapBuilder;
+
+import java.util.Map;
+import javax.annotation.Nullable;
+
+import android.util.Log;
 
 public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
 
     private static final String TAG = CvCameraViewManager.class.getSimpleName();
+
+    public static final int CMD_OVERLAY_MAT = 1;
 
     @Override
     public String getName() {
@@ -22,14 +31,33 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         return new CvCameraView(reactContext, -1);
     }
 
+    @Override
+    public Map<String,Integer> getCommandsMap() {
+     Log.d(TAG, "View manager getCommandsMap:");
+     return MapBuilder.of(
+       "setOverlay",
+       CMD_OVERLAY_MAT);
+    }
+
+    @Override
+    public void receiveCommand(CvCameraView view, int commandType, @Nullable ReadableArray args) {
+        switch (commandType) {
+            case CMD_OVERLAY_MAT: {
+                view.setOverlay(args.getMap(0));
+                return;
+            }
+            default:
+                throw new IllegalArgumentException(String.format(
+                    "Unsupported command %d received by %s.",
+                    commandType,
+                    getClass().getSimpleName()));
+
+        }
+    }
+
     @ReactProp(name = "facing")
     public void setFacing(CvCameraView view, String facing) {
         view.changeFacing(facing.equals("front") ? 1 : -1);
-    }
-
-    @ReactProp(name = "overlay")
-    public void setOverlay(CvCameraView view, ReadableMap overlay) {
-        view.setOverlay(overlay);
     }
 
     @ReactProp(name = "cvinvoke")
