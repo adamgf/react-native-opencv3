@@ -80,8 +80,14 @@ class CvInvoke {
                if (paramStr.equals("rgba")) {
                    dstMat = rgba;
                }
+               else if (paramStr.equals("rgbat")) {
+                   dstMat = rgba.t();
+               }
                else if (paramStr.equals("gray")) {
                    dstMat = gray;
+               }
+               else if (paramStr.equals("grayt")) {
+                   dstMat = gray.t();
                }
                if (dstMat != null) {
                    if (param == Mat.class) {
@@ -251,7 +257,7 @@ class CvInvoke {
 
             if (dstMatIndex >= 0) {
                 Mat dstMat = (Mat)objects[arrMatIndex];
-                MatManager.getInstance().setMat(dstMat, dstMatIndex);
+                MatManager.getInstance().setMat(dstMatIndex, dstMat);
                 result = dstMatIndex;
                 dstMatIndex = -1;
                 arrMatIndex = -1;

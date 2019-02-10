@@ -87,18 +87,17 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void drawLine(ReadableMap inMat, ReadableMap pt1, ReadableMap pt2, ReadableMap scalarVal, int thickness) {
-
-      int matIndex = inMat.getInt("matIndex");
-      Mat testMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-      double x1 = pt1.getDouble("x");
-      double y1 = pt1.getDouble("y");
-      double x2 = pt2.getDouble("x");
-      double y2 = pt2.getDouble("y");
-      Point p1 = new Point(x1,y1);
-      Point p2 = new Point(x2,y2);
-      Scalar dScalar = Scalar.all(255);
-      Imgproc.line(testMat,p1,p2,dScalar,thickness);
-      MatManager.getInstance().setMat(testMat, matIndex);
+        int matIndex = inMat.getInt("matIndex");
+        Mat testMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+        double x1 = pt1.getDouble("x");
+        double y1 = pt1.getDouble("y");
+        double x2 = pt2.getDouble("x");
+        double y2 = pt2.getDouble("y");
+        Point p1 = new Point(x1,y1);
+        Point p2 = new Point(x2,y2);
+        Scalar dScalar = Scalar.all(255);
+        Imgproc.line(testMat,p1,p2,dScalar,thickness);
+        MatManager.getInstance().setMat(matIndex, testMat);
     }
 
     @ReactMethod
@@ -142,7 +141,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     public void matToImage(ReadableMap srcMat, String outPath, final Promise promise) {
         try {
             if (outPath == null || outPath.length() == 0) {
-                // TODO: if no path sent in then auto-generate
+                // TODO: if no path sent in then auto-generate??!!!?
                 rejectInvalidParam(promise, outPath);
                 return;
             }
@@ -207,7 +206,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
 
         Imgproc.cvtColor(srcMat, dstMat, convColorCode);
-        MatManager.getInstance().setMat(dstMat, dstMatIndex);
+        MatManager.getInstance().setMat(dstMatIndex, dstMat);
     }
 
     @ReactMethod
@@ -288,18 +287,19 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getMatData(ReadableMap mat, int rownum, int colnum, final Promise promise) {
-        promise.resolve(MatManager.getInstance().getMatData(rownum, colnum, mat.getInt("matIndex")));
+        promise.resolve(MatManager.getInstance().getMatData(mat.getInt("matIndex"), rownum, colnum));
     }
 
+    // TODO: not sure if this code should be moved to MatManager
     @ReactMethod
     public void setTo(ReadableMap mat, ReadableMap cvscalar) {
-        int matIndex = mat.getInt("matIndex");
-        Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-        ReadableArray scalarVal = cvscalar.getArray("vals");
-        Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
-          scalarVal.getDouble(2),scalarVal.getDouble(3));
-        dMat.setTo(dScalar);
-        MatManager.getInstance().setMat(dMat, matIndex);
+        MatManager.getInstance().setTo(mat.getInt("matIndex"), cvscalar);
+    }
+
+    // TODO: ditto previous
+    @ReactMethod
+    public void put(ReadableMap mat, int rownum, int colnum, ReadableArray data) {
+        MatManager.getInstance().put(mat.getInt("matIndex"), rownum, colnum, data);
     }
 
     @ReactMethod

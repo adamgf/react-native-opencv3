@@ -154,8 +154,6 @@ export {
   ColorConv,
   CvType,
   Mat,
-  setTo,
-  get,
   MatOfInt,
   MatOfFloat,
   CvScalar,

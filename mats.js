@@ -5,14 +5,6 @@ import { NativeModules } from 'react-native';
 const  { RNOpencv3 } = NativeModules;
 import { CvType } from './constants';
 
-export function setTo(cvmat, color) {
-  cvmat.setTo(color)
-}
-
-export async function get(cvmat, rownum, colnum, data) {
-  cvmat.get(rownum, colnum, data)
-}
-
 export class Mat {
   constructor(numRows, numCols, cvtype, scalarval) {
     if (numRows && numCols && cvtype) {
@@ -36,6 +28,11 @@ export class Mat {
     else {
       res = await RNOpencv3.Mat()
     }
+    res.setTo = this.setTo.bind(res)
+    res.get = this.get.bind(res)
+    res.put = this.put.bind(res)
+    res.t = this.t.bind(res)
+    this.matIndex = res.matIndex
     return res
   }
 
@@ -49,6 +46,14 @@ export class Mat {
   get = async(rownum, colnum, data) => {
     // not sure if data needs to be returned here ...
     data = await RNOpencv3.getMatData(this, rownum, colnum)
+  }
+
+  put = (rownum, colnum, v0, v1, v2, v3) => {
+    RNOpencv3.put(this, rownum, colnum, [v0, v1, v2, v3])
+  }
+
+  t = () => {
+    RNOpencv3.transpose(this)
   }
 }
 

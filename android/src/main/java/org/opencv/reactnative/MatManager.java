@@ -2,6 +2,8 @@
 package org.opencv.reactnative;
 
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 
 import java.io.ByteArrayOutputStream;
@@ -18,6 +20,10 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
 
+/*
+ *  In javascript land a Mat is an opaque object represented by an integer index into an array ...
+ *  That way large amounts of data do not need to be encoded decoded and passed back-and-forth
+ */
 class MatManager {
 
     private static ArrayList mats = new ArrayList<Object>();
@@ -36,15 +42,22 @@ class MatManager {
         return matManager;
     }
 
-    public static int createMat(int cols, int rows, int cvtype, Scalar scalarVal) {
+    public static int createEmptyMat() {
+        int matIndex = mats.size();
+        Mat emptyMat = new Mat();
+        mats.add(emptyMat);
+        return matIndex;
+    }
+
+    public static int createMat(int rows, int cols, int cvtype, Scalar scalarVal) {
         int matIndex = mats.size();
         Mat matToAdd = null;
 
         if (scalarVal != null) {
-            matToAdd = new Mat(cols, rows, cvtype, scalarVal);
+            matToAdd = new Mat(rows, cols, cvtype, scalarVal);
         }
         else {
-            matToAdd = new Mat(cols, rows, cvtype);
+            matToAdd = new Mat(rows, cols, cvtype);
         }
         mats.add(matToAdd);//cv::Mat mat(480, 640, CV_8UC3, cv::Scalar(255,0,255));
 
@@ -65,13 +78,6 @@ class MatManager {
         return matIndex;
     }
 
-    public static int createEmptyMat() {
-        int matIndex = mats.size();
-        Mat emptyMat = new Mat();
-        mats.add(emptyMat);
-        return matIndex;
-    }
-
     public static int addMat(Object matToAdd) {
         int matIndex = mats.size();
         mats.add(matToAdd);
@@ -86,11 +92,12 @@ class MatManager {
         return null;
     }
 
-    public static void setMat(Object matToSet, int matIndex) {
+    public static void setMat(int matIndex, Object matToSet) {
         mats.set(matIndex, matToSet);
     }
 
-    public static WritableArray getMatData(int rownum, int colnum, int matIndex) {
+    // TODO: get this to work for different data types checking CvType
+    public static WritableArray getMatData(int matIndex, int rownum, int colnum) {
         Mat mat = (Mat)matAtIndex(matIndex);
         float[] retFloats = new float[mat.rows() * mat.cols()];
         mat.get(rownum, colnum, retFloats);
@@ -101,9 +108,52 @@ class MatManager {
         return retArr;
     }
 
+    public static void setTo(int matIndex, ReadableMap cvscalar) {
+        Mat dMat = (Mat)matAtIndex(matIndex);
+        ReadableArray scalarVal = cvscalar.getArray("vals");
+        Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
+          scalarVal.getDouble(2),scalarVal.getDouble(3));
+        dMat.setTo(dScalar);
+        setMat(matIndex, dMat);
+    }
+
+    // TODO: check type to use different types ...
+    public static void put(int matIndex, int rownum, int colnum, ReadableArray data) {
+        Mat dMat = (Mat)matAtIndex(matIndex);
+        ArrayList listOfObjs = data.toArrayList();
+        float[] arr = new float[listOfObjs.size()];
+        int i = 0;
+        for (Object listObj : listOfObjs) {
+            arr[i++] = (float)listObj;
+        }
+        dMat.put(rownum, colnum, arr);
+        setMat(matIndex, dMat);
+    }
+
+    public static void transpose(int matIndex) {
+        Mat dMat = (Mat)matAtIndex(matIndex);
+        dMat.t();
+        setMat(matIndex, dMat);
+    }
+
+    private static void releaseMat(Object dMat) {
+
+        String objType = dMat.getClass().getSimpleName();
+        if (objType.equals("Mat")) {
+            ((Mat)dMat).release();
+        }
+        else if (objType.equals("MatOfInt")) {
+            ((MatOfInt)dMat).release();
+        }
+        else if (objType.equals("MatOfFloat")) {
+            ((MatOfFloat)dMat).release();
+        }
+        dMat = null;
+    }
+
     public static void deleteMatAtIndex(int matIndex) {
         Object mat = matAtIndex(matIndex);
-        mat = null;
+        releaseMat(mat);
         mats.remove(matIndex);
     }
 
@@ -111,7 +161,7 @@ class MatManager {
         int matsSize = mats.size();
         for (int i=0;i < matsSize;i++) {
             Object mat = matAtIndex(i);
-            mat = null;
+            releaseMat(mat);
         }
         mats.clear();
     }

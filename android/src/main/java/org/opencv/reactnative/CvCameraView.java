@@ -226,7 +226,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             overlayMat.copyTo(mOverlayMat);
             Scalar clearColor = Scalar.all(0);
             overlayMat.setTo(clearColor);
-            MatManager.getInstance().setMat(overlayMat, matIndex);
+            MatManager.getInstance().setMat(matIndex, overlayMat);
             mUpdateOverlay = true;
         }
     }
@@ -634,24 +634,20 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         }
 
         boolean sendCallbackData = false;
-        if (mOverlay != null) {
-            int matIndex = mOverlay.getInt("matIndex");
-            Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-            if (mOverlayMat != null) {
-                Core.addWeighted(in, 1.0, mOverlayMat, 1.0, 0.0, in);
-            }
+        if (mOverlayMat != null) {
+            Core.addWeighted(in, 1.0, mOverlayMat, 1.0, 0.0, in);
         }
 
         if (mCvInvokeGroup != null) {
             long currMillis = System.currentTimeMillis();
             long diff = (currMillis - mCurrentMillis);
-            if (diff >= 200) {
+            if (diff >= 300) {
                 mCurrentMillis = currMillis;
                 CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
                 int dstMatIndex = invoker.invokeCvMethods(mCvInvokeGroup);
                 String callback = invoker.callback;
                 Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
-                WritableArray retArr = MatManager.getInstance().getMatData(0, 0, dstMatIndex);
+                WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
                 WritableMap response = new WritableNativeMap();
                 response.putArray("payload", retArr);
                 mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
