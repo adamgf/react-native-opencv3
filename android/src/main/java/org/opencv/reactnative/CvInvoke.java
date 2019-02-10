@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -13,13 +14,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import org.opencv.imgproc.Imgproc.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core.*;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.Scalar;
-import org.opencv.core.Point;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 
 import android.util.Log;
 
@@ -54,7 +49,7 @@ class CvInvoke {
         }
     }
 
-    private int getNumKeys(ReadableMap RM) {
+    private static int getNumKeys(ReadableMap RM) {
         int numKeys = 0;
         ReadableMapKeySetIterator keyIterator = RM.keySetIterator();
         while (keyIterator.hasNextKey()) {
@@ -200,6 +195,84 @@ class CvInvoke {
             }
         }
         return retMethod;
+    }
+
+    public static Object[] populateInvokeGroups(ReadableMap cvInvokeGroup) {
+
+        ArrayList invokeGroupList = new ArrayList<ReadableMap>();
+
+        ReadableArray functions = cvInvokeGroup.getArray("functions");
+        ReadableArray paramsArr = cvInvokeGroup.getArray("paramsArr");
+        ReadableArray callbacks = cvInvokeGroup.getArray("callbacks");
+        ReadableArray groupids  = cvInvokeGroup.getArray("groupids");
+        WritableArray responseArr = new WritableNativeArray();
+
+        if (groupids.size() > 0) {
+            int i = 0;
+            while (i < groupids.size()) {
+                WritableMap invokeGroup = new WritableNativeMap();
+                WritableArray funcs = new WritableNativeArray();
+                WritableArray parms = new WritableNativeArray();
+                WritableArray calls = new WritableNativeArray();
+                String invokeGroupStr = groupids.getString(i);
+                while (i < groupids.size() && groupids.getString(i).equals(invokeGroupStr)) {
+                    String function = functions.getString(i);
+                    ReadableMap params = paramsArr.getMap(i);
+                    String callback = callbacks.getString(i);
+                    WritableMap wrParams = new WritableNativeMap();
+                    for (int j=0;j < getNumKeys(params);j++) {
+                        // TODO: move this into read map 2 write map function ...
+                        String dKey = "p" + (j + 1);
+                        ReadableType itsType = params.getType(dKey);
+                        if (itsType == ReadableType.String) {
+                            String val = params.getString(dKey);
+                            wrParams.putString(dKey, val);
+                        }
+                        else if (itsType == ReadableType.Number) {
+                            double val = params.getDouble(dKey);
+                            wrParams.putDouble(dKey, val);
+                        }
+                        else if (itsType == ReadableType.Boolean) {
+                            boolean val = params.getBoolean(dKey);
+                            wrParams.putBoolean(dKey, val);
+                        }
+                        else if (itsType == ReadableType.Map) {
+                            // TODO: move this into read map 2 write map function ...
+                            ReadableMap val = params.getMap(dKey);
+                            WritableMap val2 = new WritableNativeMap();
+                            ReadableMapKeySetIterator iterator = val.keySetIterator();
+                            while (iterator.hasNextKey()) {
+                                String dKey2 = iterator.nextKey();
+                                ReadableType itsType2 = val.getType(dKey2);
+                                if (itsType2 == ReadableType.String) {
+                                    String newval = val.getString(dKey2);
+                                    val2.putString(dKey2, newval);
+                                }
+                                else if (itsType2 == ReadableType.Number) {
+                                    double newval = val.getDouble(dKey2);
+                                    val2.putDouble(dKey2, newval);
+                                }
+                                else if (itsType2 == ReadableType.Boolean) {
+                                    boolean newval = val.getBoolean(dKey2);
+                                    val2.putBoolean(dKey2, newval);
+                                }
+                            }
+                            wrParams.putMap(dKey, val2);
+                        }
+                    }
+                    funcs.pushString(function);
+                    parms.pushMap(wrParams);
+                    calls.pushString(callback);
+                    i++;
+                }
+                invokeGroup.putArray("functions", funcs);
+                invokeGroup.putArray("paramsArr", parms);
+                invokeGroup.putArray("callbacks", calls);
+                invokeGroupList.add(invokeGroup);
+            }
+        }
+        Object[] retMaps = invokeGroupList.toArray(new Object[invokeGroupList.size()]);
+        return retMaps;
     }
 
     public int invokeCvMethods(ReadableMap cvInvokeMap) {

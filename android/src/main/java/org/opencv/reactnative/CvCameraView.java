@@ -422,16 +422,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         return (distX + distY);
     }
 
-    private int getNumKeys(ReadableMap RM) {
-        int numKeys = 0;
-        ReadableMapKeySetIterator keyIterator = RM.keySetIterator();
-        while (keyIterator.hasNextKey()) {
-            keyIterator.nextKey();
-            numKeys++;
-        }
-        return numKeys;
-    }
-
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
@@ -441,15 +431,13 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mCurrentMillis == -1) {
             mCurrentMillis = System.currentTimeMillis();
         }
-        //if (mSendFrameSize) {
-            mSendFrameSize = false;
-            WritableMap fsResponse = new WritableNativeMap();
-            //Log.d(TAG, "payload is: " + faceInfo);
-            String frameSizeStr = "{\"frameSize\":{\"frameWidth\":" + (double)in.size().width + ",\"frameHeight\":" + (double)in.size().height + "}}";
-            fsResponse.putString("payload", frameSizeStr);
-            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-              .emit("onFrameSize", fsResponse);
-        //}
+
+        WritableMap fsResponse = new WritableNativeMap();
+        //Log.d(TAG, "payload is: " + faceInfo);
+        String frameSizeStr = "{\"frameSize\":{\"frameWidth\":" + (double)in.size().width + ",\"frameHeight\":" + (double)in.size().height + "}}";
+        fsResponse.putString("payload", frameSizeStr);
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("onFrameSize", fsResponse);
 
         if (mUseFaceDetection) {
             ingray = inputFrame.gray();
@@ -656,66 +644,14 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             if (diff >= 1000) {
                 mCurrentMillis = currMillis;
                 String lastCall = null;
-                ReadableArray functions = mCvInvokeGroup.getArray("functions");
-                ReadableArray paramsArr = mCvInvokeGroup.getArray("paramsArr");
-                ReadableArray callbacks = mCvInvokeGroup.getArray("callbacks");
-                ReadableArray groupids  = mCvInvokeGroup.getArray("groupids");
+                ReadableArray groupids = mCvInvokeGroup.getArray("groupids");
                 WritableArray responseArr = new WritableNativeArray();
+                if (groupids != null && groupids.size() > 0) {
+                    Object[] invokeGroups = CvInvoke.populateInvokeGroups(mCvInvokeGroup);
 
-                if (groupids.size() > 0) {
-                    int i = 0;
-                    while (i < groupids.size()) {
-                        WritableMap invokeGroup = new WritableNativeMap();
-                        WritableArray funcs = new WritableNativeArray();
-                        WritableArray parms = new WritableNativeArray();
-                        WritableArray calls = new WritableNativeArray();
-                        String invokeGroupStr = groupids.getString(i);
-                        while (i < groupids.size() && groupids.getString(i).equals(invokeGroupStr)) {
-                            String function = functions.getString(i);
-                            ReadableMap params = paramsArr.getMap(i);
-                            String callback = callbacks.getString(i);
-                            WritableMap wrParams = new WritableNativeMap();
-                            for (int j=0;j < getNumKeys(params);j++) {
-                                String dKey = "p" + (j + 1);
-                                ReadableType itsType = params.getType(dKey);
-                                if (itsType == ReadableType.String) {
-                                    String val = params.getString(dKey);
-                                    wrParams.putString(dKey, val);
-                                }
-                                else if (itsType == ReadableType.Number) {
-                                    double val = params.getDouble(dKey);
-                                    wrParams.putDouble(dKey, val);
-                                }
-                                else if (itsType == ReadableType.Map) {
-                                    ReadableMap val = params.getMap(dKey);
-                                    WritableMap val2 = new WritableNativeMap();
-                                    ReadableMapKeySetIterator iterator = val.keySetIterator();
-                                    while (iterator.hasNextKey()) {
-                                      String dKey2 = iterator.nextKey();
-                                      ReadableType itsType2 = val.getType(dKey2);
-                                      if (itsType2 == ReadableType.String) {
-                                          String newval = val.getString(dKey2);
-                                          val2.putString(dKey2, newval);
-                                      }
-                                      else if (itsType2 == ReadableType.Number) {
-                                          double newval = val.getDouble(dKey2);
-                                          val2.putDouble(dKey2, newval);
-                                      }
-                                    }
-                                    wrParams.putMap(dKey, val2);
-                                }
-                            }
-                            funcs.pushString(function);
-                            parms.pushMap(wrParams);
-                            calls.pushString(callback);
-                            i++;
-                        }
-
-                        invokeGroup.putArray("functions", funcs);
-                        invokeGroup.putArray("paramsArr", parms);
-                        invokeGroup.putArray("callbacks", calls);
+                    for (int i=invokeGroups.length-1;i >= 0;i--) {
                         CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
-                        int dstMatIndex = invoker.invokeCvMethods(invokeGroup);
+                        int dstMatIndex = invoker.invokeCvMethods((ReadableMap)invokeGroups[i]);
                         if (invoker.callback != null) {
                             lastCall = invoker.callback;
                         }
@@ -723,9 +659,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                         WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
                         responseArr.pushArray(retArr);
                     }
-                    //invokeGroup.putArray("functions", funcs);
-                    //invokeGroup.putArray("paramsArr", parms);
-                    //invokeGroup.putArray("callbacks", calls);
                 }
                 else {
                     CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
@@ -737,10 +670,12 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                     WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
                     responseArr.pushArray(retArr);
                 }
-                WritableMap response = new WritableNativeMap();
-                response.putArray("payload", responseArr);
-                mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(lastCall, response);
+                if (lastCall != null) {
+                    WritableMap response = new WritableNativeMap();
+                    response.putArray("payload", responseArr);
+                    mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                        .emit(lastCall, response);
+                }
             }
         }
 
