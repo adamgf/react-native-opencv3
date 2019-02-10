@@ -303,6 +303,11 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void transpose(ReadableMap mat) {
+        MatManager.getInstance().transpose(mat.getInt("matIndex"));
+    }
+
+    @ReactMethod
     public void deleteMat(ReadableMap mat) {
         MatManager.getInstance().deleteMatAtIndex(mat.getInt("matIndex"));
     }

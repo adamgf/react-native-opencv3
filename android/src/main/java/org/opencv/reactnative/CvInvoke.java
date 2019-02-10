@@ -215,12 +215,10 @@ class CvInvoke {
             ReadableMap params = paramsArr.getMap(i);
 
             ReadableType callbackType = callbacks.getType(i);
-            if (i == 0 && callbackType == ReadableType.String) {
+            if (i == 0) {
                 callback = callbacks.getString(i);
                 // last method in invoke group should have callback ...
-                if (callback != null && !callback.equals("")) {
-                    ret = invokeCvMethod(function, params);
-                }
+                ret = invokeCvMethod(function, params);
             }
             else {
                 invokeCvMethod(function, params);
