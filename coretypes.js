@@ -31,9 +31,10 @@ export class CvScalar {
       this.vals = [v0,v1,v2,v3]
     }
 
-    all = (allval) => {
-      this.vals = [allval,allval,allval,allval]
-      return this.vals
+    static all(allval) {
+      let res = new CvScalar()
+      res.vals = [allval,allval,allval,allval]
+      return res
     }
 
     set = (vals) => {
