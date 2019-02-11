@@ -641,7 +641,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mCvInvokeGroup != null) {
             long currMillis = System.currentTimeMillis();
             long diff = (currMillis - mCurrentMillis);
-            if (diff >= 1000) {
+            if (diff >= 500) {
                 mCurrentMillis = currMillis;
                 RNOpencv3Module.invokeMethods(mCvInvokeGroup, in, inputFrame.gray());
             }
