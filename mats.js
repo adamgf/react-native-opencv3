@@ -39,7 +39,6 @@ export class Mat {
   setTo = (color) => {
     // of course this could be implemented as a CvInvoke but
     // since it is probably such a common op ...
-    this.CvScalar = color
     RNOpencv3.setTo(this, color)
   }
 
