@@ -11,6 +11,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableType;
@@ -47,7 +48,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         System.loadLibrary("opencv_java3");
     }
 
-    private ReactApplicationContext reactContext;
+    private static ReactApplicationContext reactContext;
 
 
     public RNOpencv3Module(ReactApplicationContext reactContext) {
@@ -210,18 +211,39 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void invokeMethods(ReadableMap cvInvokeMap) {
-        CvInvoke invoker = new CvInvoke();
-        int dstMatIndex = invoker.invokeCvMethods(cvInvokeMap);
-        String callback = invoker.callback;
-        sendCallbackData(dstMatIndex, callback);
+    public static void invokeMethods(ReadableMap cvInvokeMap, Mat in, Mat ingray) {
+        String lastCall = null;
+        ReadableArray groupids = cvInvokeMap.getArray("groupids");
+        WritableArray responseArr;
+        int dstMatIndex = -1;
+        if (groupids != null && groupids.size() > 0) {
+            Object[] invokeGroups = CvInvoke.populateInvokeGroups(cvInvokeMap);
+            responseArr = new WritableNativeArray();
+            for (int i=invokeGroups.length-1;i >= 0;i--) {
+                CvInvoke invoker = new CvInvoke(in, ingray);
+                dstMatIndex = invoker.invokeCvMethods((ReadableMap)invokeGroups[i]);
+                if (invoker.callback != null) {
+                    lastCall = invoker.callback;
+                }
+                WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+                responseArr.pushArray(retArr);
+            }
+        }
+        else {
+            CvInvoke invoker = new CvInvoke(in, ingray);
+            dstMatIndex = invoker.invokeCvMethods(cvInvokeMap);
+            if (invoker.callback != null) {
+                lastCall = invoker.callback;
+            }
+            responseArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+        }
+        sendCallbackData(responseArr, lastCall, dstMatIndex);
     }
 
-    public void sendCallbackData(int dstMatIndex, String callback) {
+    // IMPT NOTE: retArr can either be one single array or an array of arrays ...
+    public static void sendCallbackData(WritableArray retArr, String callback, int dstMatIndex) {
         if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
             // not sure how this should be handled yet for different return objects ...
-            Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
-            WritableArray retArr = MatManager.getInstance().getMatData(0, 0, dstMatIndex);
             WritableMap response = new WritableNativeMap();
             response.putArray("payload", retArr);
             reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
@@ -244,7 +266,8 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     @ReactMethod
     public void invokeMethodWithCallback(String func, ReadableMap params, String callback) {
         int dstMatIndex = (new CvInvoke()).invokeCvMethod(func, params);
-        sendCallbackData(dstMatIndex, callback);
+        WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+        sendCallbackData(retArr, callback, dstMatIndex);
     }
 
     @ReactMethod
@@ -252,7 +275,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         (new CvInvoke()).invokeCvMethod(func, params);
     }
 
-    private void resolveMatPromise(int rows, int cols, int cvtype, int matIndex, final Promise promise) {
+    private void resolveMatPromise(int matIndex, int rows, int cols, int cvtype, final Promise promise) {
         WritableNativeMap result = new WritableNativeMap();
         result.putInt("rows", rows);
         result.putInt("cols", cols);
@@ -270,19 +293,19 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
           scalarVal.getDouble(2),scalarVal.getDouble(3));
         int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, dScalar);
-        resolveMatPromise(rows, cols, cvtype, matIndex, promise);
+        resolveMatPromise(matIndex, rows, cols, cvtype, promise);
     }
 
     @ReactMethod
     public void MatWithParams(int rows, int cols, int cvtype, final Promise promise) {
         int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, null);
-        resolveMatPromise(rows, cols, cvtype, matIndex, promise);
+        resolveMatPromise(matIndex, rows, cols, cvtype, promise);
     }
 
     @ReactMethod
     public void Mat(final Promise promise) {
         int matIndex = MatManager.getInstance().createEmptyMat();
-        resolveMatPromise(0, 0, -1, matIndex, promise);
+        resolveMatPromise(matIndex, 0, 0, -1, promise);
     }
 
     @ReactMethod

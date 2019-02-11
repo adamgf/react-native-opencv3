@@ -643,39 +643,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             long diff = (currMillis - mCurrentMillis);
             if (diff >= 1000) {
                 mCurrentMillis = currMillis;
-                String lastCall = null;
-                ReadableArray groupids = mCvInvokeGroup.getArray("groupids");
-                WritableArray responseArr = new WritableNativeArray();
-                if (groupids != null && groupids.size() > 0) {
-                    Object[] invokeGroups = CvInvoke.populateInvokeGroups(mCvInvokeGroup);
-
-                    for (int i=invokeGroups.length-1;i >= 0;i--) {
-                        CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
-                        int dstMatIndex = invoker.invokeCvMethods((ReadableMap)invokeGroups[i]);
-                        if (invoker.callback != null) {
-                            lastCall = invoker.callback;
-                        }
-                        Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
-                        WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
-                        responseArr.pushArray(retArr);
-                    }
-                }
-                else {
-                    CvInvoke invoker = new CvInvoke(in, inputFrame.gray());
-                    int dstMatIndex = invoker.invokeCvMethods(mCvInvokeGroup);
-                    if (invoker.callback != null) {
-                        lastCall = invoker.callback;
-                    }
-                    Mat dstMat = (Mat)MatManager.getInstance().matAtIndex(dstMatIndex);
-                    WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
-                    responseArr.pushArray(retArr);
-                }
-                if (lastCall != null) {
-                    WritableMap response = new WritableNativeMap();
-                    response.putArray("payload", responseArr);
-                    mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                        .emit(lastCall, response);
-                }
+                RNOpencv3Module.invokeMethods(mCvInvokeGroup, in, inputFrame.gray());
             }
         }
 

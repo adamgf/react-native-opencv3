@@ -69,9 +69,11 @@ class CvInvoke {
 
            ReadableType itsType = RM.getType(paramNum);
            if (itsType == ReadableType.String) {
+               // special case the string rgba and rgbat is used
+               // to represent the current frame in RGBA colorspace
+               // the strings gray and grayt represent grayscale frame
                String paramStr = RM.getString(paramNum);
                Mat dstMat = null;
-               // special case grabbing the current frame
                if (paramStr.equals("rgba")) {
                    dstMat = rgba;
                }
@@ -197,6 +199,40 @@ class CvInvoke {
         return retMethod;
     }
 
+    private static WritableMap readable2WritableMap(ReadableMap map1) {
+        WritableMap map2 = new WritableNativeMap();
+        ReadableMapKeySetIterator iterator = map1.keySetIterator();
+        while (iterator.hasNextKey()) {
+            String key = iterator.nextKey();
+            ReadableType itsType = map1.getType(key);
+            switch (itsType) {
+                case String:
+                    String snewval = map1.getString(key);
+                    map2.putString(key, snewval);
+                    break;
+                case Number:
+                    double dnewval = map1.getDouble(key);
+                    map2.putDouble(key, dnewval);
+                    break;
+                case Boolean:
+                    boolean bnewval = map1.getBoolean(key);
+                    map2.putBoolean(key, bnewval);
+                    break;
+                case Map:
+                    ReadableMap mnewval = map1.getMap(key);
+                    // recursive call
+                    map2.putMap(key, readable2WritableMap(mnewval));
+                    break;
+                // TODO: implement ReadableType.Array
+                // but then Readable2WritableArray needs to be implemented
+                default:
+                case Null:
+                    map2.putString(key, null);
+            }
+        }
+        return map2;
+    }
+
     public static Object[] populateInvokeGroups(ReadableMap cvInvokeGroup) {
 
         ArrayList invokeGroupList = new ArrayList<ReadableMap>();
@@ -217,51 +253,10 @@ class CvInvoke {
                 String invokeGroupStr = groupids.getString(i);
                 while (i < groupids.size() && groupids.getString(i).equals(invokeGroupStr)) {
                     String function = functions.getString(i);
-                    ReadableMap params = paramsArr.getMap(i);
+                    WritableMap params = readable2WritableMap(paramsArr.getMap(i));
                     String callback = callbacks.getString(i);
-                    WritableMap wrParams = new WritableNativeMap();
-                    for (int j=0;j < getNumKeys(params);j++) {
-                        // TODO: move this into read map 2 write map function ...
-                        String dKey = "p" + (j + 1);
-                        ReadableType itsType = params.getType(dKey);
-                        if (itsType == ReadableType.String) {
-                            String val = params.getString(dKey);
-                            wrParams.putString(dKey, val);
-                        }
-                        else if (itsType == ReadableType.Number) {
-                            double val = params.getDouble(dKey);
-                            wrParams.putDouble(dKey, val);
-                        }
-                        else if (itsType == ReadableType.Boolean) {
-                            boolean val = params.getBoolean(dKey);
-                            wrParams.putBoolean(dKey, val);
-                        }
-                        else if (itsType == ReadableType.Map) {
-                            // TODO: move this into read map 2 write map function ...
-                            ReadableMap val = params.getMap(dKey);
-                            WritableMap val2 = new WritableNativeMap();
-                            ReadableMapKeySetIterator iterator = val.keySetIterator();
-                            while (iterator.hasNextKey()) {
-                                String dKey2 = iterator.nextKey();
-                                ReadableType itsType2 = val.getType(dKey2);
-                                if (itsType2 == ReadableType.String) {
-                                    String newval = val.getString(dKey2);
-                                    val2.putString(dKey2, newval);
-                                }
-                                else if (itsType2 == ReadableType.Number) {
-                                    double newval = val.getDouble(dKey2);
-                                    val2.putDouble(dKey2, newval);
-                                }
-                                else if (itsType2 == ReadableType.Boolean) {
-                                    boolean newval = val.getBoolean(dKey2);
-                                    val2.putBoolean(dKey2, newval);
-                                }
-                            }
-                            wrParams.putMap(dKey, val2);
-                        }
-                    }
                     funcs.pushString(function);
-                    parms.pushMap(wrParams);
+                    parms.pushMap(params);
                     calls.pushString(callback);
                     i++;
                 }
