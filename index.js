@@ -104,7 +104,7 @@ class CvInvoke extends Component {
   static propTypes = {
     inobj: PropTypes.string,
     func: PropTypes.string.isRequired,
-    params: PropTypes.any.isRequired,
+    params: PropTypes.any,
     outobj: PropTypes.string,
     callback: PropTypes.string
   }

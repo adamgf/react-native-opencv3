@@ -188,17 +188,27 @@ class CvInvoke {
            i++;
         }
         Object[] retArr = retObjs.toArray(new Object[retObjs.size()]);
+
         return retArr;
     }
 
     private Method findMethod(String func, ReadableMap params, Class searchClass) {
         Method retMethod = null;
-        int numParams = getNumKeys(params);
+        int numParams = 0;
+        if (params != null) {
+            numParams = getNumKeys(params);
+        }
         Method[] methods = searchClass.getDeclaredMethods();
         for (Method method : methods) {
             if (method.getName().equals(func)) {
-                Class<?>[] methodParams = method.getParameterTypes();
-                if (numParams == methodParams.length) {
+                if (numParams > 0) {
+                    Class<?>[] methodParams = method.getParameterTypes();
+                    if (numParams == methodParams.length) {
+                        retMethod = method;
+                        break;
+                    }
+                }
+                else {
                     retMethod = method;
                     break;
                 }
@@ -266,7 +276,10 @@ class CvInvoke {
                 while (i < groupids.size() && groupids.getString(i).equals(invokeGroupStr)) {
                     String in = ins.getString(i);
                     String function = functions.getString(i);
-                    WritableMap params = readable2WritableMap(paramsArr.getMap(i));
+                    WritableMap params = null;
+                    if (paramsArr != null && paramsArr.getMap(i) != null) {
+                        params = readable2WritableMap(paramsArr.getMap(i));
+                    }
                     String out = outs.getString(i);
                     String callback = callbacks.getString(i);
                     inobs.pushString(in);
@@ -320,7 +333,10 @@ class CvInvoke {
     public int invokeCvMethod(String in, String func, ReadableMap params, String out) {
 
         int result = -1;
-        int numParams = getNumKeys(params);
+        int numParams = 0;
+        if (params != null) {
+            numParams = getNumKeys(params);
+        }
         Object[] objects = null;
 
         try {
@@ -340,14 +356,15 @@ class CvInvoke {
             if (method == null) {
                 throw new Exception(func + " not found make sure method exists and is part of Opencv Imgproc, Core or Mat.");
             }
-            Class<?>[] methodParams = method.getParameterTypes();
-            objects = getObjectArr(params, methodParams);
+            if (numParams > 0) {
+                Class<?>[] methodParams = method.getParameterTypes();
+                objects = getObjectArr(params, methodParams);
 
-            if (numParams != objects.length) {
-                throw new Exception("One of the parameters is invalid and " + func + " cannot be invoked.");
+                if (numParams != objects.length) {
+                    throw new Exception("One of the parameters is invalid and " + func + " cannot be invoked.");
+                }
             }
-
-            if (method != null && objects != null) {
+            if (method != null) {
                 Mat matToUse = null;
 
                 if (in != null && in.equals("rgba")) {
@@ -362,13 +379,24 @@ class CvInvoke {
                 else if (in != null && in.equals("grayt")) {
                     matToUse = gray.t();
                 }
+                else if (in != null && in.equals(matParamID)) {
+                    matToUse = matParam;
+                }
 
                 if (out != null && !out.equals("")) {
                     matParamID = out;
                     matParam = (Mat)method.invoke(matToUse, objects);
                 }
                 else {
-                    method.invoke(matToUse, objects);
+                    if (func.equals("release")) {
+                        // special case deleting the last Mat
+                        matToUse.release();
+                        matParam = null;
+                        matParamID = null;
+                    }
+                    else {
+                        method.invoke(matToUse, objects);
+                    }
                 }
             }
 

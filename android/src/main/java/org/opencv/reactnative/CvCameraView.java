@@ -54,6 +54,7 @@ import java.io.InputStream;
 import java.io.File;
 import java.lang.Runnable;
 import java.util.ArrayList;
+import java.lang.Thread;
 
 // useful for popping up an alert if need be ...
 //import android.widget.Toast;
@@ -431,7 +432,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         // TODO: map camera settings to OpenCV frame modifications here ...
         Mat in = inputFrame.rgba();
 
-        Mat ingray = null;
+        Mat ingray = inputFrame.gray();
 
         if (mCurrentMillis == -1) {
             mCurrentMillis = System.currentTimeMillis();
@@ -444,15 +445,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
             .emit("onFrameSize", fsResponse);
 
-        if (mUseFaceDetection) {
-            ingray = inputFrame.gray();
-        }
-
         if (mCameraFacing == 1) {
             Core.flip(in, in, 1);
-            if (mUseFaceDetection) {
+            //if (mUseFaceDetection) {
                 Core.flip(ingray, ingray, 1);
-            }
+            //}
         }
 
         if (mUseFaceDetection) {
@@ -648,7 +645,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             long diff = (currMillis - mCurrentMillis);
             if (diff >= mOverlayInterval) {
                 mCurrentMillis = currMillis;
-                RNOpencv3Module.invokeMethods(mCvInvokeGroup, in, inputFrame.gray());
+                RNOpencv3Module.invokeMethods(mCvInvokeGroup, in, ingray);
             }
         }
 
