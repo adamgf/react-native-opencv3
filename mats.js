@@ -44,6 +44,7 @@ export class Mat {
 
   get = async(rownum, colnum, data) => {
     // not sure if data needs to be returned here ...
+    // this has not been tested yet ...
     data = await RNOpencv3.getMatData(this, rownum, colnum)
   }
 

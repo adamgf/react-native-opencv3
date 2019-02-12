@@ -211,23 +211,26 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public static void invokeMethods(final ReadableMap cvInvokeMap, final Mat in, final Mat ingray) {
+    public static void invokeMethods(ReadableMap cvInvokeMap, Mat in, Mat ingray) {
         WritableArray responseArr = null;
         String lastCall = null;
         int dstMatIndex = -1;
-        ReadableArray groupids = cvInvokeMap.getArray("groupids");
-        if (groupids != null && groupids.size() > 0) {
-            Object[] invokeGroups = CvInvoke.populateInvokeGroups(cvInvokeMap);
-            responseArr = new WritableNativeArray();
-            for (int i=invokeGroups.length-1;i >= 0;i--) {
-                CvInvoke invoker = new CvInvoke(in, ingray);
-                dstMatIndex = invoker.invokeCvMethods((ReadableMap)invokeGroups[i]);
-                if (invoker.callback != null) {
-                    lastCall = invoker.callback;
-                }
-                if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
-                    WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
-                    responseArr.pushArray(retArr);
+        ReadableArray groupids = null;
+        if (cvInvokeMap.hasKey("groupids")) {
+            groupids = cvInvokeMap.getArray("groupids");
+            if (groupids != null && groupids.size() > 0) {
+                Object[] invokeGroups = CvInvoke.populateInvokeGroups(cvInvokeMap);
+                responseArr = new WritableNativeArray();
+                for (int i=invokeGroups.length-1;i >= 0;i--) {
+                    CvInvoke invoker = new CvInvoke(in, ingray);
+                    dstMatIndex = invoker.invokeCvMethods((ReadableMap)invokeGroups[i]);
+                    if (invoker.callback != null) {
+                        lastCall = invoker.callback;
+                    }
+                    if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                        WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+                        responseArr.pushArray(retArr);
+                    }
                 }
             }
         }

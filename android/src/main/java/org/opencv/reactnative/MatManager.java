@@ -124,7 +124,8 @@ class MatManager {
         float[] arr = new float[listOfObjs.size()];
         int i = 0;
         for (Object listObj : listOfObjs) {
-            arr[i++] = (float)listObj;
+            double dd = (double)listObj;
+            arr[i++] = (float)dd;
         }
         dMat.put(rownum, colnum, arr);
         setMat(matIndex, dMat);

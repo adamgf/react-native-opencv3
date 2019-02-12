@@ -279,6 +279,30 @@ CV_8UC = (ch) => {
   return makeType(0, ch)
 }
 
+CV_8SC = (ch) => {
+  return makeType(1, ch)
+}
+
+CV_16UC = (ch) => {
+  return makeType(2, ch)
+}
+
+CV_16SC = (ch) => {
+  return makeType(3, ch)
+}
+
+CV_32SC = (ch) => {
+  return makeType(4, ch)
+}
+
+CV_32FC = (ch) => {
+  return makeType(5, ch)
+}
+
+CV_64FC = (ch) => {
+  return makeType(6, ch)
+}
+
 export const CvType = {
    "CV_8U" : 0,
    "CV_8S" : 1,
@@ -289,92 +313,68 @@ export const CvType = {
    "CV_64F" : 6,
    "CV_USRTYPE1" : 7,
    "CV_8UC1" : CV_8UC(1), "CV_8UC2" : CV_8UC(2), "CV_8UC3" : CV_8UC(3), "CV_8UC4" : CV_8UC(4),
-   /**"CV_8SC1" : this.CV_8SC(1), "CV_8SC2" : this.CV_8SC(2), "CV_8SC3" : this.CV_8SC(3), "CV_8SC4" : this.CV_8SC(4),
-   "CV_16UC1" : this.CV_16UC(1), "CV_16UC2" : this.CV_16UC(2), "CV_16UC3" : this.CV_16UC(3), "CV_16UC4" : this.CV_16UC(4),
-   "CV_16SC1" : this.CV_16SC(1), "CV_16SC2" : this.CV_16SC(2), "CV_16SC3" : this.CV_16SC(3), "CV_16SC4" : this.CV_16SC(4),
-   "CV_32SC1" : this.CV_32SC(1), "CV_32SC2" : this.CV_32SC(2), "CV_32SC3" : this.CV_32SC(3), "CV_32SC4" : this.CV_32SC(4),
-   "CV_32FC1" : this.CV_32FC(1), "CV_32FC2" : this.CV_32FC(2), "CV_32FC3" : this.CV_32FC(3), "CV_32FC4" : this.CV_32FC(4),
-   "CV_64FC1" : this.CV_64FC(1), "CV_64FC2" : this.CV_64FC(2), "CV_64FC3" : this.CV_64FC(3), "CV_64FC4" : this.CV_64FC(4), */
+   "CV_8SC1" : CV_8SC(1), "CV_8SC2" : CV_8SC(2), "CV_8SC3" : this.CV_8SC(3), "CV_8SC4" : CV_8SC(4),
+   "CV_16UC1" : CV_16UC(1), "CV_16UC2" : CV_16UC(2), "CV_16UC3" : CV_16UC(3), "CV_16UC4" : CV_16UC(4),
+   "CV_16SC1" : CV_16SC(1), "CV_16SC2" : CV_16SC(2), "CV_16SC3" : CV_16SC(3), "CV_16SC4" : CV_16SC(4),
+   "CV_32SC1" : CV_32SC(1), "CV_32SC2" : CV_32SC(2), "CV_32SC3" : CV_32SC(3), "CV_32SC4" : CV_32SC(4),
+   "CV_32FC1" : CV_32FC(1), "CV_32FC2" : CV_32FC(2), "CV_32FC3" : CV_32FC(3), "CV_32FC4" : CV_32FC(4),
+   "CV_64FC1" : CV_64FC(1), "CV_64FC2" : CV_64FC(2), "CV_64FC3" : CV_64FC(3), "CV_64FC4" : CV_64FC(4),
    "CV_CN_MAX" : 512, "CV_CN_SHIFT" : 3, "CV_DEPTH_MAX" : (1 << 3)
 }
 
 /**
- CV_8SC(ch) {
-  return this.makeType(this.CvType.CV_8S, ch)
+static channels(type) {
+  return ((type >> CvType.CV_CN_SHIFT) + 1)
 }
 
-  CV_16UC(ch) {
-  return this.makeType(this.CvType.CV_16U, ch)
+static depth(type) {
+  return (type & (CvType.CV_DEPTH_MAX - 1))
 }
 
-  CV_16SC(ch) {
-  return this.makeType(this.CvType.CV_16S, ch)
+static isInteger(type) {
+  return depth(type) < CvType.CV_32F
 }
 
-  CV_32SC(ch) {
-  return this.makeType(this.CvType.CV_32S, ch)
-}
-
-  CV_32FC(ch) {
-  return this.makeType(this.CvType.CV_32F, ch)
-}
-
-  CV_64FC(ch) {
-  return this.makeType(this.CvType.CV_64F, ch)
-}
-
-  channels(type) {
-  return (type >> this.CvType.CV_CN_SHIFT) + 1
-}
-
-  depth(type) {
-  return type & (this.CvType.CV_DEPTH_MAX - 1)
-}
-
-  isInteger(type) {
-  return depth(type) < this.CvType.CV_32F
-}
-
-  ELEM_SIZE(type) {
+static ELEM_SIZE(type) {
   switch (depth(type)) {
-  case this.CvType.CV_8U:
-  case this.CvType.CV_8S:
+  case CvType.CV_8U:
+  case CvType.CV_8S:
       return channels(type)
-  case this.CvType.CV_16U:
-  case this.CvType.CV_16S:
+  case CvType.CV_16U:
+  case CvType.CV_16S:
       return 2 * channels(type)
-  case this.CvType.CV_32S:
-  case this.CvType.CV_32F:
+  case CvType.CV_32S:
+  case CvType.CV_32F:
       return 4 * channels(type)
-  case this.CvType.CV_64F:
+  case CvType.CV_64F:
       return 8 * channels(type)
   default:
       alert("Unsupported this.CvType value: " + type)
   }
 }
 
-  typeToString(type) {
+static typeToString(type) {
     let s = ""
     switch (depth(type)) {
-    case this.CvType.CV_8U:
+    case CvType.CV_8U:
         s = "CV_8U"
         break;
-    case this.CvType.CV_8S:
+    case CvType.CV_8S:
         s = "CV_8S"
         break;
-    case this.CvType.CV_16U:
+    case CvType.CV_16U:
         s = "CV_16U"
         break;
-    case this.CvType.CV_16S:
+    case CvType.CV_16S:
         s = "CV_16S"
         break;
-    case this.CvType.CV_32S:
+    case CvType.CV_32S:
         s = "CV_32S"
         break;
-    case this.CvType.CV_32F:
+    case CvType.CV_32F:
         s = "CV_32F"
         break
-    case this.CvType.CV_64F:
+    case CvType.CV_64F:
         s = "CV_64F"
         break
     case this.CvType.CV_USRTYPE1:
@@ -389,4 +389,5 @@ export const CvType = {
         return s + "C" + ch
     else
         return s + "C(" + ch + ")"
-} */
+  }
+*/
