@@ -82,7 +82,17 @@ export class CvPoint {
 
 export class CvSize {
   constructor(width, height) {
-    this.width = width
-    this.height = height
+	if (width) {
+      this.width = width
+	}
+	else {
+	  this.width = 0.0
+	}
+	if (height) {
+      this.height = height
+	}
+	else {
+	  this.height = 0.0
+	}	
   }
 }

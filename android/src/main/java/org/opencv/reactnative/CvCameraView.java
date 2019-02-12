@@ -447,9 +447,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
         if (mCameraFacing == 1) {
             Core.flip(in, in, 1);
-            //if (mUseFaceDetection) {
-                Core.flip(ingray, ingray, 1);
-            //}
+            Core.flip(ingray, ingray, 1);
         }
 
         if (mUseFaceDetection) {

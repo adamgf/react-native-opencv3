@@ -150,6 +150,10 @@ class CvInvoke {
               if (itsType == ReadableType.Map) {
                   ReadableMap scalarMap = RM.getMap(paramNum);
                   ReadableArray scalarVal = scalarMap.getArray("vals");
+                  if (scalarVal == null) {
+                      Log.d("FUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJ",
+                        "Fuckin scalar val is null!!!! paramNum is: " + paramNum);
+                  }
                   Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
                       scalarVal.getDouble(2),scalarVal.getDouble(3));
                   retObjs.add(dScalar);
@@ -227,6 +231,40 @@ class CvInvoke {
         return retMethod;
     }
 
+	// recursive serialization helper functions ...
+    private static WritableArray readable2WritableArray(ReadableArray arr1) {
+    	WritableArray arr2 = new WritableNativeArray();
+		for (int i=0;i < arr1.size();i++) {
+			ReadableType itsType = arr1.getType(i);
+			switch (itsType) {
+				case String:
+					String strval = arr1.getString(i);
+					arr2.pushString(strval);
+					break;
+				case Number:
+					double dubval = arr1.getDouble(i);
+					arr2.pushDouble(dubval);
+					break;
+				case Boolean:
+					boolean boolval = arr1.getBoolean(i);
+					arr2.pushBoolean(boolval);
+					break;
+				case Map:
+					ReadableMap mapval = arr1.getMap(i);
+					arr2.pushMap(readable2WritableMap(mapval));
+					break;
+				case Array:
+					ReadableArray arrval = arr1.getArray(i);
+					// recursive call
+					arr2.pushArray(readable2WritableArray(arrval));
+					break;
+				case Null:
+					arr2.pushString(null);
+			}
+		}
+		return arr2;
+    }
+	
     private static WritableMap readable2WritableMap(ReadableMap map1) {
         WritableMap map2 = new WritableNativeMap();
         ReadableMapKeySetIterator iterator = map1.keySetIterator();
@@ -235,25 +273,26 @@ class CvInvoke {
             ReadableType itsType = map1.getType(key);
             switch (itsType) {
                 case String:
-                    String snewval = map1.getString(key);
-                    map2.putString(key, snewval);
+                    String strval = map1.getString(key);
+                    map2.putString(key, strval);
                     break;
                 case Number:
-                    double dnewval = map1.getDouble(key);
-                    map2.putDouble(key, dnewval);
+                    double dubval = map1.getDouble(key);
+                    map2.putDouble(key, dubval);
                     break;
                 case Boolean:
-                    boolean bnewval = map1.getBoolean(key);
-                    map2.putBoolean(key, bnewval);
+                    boolean boolval = map1.getBoolean(key);
+                    map2.putBoolean(key, boolval);
                     break;
                 case Map:
-                    ReadableMap mnewval = map1.getMap(key);
+                    ReadableMap mapval = map1.getMap(key);
                     // recursive call
-                    map2.putMap(key, readable2WritableMap(mnewval));
+                    map2.putMap(key, readable2WritableMap(mapval));
                     break;
-                // TODO: implement ReadableType.Array
-                // but then Readable2WritableArray recursive method needs to be implemented
-                default:
+				case Array:
+					ReadableArray arrval = map1.getArray(key);
+					map2.putArray(key, readable2WritableArray(arrval));
+					break;
                 case Null:
                     map2.putString(key, null);
             }
