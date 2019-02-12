@@ -5,8 +5,8 @@ import { NativeModules, requireNativeComponent, View, UIManager } from 'react-na
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 const  { RNOpencv3 } = NativeModules;
-import { ColorConv, CvType } from './constants';
-import { CvScalar, CvPoint } from './coretypes';
+import { ColorConv, CvType, Imgproc } from './constants';
+import { CvScalar, CvPoint, CvSize } from './coretypes';
 import { Mat, MatOfInt, MatOfFloat, setTo, get } from './mats';
 import { CvImage } from './cvimage';
 import { findNodeHandle } from 'react-native';
@@ -175,9 +175,11 @@ export {
   CvInvokeGroup,
   ColorConv,
   CvType,
+  Imgproc,
   Mat,
   MatOfInt,
   MatOfFloat,
   CvScalar,
-  CvPoint
+  CvPoint,
+  CvSize
 };

@@ -79,3 +79,10 @@ export class CvPoint {
     return (this.x * otherPt.x + this.y * otherPt.y)
   }
 }
+
+export class CvSize {
+  constructor(width, height) {
+    this.width = width
+    this.height = height
+  }
+}

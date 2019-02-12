@@ -23,6 +23,7 @@ import java.lang.Exception;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
 
 class CvInvoke {
 
@@ -36,8 +37,8 @@ class CvInvoke {
     private Mat gray = null;
 
     public String callback = null;
-    private Mat matParam = null;
-    private String matParamID = null;
+
+    private HashMap<String, Mat> matParams = new HashMap<String, Mat>();
 
     public CvInvoke() {
     }
@@ -74,7 +75,7 @@ class CvInvoke {
                // special case the string rgba and rgbat is used
                // to represent the current frame in RGBA colorspace
                // the strings gray and grayt represent grayscale frame
-               // the string matParamID represents the Mat returned
+               // the matParams key string represents the Mat returned
                // from a Mat function on the input frame
                String paramStr = RM.getString(paramNum);
                Mat dstMat = null;
@@ -90,8 +91,8 @@ class CvInvoke {
                else if (paramStr.equals("grayt")) {
                    dstMat = gray.t();
                }
-               else if (matParamID != null && matParam != null && paramStr.equals(matParamID)) {
-                   dstMat = matParam;
+               else if (matParams.containsKey(paramStr)) {
+                   dstMat = matParams.get(paramStr);
                }
                if (dstMat != null) {
                    if (param == Mat.class) {
@@ -152,6 +153,15 @@ class CvInvoke {
                   Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
                       scalarVal.getDouble(2),scalarVal.getDouble(3));
                   retObjs.add(dScalar);
+              }
+           }
+           else if (param == Size.class) {
+              if (itsType == ReadableType.Map) {
+                  ReadableMap sizeMap = RM.getMap(paramNum);
+                  double width = sizeMap.getDouble("width");
+                  double height = sizeMap.getDouble("height");
+                  Size dSize = new Size(width, height);
+                  retObjs.add(dSize);
               }
            }
            else if (param == int.class) {
@@ -342,7 +352,7 @@ class CvInvoke {
         try {
             Method method = null;
             if (in != null && !in.equals("") && (in.equals("rgba") || in.equals("rgbat") ||
-                in.equals("gray") || in.equals("grayt")))
+                in.equals("gray") || in.equals("grayt") || matParams.containsKey(in)))
             {
                 method = findMethod(func, params, Mat.class);
             }
@@ -379,20 +389,19 @@ class CvInvoke {
                 else if (in != null && in.equals("grayt")) {
                     matToUse = gray.t();
                 }
-                else if (in != null && in.equals(matParamID)) {
-                    matToUse = matParam;
+                else if (in != null && matParams.containsKey(in)) {
+                    matToUse = matParams.get(in);
                 }
 
                 if (out != null && !out.equals("")) {
-                    matParamID = out;
-                    matParam = (Mat)method.invoke(matToUse, objects);
+                    Mat matParam = (Mat)method.invoke(matToUse, objects);
+                    matParams.put(out, matParam);
                 }
                 else {
                     if (func.equals("release")) {
                         // special case deleting the last Mat
                         matToUse.release();
-                        matParam = null;
-                        matParamID = null;
+                        matParams.remove(in);
                     }
                     else {
                         method.invoke(matToUse, objects);
