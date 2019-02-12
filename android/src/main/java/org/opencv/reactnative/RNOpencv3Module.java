@@ -211,11 +211,11 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public static void invokeMethods(ReadableMap cvInvokeMap, Mat in, Mat ingray) {
+    public static void invokeMethods(final ReadableMap cvInvokeMap, final Mat in, final Mat ingray) {
+        WritableArray responseArr = null;
         String lastCall = null;
-        ReadableArray groupids = cvInvokeMap.getArray("groupids");
-        WritableArray responseArr;
         int dstMatIndex = -1;
+        ReadableArray groupids = cvInvokeMap.getArray("groupids");
         if (groupids != null && groupids.size() > 0) {
             Object[] invokeGroups = CvInvoke.populateInvokeGroups(cvInvokeMap);
             responseArr = new WritableNativeArray();
@@ -225,8 +225,10 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
                 if (invoker.callback != null) {
                     lastCall = invoker.callback;
                 }
-                WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
-                responseArr.pushArray(retArr);
+                if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                    WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+                    responseArr.pushArray(retArr);
+                }
             }
         }
         else {
@@ -235,7 +237,9 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
             if (invoker.callback != null) {
                 lastCall = invoker.callback;
             }
-            responseArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+            if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                responseArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+            }
         }
         sendCallbackData(responseArr, lastCall, dstMatIndex);
     }
@@ -264,15 +268,20 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void invokeMethodWithCallback(String func, ReadableMap params, String callback) {
-        int dstMatIndex = (new CvInvoke()).invokeCvMethod(func, params);
+    public void invokeMethodWithCallback(String in, String func, ReadableMap params, String out, String callback) {
+        int dstMatIndex = (new CvInvoke()).invokeCvMethod(in, func, params, out);
         WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
         sendCallbackData(retArr, callback, dstMatIndex);
     }
 
     @ReactMethod
     public void invokeMethod(String func, ReadableMap params) {
-        (new CvInvoke()).invokeCvMethod(func, params);
+        (new CvInvoke()).invokeCvMethod(null, func, params, null);
+    }
+
+    @ReactMethod
+    public void invokeInOutMethod(String in, String func, ReadableMap params, String out) {
+        (new CvInvoke()).invokeCvMethod(in, func, params, out);
     }
 
     private void resolveMatPromise(int matIndex, int rows, int cols, int cvtype, final Promise promise) {

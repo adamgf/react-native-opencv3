@@ -36,6 +36,8 @@ class CvInvoke {
     private Mat gray = null;
 
     public String callback = null;
+    private Mat matParam = null;
+    private String matParamID = null;
 
     public CvInvoke() {
     }
@@ -72,6 +74,8 @@ class CvInvoke {
                // special case the string rgba and rgbat is used
                // to represent the current frame in RGBA colorspace
                // the strings gray and grayt represent grayscale frame
+               // the string matParamID represents the Mat returned
+               // from a Mat function on the input frame
                String paramStr = RM.getString(paramNum);
                Mat dstMat = null;
                if (paramStr.equals("rgba")) {
@@ -85,6 +89,9 @@ class CvInvoke {
                }
                else if (paramStr.equals("grayt")) {
                    dstMat = gray.t();
+               }
+               else if (matParamID != null && matParam != null && paramStr.equals(matParamID)) {
+                   dstMat = matParam;
                }
                if (dstMat != null) {
                    if (param == Mat.class) {
@@ -173,6 +180,7 @@ class CvInvoke {
                     dstMatIndex = matIndex;
                 }
                 else if (itsType == ReadableType.Array) {
+                    // this has not been tested yet ...
                     ReadableArray arr = RM.getArray(paramNum);
                     retObjs.add(arr.toArrayList());
                 }
@@ -224,7 +232,7 @@ class CvInvoke {
                     map2.putMap(key, readable2WritableMap(mnewval));
                     break;
                 // TODO: implement ReadableType.Array
-                // but then Readable2WritableArray needs to be implemented
+                // but then Readable2WritableArray recursive method needs to be implemented
                 default:
                 case Null:
                     map2.putString(key, null);
@@ -237,8 +245,10 @@ class CvInvoke {
 
         ArrayList invokeGroupList = new ArrayList<ReadableMap>();
 
+        ReadableArray ins = cvInvokeGroup.getArray("ins");
         ReadableArray functions = cvInvokeGroup.getArray("functions");
         ReadableArray paramsArr = cvInvokeGroup.getArray("paramsArr");
+        ReadableArray outs = cvInvokeGroup.getArray("outs");
         ReadableArray callbacks = cvInvokeGroup.getArray("callbacks");
         ReadableArray groupids  = cvInvokeGroup.getArray("groupids");
         WritableArray responseArr = new WritableNativeArray();
@@ -247,21 +257,29 @@ class CvInvoke {
             int i = 0;
             while (i < groupids.size()) {
                 WritableMap invokeGroup = new WritableNativeMap();
+                WritableArray inobs = new WritableNativeArray();
                 WritableArray funcs = new WritableNativeArray();
                 WritableArray parms = new WritableNativeArray();
+                WritableArray otobs = new WritableNativeArray();
                 WritableArray calls = new WritableNativeArray();
                 String invokeGroupStr = groupids.getString(i);
                 while (i < groupids.size() && groupids.getString(i).equals(invokeGroupStr)) {
+                    String in = ins.getString(i);
                     String function = functions.getString(i);
                     WritableMap params = readable2WritableMap(paramsArr.getMap(i));
+                    String out = outs.getString(i);
                     String callback = callbacks.getString(i);
+                    inobs.pushString(in);
                     funcs.pushString(function);
                     parms.pushMap(params);
+                    otobs.pushString(out);
                     calls.pushString(callback);
                     i++;
                 }
+                invokeGroup.putArray("ins", inobs);
                 invokeGroup.putArray("functions", funcs);
                 invokeGroup.putArray("paramsArr", parms);
+                invokeGroup.putArray("outs", otobs);
                 invokeGroup.putArray("callbacks", calls);
                 invokeGroupList.add(invokeGroup);
             }
@@ -273,42 +291,54 @@ class CvInvoke {
     public int invokeCvMethods(ReadableMap cvInvokeMap) {
 
         int ret = -1;
+        ReadableArray ins = cvInvokeMap.getArray("ins");
         ReadableArray functions = cvInvokeMap.getArray("functions");
         ReadableArray paramsArr = cvInvokeMap.getArray("paramsArr");
+        ReadableArray outs = cvInvokeMap.getArray("outs");
         ReadableArray callbacks = cvInvokeMap.getArray("callbacks");
 
         // back to front
         for (int i=(functions.size()-1);i >= 0;i--) {
+            String in = ins.getString(i);
             String function = functions.getString(i);
             ReadableMap params = paramsArr.getMap(i);
+            String out = outs.getString(i);
 
             ReadableType callbackType = callbacks.getType(i);
             if (i == 0) {
                 callback = callbacks.getString(i);
-                // last method in invoke group should have callback ...
-                ret = invokeCvMethod(function, params);
+                // last method in invoke group might have callback ...
+                ret = invokeCvMethod(in, function, params, out);
             }
             else {
-                invokeCvMethod(function, params);
+                invokeCvMethod(in, function, params, out);
             }
         }
         return ret;
     }
 
-    public int invokeCvMethod(String func, ReadableMap params) {
+    public int invokeCvMethod(String in, String func, ReadableMap params, String out) {
 
         int result = -1;
         int numParams = getNumKeys(params);
         Object[] objects = null;
 
         try {
-            Method method = findMethod(func, params, Imgproc.class);
-            if (method == null) {
-                method = findMethod(func, params, Core.class);
+            Method method = null;
+            if (in != null && !in.equals("") && (in.equals("rgba") || in.equals("rgbat") ||
+                in.equals("gray") || in.equals("grayt")))
+            {
+                method = findMethod(func, params, Mat.class);
+            }
+            else {
+                method = findMethod(func, params, Imgproc.class);
+                if (method == null) {
+                    method = findMethod(func, params, Core.class);
+                }
             }
 
             if (method == null) {
-                throw new Exception(func + " not found make sure method exists and is part of Opencv Imgproc or Core.");
+                throw new Exception(func + " not found make sure method exists and is part of Opencv Imgproc, Core or Mat.");
             }
             Class<?>[] methodParams = method.getParameterTypes();
             objects = getObjectArr(params, methodParams);
@@ -318,7 +348,28 @@ class CvInvoke {
             }
 
             if (method != null && objects != null) {
-                method.invoke(null, objects);
+                Mat matToUse = null;
+
+                if (in != null && in.equals("rgba")) {
+                    matToUse = rgba;
+                }
+                else if (in != null && in.equals("rgbat")) {
+                    matToUse = rgba.t();
+                }
+                else if (in != null && in.equals("gray")) {
+                    matToUse = gray;
+                }
+                else if (in != null && in.equals("grayt")) {
+                    matToUse = gray.t();
+                }
+
+                if (out != null && !out.equals("")) {
+                    matParamID = out;
+                    matParam = (Mat)method.invoke(matToUse, objects);
+                }
+                else {
+                    method.invoke(matToUse, objects);
+                }
             }
 
             if (dstMatIndex >= 0) {
@@ -335,7 +386,7 @@ class CvInvoke {
         catch (IllegalAccessException IAE) {
             result = 1001;
         }
-        catch (InvocationTargetException IAE) {
+        catch (InvocationTargetException ITE) {
             result = 1002;
         }
         catch (Exception EXC) {

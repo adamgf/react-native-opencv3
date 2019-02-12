@@ -75,6 +75,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     // params
     private ReadableMap            mOverlay;
     private Mat                    mOverlayMat;
+    private int                    mOverlayInterval = 0;
     private ReadableMap            mCvInvokeGroup;
     private int                    mCameraFacing;
     private CascadeClassifier      mFaceClassifier;
@@ -231,6 +232,10 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             MatManager.getInstance().setMat(matIndex, overlayMat);
             mUpdateOverlay = true;
         }
+    }
+
+    public void setOverlayInterval(int overlayInterval) {
+        this.mOverlayInterval = overlayInterval;
     }
 
     public void setLandmarksModel(String landmarksModel) {
@@ -641,7 +646,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mCvInvokeGroup != null) {
             long currMillis = System.currentTimeMillis();
             long diff = (currMillis - mCurrentMillis);
-            if (diff >= 1000) {
+            if (diff >= mOverlayInterval) {
                 mCurrentMillis = currMillis;
                 RNOpencv3Module.invokeMethods(mCvInvokeGroup, in, inputFrame.gray());
             }

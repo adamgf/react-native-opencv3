@@ -90,4 +90,9 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         view.setLandmarksModel(landmarksModel);
     }
 
+    @ReactProp(name = "overlayInterval")
+    public void setOverlayInterval(CvCameraView view, int overlayInterval) {
+        view.setOverlayInterval(overlayInterval);
+    }
+
 }
