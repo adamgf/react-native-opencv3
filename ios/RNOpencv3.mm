@@ -1,10 +1,10 @@
 
 
 // @author Adam G. Freeman - adamgf@gmail.com
-#import "RNOpencv3.h"
 #import "FileUtils.h"
 #import "MatManager.h"
 #import "CvInvoke.h"
+#import "RNOpencv3.h"
 
 @implementation RNOpencv3
 
@@ -107,7 +107,7 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
     [MatManager.sharedMgr setMat:dstMatIndex matToSet:(__bridge id)dstMat];
 }
 
--(void)invokeCvMethods:(NSDictionary*)cvInvokeMap in:(Mat*)in ingray:(Mat*)ingray {
+RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat*)in ingray:(Mat*)ingray) {
     NSArray *responseArr = NULL;
     NSString *lastCall = NULL;
     int dstMatIndex = -1;
@@ -143,15 +143,11 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
     [self sendCallbackData:responseArr callback:lastCall dstMatIndex:dstMatIndex];
 }
 
-RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat*)in ingray:(Mat*)ingray) {
-    [self invokeCvMethods:cvInvokeMap in:in ingray:ingray];
-}
-
 // IMPT NOTE: retArr can either be one single array or an array of arrays ...
 -(void)sendCallbackData:(NSArray*)retArr callback:(NSString*)callback dstMatIndex:(int)dstMatIndex {
     if (callback != NULL && ![callback isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
         // not sure how this should be handled yet for different return objects ...
-        [self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
+        //[self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
     }
     else {
         // not necessarily error condition unless dstMatIndex >= 1000

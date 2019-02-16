@@ -8,7 +8,6 @@
 
 #import "CvCamera.h"
 #import "FileUtils.h"
-#import "RNOpencv3.h"
 
 @implementation CvCamera {
     // private properties
@@ -372,7 +371,7 @@
         //long diff = (currMillis - mCurrentMillis);
         //if (diff >= mOverlayInterval) {
         //    mCurrentMillis = currMillis;
-        [RNOpencv3 invokeCvMethods:mCvInvokeGroup in:image ingray:gray];
+        //[RNOpencv3 invokeMethods:mCvInvokeGroup in:image ingray:gray];
         //}
     }
 
