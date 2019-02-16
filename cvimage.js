@@ -12,11 +12,12 @@ import { Platform, Image } from 'react-native';
 const  { RNOpencv3 } = NativeModules;
 import { ColorConv } from './constants';
 
+var RNFS = require('react-native-fs')
+
 export class CvImage extends Component {
 
   constructor(props) {
     super(props)
-    this.RNFS = require('react-native-fs')
     this.resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource')
     this.state = { 'destFile' : '' }
   }
@@ -32,7 +33,7 @@ export class CvImage extends Component {
         dstMat = res
         RNOpencv3.imageToMat(sourceFile).then((res) => {
           srcMat = res
-          this.RNFS.unlink(sourceFile).then(() => {
+          RNFS.unlink(sourceFile).then(() => {
 
             // replace srcMat and dstMat strings with actual srcMat and dstMat
             const { cvinvoke } = this.props
@@ -50,8 +51,8 @@ export class CvImage extends Component {
             }
 
             //alert('cvinvoke is: ' + JSON.stringify(this.props.cvinvoke))
-            RNOpencv3.invokeMethods(cvinvoke)
-            //RNOpencv3.invokeMethod("cvtColor", {"p1":srcMat,"p2":dstMat,"p3":ColorConv.COLOR_BGR2GRAY});
+            //RNOpencv3.invokeMethods(cvinvoke)
+            RNOpencv3.invokeMethod("cvtColor", {"p1":srcMat,"p2":dstMat,"p3":ColorConv.COLOR_BGR2GRAY});
             //RNOpencv3.cvtColor(srcMat, dstMat, ColorConv.COLOR_BGR2GRAY)
             RNOpencv3.matToImage(dstMat, sourceFile)
             .then((image) => {
@@ -82,8 +83,8 @@ export class CvImage extends Component {
 
   getFilename = (source_uri) => {
     const filePortion = source_uri.substring(source_uri.lastIndexOf('/'), source_uri.lastIndexOf('?'))
-    if (this.RNFS) {
-      return this.RNFS.DocumentDirectoryPath + filePortion
+    if (RNFS) {
+      return RNFS.DocumentDirectoryPath + filePortion
     }
     else {
       console.error('RNFS is null filePortion is: ' + filePortion)
@@ -95,10 +96,10 @@ export class CvImage extends Component {
     return new Promise((resolve, reject) => {
       const filename = this.getFilename(uri)
 
-      this.RNFS.exists(filename)
+      RNFS.exists(filename)
       .then((itExists) => {
         if (itExists) {
-          this.RNFS.unlink(filename)
+          RNFS.unlink(filename)
           .then(() => {})
           .catch((err) => {
             console.error(err)
@@ -106,7 +107,7 @@ export class CvImage extends Component {
           })
         }
 
-        const ret = this.RNFS.downloadFile({
+        const ret = RNFS.downloadFile({
           fromUrl: uri,
           toFile: filename
         })

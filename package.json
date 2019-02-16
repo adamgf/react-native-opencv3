@@ -35,7 +35,8 @@
   "main": "index.js",
   "name": "react-native-opencv3",
   "peerDependencies": {
-    "react-native": "^0.57.4"
+    "react-native": "^0.57.4",
+    "react-native-fs": "^2.13.3"
   },
   "rnpm": {
     "Assets": [
