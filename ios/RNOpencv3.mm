@@ -4,6 +4,7 @@
 #import "RNOpencv3.h"
 #import "FileUtils.h"
 #import "MatManager.h"
+#import "CvInvoke.h"
 
 @implementation RNOpencv3
 
@@ -12,6 +13,11 @@
     return dispatch_get_main_queue();
 }
 RCT_EXPORT_MODULE()
+
+- (NSArray<NSString *> *)supportedEvents
+{
+    return @[@"onPayload"];
+}
 
 RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
 
@@ -38,7 +44,7 @@ RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)
 
     cv::Mat outputMat;
     UIImageToMat(normalizedImage, outputMat);
-    int matIndex = [(MatManager*)MatManager.sharedMgr addMat:outputMat];
+    int matIndex = [(MatManager*)MatManager.sharedMgr addMat:(__bridge id)&outputMat];
 
     NSNumber *wid = [NSNumber numberWithInt:(int)sourceImage.size.width];
     NSNumber *hei = [NSNumber numberWithInt:(int)sourceImage.size.height];
@@ -57,9 +63,9 @@ RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resol
     NSNumber *srcMatNum = [src valueForKey:@"matIndex"];
     int matIndex = (int)[srcMatNum integerValue];
 
-    cv::Mat inputMat = [(MatManager*)MatManager.sharedMgr matAtIndex:matIndex];
+    cv::Mat *inputMat = (__bridge Mat*)[MatManager.sharedMgr matAtIndex:matIndex];
 
-    UIImage *destImage = MatToUIImage(inputMat);
+    UIImage *destImage = MatToUIImage(*inputMat);
     if (destImage == nil) {
         return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", destImage], nil);
     }
@@ -93,29 +99,121 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
     int srcMatIndex = (int)[srcMatNum integerValue];
     int dstMatIndex = (int)[dstMatNum integerValue];
 
-    cv::Mat srcMat = [(MatManager*)MatManager.sharedMgr matAtIndex:srcMatIndex];
-    cv::Mat dstMat = [(MatManager*)MatManager.sharedMgr matAtIndex:dstMatIndex];
+    cv::Mat *srcMat = (__bridge Mat*)[MatManager.sharedMgr matAtIndex:srcMatIndex];
+    cv::Mat *dstMat = (__bridge Mat*)[MatManager.sharedMgr matAtIndex:dstMatIndex];
 
-    cvtColor(srcMat, dstMat, convColorCode);
+    cvtColor(*srcMat, *dstMat, convColorCode);
 
-    [(MatManager*)MatManager.sharedMgr setMat:dstMat atIndex:dstMatIndex];
+    [MatManager.sharedMgr setMat:dstMatIndex matToSet:(__bridge id)dstMat];
+}
+
+-(void)invokeCvMethods:(NSDictionary*)cvInvokeMap in:(Mat*)in ingray:(Mat*)ingray {
+    NSArray *responseArr = NULL;
+    NSString *lastCall = NULL;
+    int dstMatIndex = -1;
+    NSArray *groupids = NULL;
+    if ([cvInvokeMap.allKeys containsObject:@"groupids"]) {
+        groupids = (NSArray*)[cvInvokeMap valueForKey:@"groupids"];
+        if (groupids != NULL && groupids.count > 0) {
+            NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
+            responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
+            for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
+                CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:in gray:ingray];
+                dstMatIndex = [invoker invokeCvMethods:(NSDictionary*)invokeGroups[i]];
+                if (invoker.callback != NULL) {
+                    lastCall = invoker.callback;
+                }
+                if (lastCall != NULL && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                    NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+                    [(NSMutableArray*)responseArr addObject:retArr];
+                }
+            }
+        }
+    }
+    else {
+        CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:in gray:ingray];
+        dstMatIndex = [invoker invokeCvMethods:cvInvokeMap];
+        if (invoker.callback != NULL) {
+            lastCall = invoker.callback;
+        }
+        if (lastCall != NULL && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+            responseArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+        }
+    }
+    [self sendCallbackData:responseArr callback:lastCall dstMatIndex:dstMatIndex];
+}
+
+RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat*)in ingray:(Mat*)ingray) {
+    [self invokeCvMethods:cvInvokeMap in:in ingray:ingray];
+}
+
+// IMPT NOTE: retArr can either be one single array or an array of arrays ...
+-(void)sendCallbackData:(NSArray*)retArr callback:(NSString*)callback dstMatIndex:(int)dstMatIndex {
+    if (callback != NULL && ![callback isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+        // not sure how this should be handled yet for different return objects ...
+        [self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
+    }
+    else {
+        // not necessarily error condition unless dstMatIndex >= 1000
+        if (dstMatIndex >= 1000) {
+            NSLog(@"Exception thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(invokeMethodWithCallback:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out callback:(NSString*)callback) {
+    CvInvoke *invoker = [[CvInvoke alloc] init];
+    int dstMatIndex = [invoker invokeCvMethod:in func:func params:params out:out];
+    NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+    [self sendCallbackData:retArr callback:callback dstMatIndex:dstMatIndex];
+}
+
+RCT_EXPORT_METHOD(invokeMethod:(NSString*)func params:(NSDictionary*)params) {
+    CvInvoke *invoker = [[CvInvoke alloc] init];
+    [invoker invokeCvMethod:NULL func:func params:params out:NULL];
+}
+
+RCT_EXPORT_METHOD(invokeInOutMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out) {
+    CvInvoke *invoker = [[CvInvoke alloc] init];
+    [invoker invokeCvMethod:in func:func params:params out:out];
+}
+
+-(void)resolveMatPromise:(int)matIndex rows:(int)rows cols:(int)cols cvtype:(int)cvtype resolver:(RCTPromiseResolveBlock)resolve {
+    
+    NSDictionary *returnDict;
+    
+    if (cvtype == -1) {
+        returnDict = @{ @"matIndex" : [NSNumber numberWithInt:matIndex], @"rows" : [NSNumber numberWithInt:rows], @"cols" : [NSNumber numberWithInt:cols] };
+    }
+    else {
+        returnDict = @{ @"matIndex" : [NSNumber numberWithInt:matIndex], @"rows" : [NSNumber numberWithInt:rows], @"cols" : [NSNumber numberWithInt:cols] , @"CvType" : [NSNumber numberWithInt:cvtype] };
+    }
+    resolve(returnDict);
+}
+
+RCT_EXPORT_METHOD(MatWithScalar:(int)rows cols:(int)cols cvtype:(int)cvtype scalarVal:(NSDictionary*)scalarVal resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    int matIndex = [MatManager.sharedMgr createMat:rows cols:cols cvtype:cvtype scalarVal:scalarVal];
+    [self resolveMatPromise:matIndex rows:rows cols:cols cvtype:cvtype resolver:resolve];
+}
+
+RCT_EXPORT_METHOD(MatWithParams:(int)rows cols:(int)cols cvtype:(int)cvtype resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    int matIndex = [MatManager.sharedMgr createMat:rows cols:cols cvtype:cvtype scalarVal:NULL];
+    [self resolveMatPromise:matIndex rows:rows cols:cols cvtype:cvtype resolver:resolve];
 }
 
 RCT_EXPORT_METHOD(Mat:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    int matIndex = [(MatManager*)MatManager.sharedMgr createEmptyMat];
-    NSString *matIndexStr = [NSString stringWithFormat:@"%d", matIndex];
-    NSDictionary *returnDict = @{ @"matIndex" : matIndexStr, @"cols" : @0, @"rows" : @0 };
-    resolve(returnDict);
+    int matIndex = [MatManager.sharedMgr createEmptyMat];
+    [self resolveMatPromise:matIndex rows:0 cols:0 cvtype:-1 resolver:resolve];
 }
 
 RCT_EXPORT_METHOD(deleteMat:(NSDictionary*)mat) {
     NSNumber *matIndexNum = [mat valueForKey:@"matIndex"];
-    int matIndex = (int)[matIndexNum integerValue];
-    [(MatManager*)MatManager.sharedMgr deleteMatAtIndex:matIndex];
+    int matIndex = [matIndexNum intValue];
+    [MatManager.sharedMgr deleteMatAtIndex:matIndex];
 }
 
 RCT_EXPORT_METHOD(deleteMats) {
-    [(MatManager*)MatManager.sharedMgr deleteMats];
+    [MatManager.sharedMgr deleteMats];
 }
 
 @end

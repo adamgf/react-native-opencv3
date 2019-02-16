@@ -21,9 +21,15 @@ RCT_EXPORT_MODULE(CvCameraView);
 
 RCT_EXPORT_VIEW_PROPERTY(onFacesDetected, RCTBubblingEventBlock)
 
+RCT_EXPORT_VIEW_PROPERTY(onFrameSize, RCTBubblingEventBlock)
+
 // And you sent event you want from objectC to react-native
 - (UIView *)view {
     return [[CvCamera alloc] initWithBridge:self.bridge];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(cvinvoke, NSDictionary*, CvCamera) {
+    [view setCvInvokeGroup:json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(facing, NSString*, CvCamera) {

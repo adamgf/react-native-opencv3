@@ -15,15 +15,29 @@
 
 @property (nonatomic, strong) NSMutableArray *mats;
 
-+ (id)sharedMgr;
++(id)sharedMgr;
 
 -(int)createEmptyMat;
 
--(int)addMat:(cv::Mat&)matToAdd;
+-(int)createMat:(int)rows cols:(int)cols cvtype:(int)cvtype scalarVal:(NSDictionary*)cvscalar;
 
--(cv::Mat)matAtIndex:(int)matIndex;
+-(int)createMatOfInt:(int)matval;
 
--(void)setMat:(cv::Mat&)matToSet atIndex:(int)matIndex;
+-(int)createMatOfFloat:(float)lomatval himatval:(float)himatval;
+
+-(int)addMat:(id)matToAdd;
+
+-(id)matAtIndex:(int)matIndex;
+
+-(void)setMat:(int)matIndex matToSet:(id)matToSet;
+
+-(NSArray*)getMatData:(int)matIndex rownum:(int)rownum colnum:(int)colnum;
+
+-(void)setTo:(int)matIndex cvscalar:(NSDictionary*)cvscalar;
+
+-(void)put:(int)matIndex rownum:(int)rownum colnum:(int)colnum data:(NSArray*)data;
+
+-(void)transpose:(int)matIndex;
 
 -(void)deleteMatAtIndex:(int)matIndex;
 

@@ -49,11 +49,14 @@ class MatManager {
         return matIndex;
     }
 
-    public static int createMat(int rows, int cols, int cvtype, Scalar scalarVal) {
+    public static int createMat(int rows, int cols, int cvtype, ReadableMap scalarMap) {
         int matIndex = mats.size();
         Mat matToAdd = null;
 
-        if (scalarVal != null) {
+        if (cvscalar != null) {
+	        ReadableArray cvscalar = scalarMap.getArray("vals");
+	        Scalar scalarVal = new Scalar(cvscalar.getDouble(0),cvscalar.getDouble(1),
+	          cvscalar.getDouble(2),cvscalar.getDouble(3));
             matToAdd = new Mat(rows, cols, cvtype, scalarVal);
         }
         else {

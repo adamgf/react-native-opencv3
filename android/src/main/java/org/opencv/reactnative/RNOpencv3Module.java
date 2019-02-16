@@ -300,11 +300,8 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void MatWithScalar(int rows, int cols, int cvtype, ReadableMap scalarMap, final Promise promise) {
-        ReadableArray scalarVal = scalarMap.getArray("vals");
         //MakeAToast("Scalar values are: " + scalarVal.getDouble(0) + "," + scalarVal.getDouble(1) + "," + scalarVal.getDouble(2) + "," + scalarVal.getDouble(3)  );
-        Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
-          scalarVal.getDouble(2),scalarVal.getDouble(3));
-        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, dScalar);
+        int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, scalarMap);
         resolveMatPromise(matIndex, rows, cols, cvtype, promise);
     }
 

@@ -8,28 +8,37 @@
 
 #import "CvCamera.h"
 #import "FileUtils.h"
+#import "RNOpencv3.h"
 
-@implementation CvCamera
+@implementation CvCamera {
+    // private properties
+    NSDictionary           *mOverlay;
+    Mat                    *mOverlayMat;
+    int                    mOverlayInterval;
+    NSDictionary           *mCvInvokeGroup;
 
-// private properties
-bool mUseFaceDetection;
-bool mUseEyesDetection;
-bool mUseNoseDetection;
-bool mUseMouthDetection;
-bool mUseLandmarks;
-NSString *mFacing;
-CGFloat mRelativeFaceSize = 0.2f;
-int mAbsoluteFaceSize = 0;
-
-CascadeClassifier face_cascade;
-CascadeClassifier eyes_cascade;
-CascadeClassifier mouth_cascade;
-CascadeClassifier nose_cascade;
-Ptr<face::Facemark> landmarks;
+    bool mUseFaceDetection;
+    bool mUseEyesDetection;
+    bool mUseNoseDetection;
+    bool mUseMouthDetection;
+    bool mUseLandmarks;
+    NSString *mFacing;
+    CGFloat mRelativeFaceSize;
+    int mAbsoluteFaceSize;
+    
+    CascadeClassifier face_cascade;
+    CascadeClassifier eyes_cascade;
+    CascadeClassifier mouth_cascade;
+    CascadeClassifier nose_cascade;
+    Ptr<face::Facemark> landmarks;
+}
 
 - (id)initWithBridge:(RCTBridge *)bridge
 {
     if ((self = [super init])) {
+        mOverlayInterval = 0;
+        mRelativeFaceSize = 0.2f;
+        mAbsoluteFaceSize = 0;
         self.backgroundColor = [UIColor blackColor];
         self.bridge = bridge;
         CvVideoCamera *videoCamera = [[CvVideoCamera alloc] initWithParentView:self];
@@ -165,13 +174,20 @@ Ptr<face::Facemark> landmarks;
 - (void)processImage:(cv::Mat&)image {
 
     // Do some OpenCV stuff with the image
-    cv::Mat image_copy;
+    Mat gray;
+    cv::Mat image_copy; // image in corrected colorspace ...
     cvtColor(image, image_copy, COLOR_BGR2RGBA);
-
+    cvtColor(image, gray, COLOR_BGR2GRAY);
+    
+    //Log.d(TAG, "payload is: " + faceInfo);
+    if (self && self.onFrameSize) {
+        NSString *frameSizeStr = [NSString stringWithFormat:@"{\"frameSize\":{\"frameWidth\":%d,\"frameHeight\":%d}}",image.cols,image.rows];
+        self.onFrameSize(@{@"payload":frameSizeStr});
+    }
+    
     if (mUseFaceDetection) {
         std::vector<cv::Rect> faces;
-        Mat gray;
-        cvtColor(image, gray, COLOR_BGR2GRAY);
+
         equalizeHist(gray, gray);
 
         UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
@@ -351,6 +367,15 @@ Ptr<face::Facemark> landmarks;
         }
     }
 
+    if (mCvInvokeGroup != NULL) {
+        //long currMillis = System.currentTimeMillis();
+        //long diff = (currMillis - mCurrentMillis);
+        //if (diff >= mOverlayInterval) {
+        //    mCurrentMillis = currMillis;
+        [RNOpencv3 invokeCvMethods:mCvInvokeGroup in:image ingray:gray];
+        //}
+    }
+
     // invert image
     //bitwise_not(image_copy, image_copy);
 
@@ -367,6 +392,10 @@ Ptr<face::Facemark> landmarks;
 }
 
 #pragma Properties
+
+-(void)setCvInvokeGroup:(NSDictionary*)cvinvoke {
+    mCvInvokeGroup = cvinvoke;
+}
 
 - (void)changeFacing:(NSString*)facing {
     if (![facing isEqualToString:mFacing]) {
