@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
   end
 
   s.dependency "OpenCVmin-face", "~> 3.4.5"
+  s.dependency "RNFS", "~> 2.13.3"
   # s.dependency "React"
   # s.dependency "others"
 
