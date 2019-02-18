@@ -13,7 +13,7 @@
 
 @interface CvInvoke : NSObject
 
--(id)initWithRgba:(Mat*)rgba gray:(Mat*)gray;
+-(id)initWithRgba:(Mat)rgba gray:(Mat)gray;
 
 +(NSArray*)populateInvokeGroups:(NSDictionary*)cvInvokeGroup;
 
@@ -27,9 +27,9 @@
 
 @property (nonatomic, copy) NSString *callback;
 
-@property (nonatomic, assign) cv::Mat *rgba;
+@property (nonatomic, assign) Mat rgba;
 
-@property (nonatomic, assign) cv::Mat *gray;
+@property (nonatomic, assign) Mat gray;
 
 @property (nonatomic, strong) NSMutableDictionary *matParams;
 

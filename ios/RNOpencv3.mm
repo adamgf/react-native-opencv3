@@ -42,9 +42,9 @@ RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)
 
     UIImage *normalizedImage = [FileUtils normalizeImage:sourceImage];
 
-    cv::Mat outputMat;
+    Mat outputMat;
     UIImageToMat(normalizedImage, outputMat);
-    int matIndex = [(MatManager*)MatManager.sharedMgr addMat:(__bridge id)&outputMat];
+    int matIndex = [MatManager.sharedMgr addMat:outputMat];
 
     NSNumber *wid = [NSNumber numberWithInt:(int)sourceImage.size.width];
     NSNumber *hei = [NSNumber numberWithInt:(int)sourceImage.size.height];
@@ -63,9 +63,9 @@ RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resol
     NSNumber *srcMatNum = [src valueForKey:@"matIndex"];
     int matIndex = (int)[srcMatNum integerValue];
 
-    cv::Mat *inputMat = (__bridge Mat*)[MatManager.sharedMgr matAtIndex:matIndex];
+    Mat inputMat = [MatManager.sharedMgr matAtIndex:matIndex];
 
-    UIImage *destImage = MatToUIImage(*inputMat);
+    UIImage *destImage = MatToUIImage(inputMat);
     if (destImage == nil) {
         return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", destImage], nil);
     }
@@ -88,7 +88,6 @@ RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resol
                                   @"uri" : outPath };
 
     resolve(returnDict);
-
 }
 
 RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColorCode:(int)convColorCode) {
@@ -99,15 +98,15 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
     int srcMatIndex = (int)[srcMatNum integerValue];
     int dstMatIndex = (int)[dstMatNum integerValue];
 
-    cv::Mat *srcMat = (__bridge Mat*)[MatManager.sharedMgr matAtIndex:srcMatIndex];
-    cv::Mat *dstMat = (__bridge Mat*)[MatManager.sharedMgr matAtIndex:dstMatIndex];
+    Mat srcMat = [MatManager.sharedMgr matAtIndex:srcMatIndex];
+    Mat dstMat = [MatManager.sharedMgr matAtIndex:dstMatIndex];
 
-    cvtColor(*srcMat, *dstMat, convColorCode);
+    cvtColor(srcMat, dstMat, convColorCode);
 
-    [MatManager.sharedMgr setMat:dstMatIndex matToSet:(__bridge id)dstMat];
+    [MatManager.sharedMgr setMat:dstMatIndex matToSet:dstMat];
 }
 
-RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat*)in ingray:(Mat*)ingray) {
+RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat)in ingray:(Mat)ingray) {
     NSArray *responseArr = NULL;
     NSString *lastCall = NULL;
     int dstMatIndex = -1;
@@ -177,7 +176,6 @@ RCT_EXPORT_METHOD(invokeInOutMethod:(NSString*)in func:(NSString*)func params:(N
 -(void)resolveMatPromise:(int)matIndex rows:(int)rows cols:(int)cols cvtype:(int)cvtype resolver:(RCTPromiseResolveBlock)resolve {
     
     NSDictionary *returnDict;
-    
     if (cvtype == -1) {
         returnDict = @{ @"matIndex" : [NSNumber numberWithInt:matIndex], @"rows" : [NSNumber numberWithInt:rows], @"cols" : [NSNumber numberWithInt:cols] };
     }
@@ -200,6 +198,16 @@ RCT_EXPORT_METHOD(MatWithParams:(int)rows cols:(int)cols cvtype:(int)cvtype reso
 RCT_EXPORT_METHOD(Mat:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     int matIndex = [MatManager.sharedMgr createEmptyMat];
     [self resolveMatPromise:matIndex rows:0 cols:0 cvtype:-1 resolver:resolve];
+}
+
+RCT_EXPORT_METHOD(MatOfInt:(int)lomatval himatval:(int)himatval resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    int matIndex = [MatManager.sharedMgr createMatOfInt:lomatval himatval:himatval];
+    resolve(@{ @"matIndex" : [NSNumber numberWithInt:matIndex]});
+}
+
+RCT_EXPORT_METHOD(MatOfFloat:(float)lomatval himatval:(float)himatval resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    int matIndex = [MatManager.sharedMgr createMatOfFloat:lomatval himatval:himatval];
+    resolve(@{ @"matIndex" : [NSNumber numberWithInt:matIndex]});
 }
 
 RCT_EXPORT_METHOD(deleteMat:(NSDictionary*)mat) {

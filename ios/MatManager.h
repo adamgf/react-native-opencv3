@@ -21,15 +21,15 @@
 
 -(int)createMat:(int)rows cols:(int)cols cvtype:(int)cvtype scalarVal:(NSDictionary*)cvscalar;
 
--(int)createMatOfInt:(int)matval;
+-(int)createMatOfInt:(int)lomatval himatval:(int)himatval;
 
 -(int)createMatOfFloat:(float)lomatval himatval:(float)himatval;
 
--(int)addMat:(id)matToAdd;
+-(int)addMat:(Mat)matToAdd;
 
--(id)matAtIndex:(int)matIndex;
+-(Mat)matAtIndex:(int)matIndex;
 
--(void)setMat:(int)matIndex matToSet:(id)matToSet;
+-(void)setMat:(int)matIndex matToSet:(Mat)matToSet;
 
 -(NSArray*)getMatData:(int)matIndex rownum:(int)rownum colnum:(int)colnum;
 

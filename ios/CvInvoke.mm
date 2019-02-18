@@ -9,14 +9,22 @@
 #import "CvInvoke.h"
 #import "MatManager.h"
 
+@interface MatWrapper2 : NSObject
+@property (nonatomic, assign) Mat myMat;
+@end
+
+// simple opaque object that wraps a cv::Mat or other OpenCV object or other type ...
+@implementation MatWrapper2
+@end
+
 @implementation CvInvoke
 
--(id)initWithRgba:(Mat*)rgba gray:(Mat*)gray {
+-(id)initWithRgba:(Mat)rgba gray:(Mat)gray {
     if (self = [super init]) {
-        if (rgba != NULL) {
+        if (rgba.rows > 0) {
             self.rgba = rgba;
         }
-        if (gray != NULL) {
+        if (gray.rows > 0) {
             self.gray = gray;
         }
         self.arrMatIndex = -1;
@@ -41,27 +49,28 @@
         NSString* itsType = NSStringFromClass([hashMap valueForKey:paramNum]);
         if ([itsType isEqualToString:@"NSString"]) {
             NSString *paramStr = [hashMap valueForKey:paramNum];
-            Mat *dstMat = NULL;
+            Mat dstMat;
             if ([paramStr isEqualToString:@"rgba"]) {
                 dstMat = self.rgba;
             }
             else if ([paramStr isEqualToString:@"rgbat"]) {
-                Mat tMat = self.rgba->t();
-                dstMat = &tMat;
+                dstMat = self.rgba.t();
             }
             else if ([paramStr isEqualToString:@"gray"]) {
                 dstMat = self.gray;
             }
             else if ([paramStr isEqualToString:@"grayt"]) {
-                Mat tMat = self.gray->t();
-                dstMat = &tMat;
+                dstMat = self.gray.t();
             }
             else if ([self.matParams.allKeys containsObject:paramStr]) {
-                dstMat = (__bridge Mat*)[self.matParams valueForKey:paramStr];
+                MatWrapper2 *MW2 = (MatWrapper2*)[self.matParams valueForKey:paramStr];
+                dstMat = MW2.myMat;
             }
-            if (dstMat != NULL) {
+            if (dstMat.rows > 0) {
                 // whatever the type is the Mat will suffice
-                [retObjs insertObject:(__bridge id)dstMat atIndex:(i-1)];
+                MatWrapper2 *MW2 = [[MatWrapper2 alloc] init];
+                MW2.myMat = dstMat;
+                [retObjs insertObject:MW2 atIndex:(i-1)];
                 
             }
             else if ([param isEqualToString:@"NSString"]) {
@@ -72,8 +81,10 @@
             if ([itsType isEqualToString:@"Mat"]) {
                 NSDictionary* matMap = (NSDictionary*)[hashMap valueForKey:paramNum];
                 int matIndex = [(NSNumber*)[matMap valueForKey:@"matIndex"] intValue];
-                Mat *dMat = (__bridge Mat*)[MatManager.sharedMgr  matAtIndex:matIndex];
-                [retObjs insertObject:(__bridge id)dMat atIndex:(i-1)];
+                Mat dMat = [MatManager.sharedMgr  matAtIndex:matIndex];
+                MatWrapper2 *MW2 = [[MatWrapper2 alloc] init];
+                MW2.myMat = dMat;
+                [retObjs insertObject:MW2 atIndex:(i-1)];
                 self.arrMatIndex = i - 1;
                 self.dstMatIndex = matIndex;
             }
@@ -255,10 +266,44 @@
    
    @try {
        Method method = NULL;
-       Class matclass = NSClassFromString(@"Mat");
-       Class imgprocclass = NSClassFromString(@"Imgproc");
-       Class coreclass = NSClassFromString(@"Core");
        
+       CFBundleRef ocv2 = CFBundleGetBundleWithIdentifier(CFSTR("opencv2"));
+       CFArrayRef loadedFrameworks = CFBundleGetAllBundles();
+       
+       NSArray *lframes2 = [NSBundle allBundles];
+       
+       NSArray *lframes3 = [NSBundle allFrameworks];
+       NSString *disPath = [[NSBundle mainBundle] builtInPlugInsPath];
+       
+       long discount = CFArrayGetCount(loadedFrameworks);
+       //or (int i=0;i < discount;i++) {
+         //  CFBundleRef disherebundle = (CFBundleRef)CFArrayGetValueAtIndex(loadedFrameworks, i);
+           
+           
+           NSBundle *amazingBundle = [NSBundle bundleForClass:[self class]];
+
+       NSString *ident = [amazingBundle bundleIdentifier];
+       CFBundleRef br = CFBundleGetBundleWithIdentifier(CFSTR([ident UTF8String]));
+       void* doSomething = CFBundleGetFunctionPointerForName(br,
+                                                             CFSTR("cvtColor"));
+           
+           if (doSomething != NULL) {
+               NSLog(@"Stop here");
+           }
+       //}
+       NSString *fuckingmatid = @"cvtColor";
+       
+       typedef void (*opencv_t);
+       std::string yourfunc("cvtColor");
+       
+       std::function<void(cv::InputArray,cv::OutputArray,int,int)> f_display = cvtColor;
+       
+       Class matclass = [fuckingmatid class]; //NSClassFromString(@"cv::Mat");
+       Class imgprocclass = NSClassFromString(@"cv::Imgproc");
+       Class coreclass = NSClassFromString(@"cv::Core");
+       
+       method = [self findMethod:func params:params searchClass:matclass];
+
        if (in != NULL && ![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || [self.matParams.allKeys containsObject:in]))
            {
            
@@ -283,24 +328,23 @@
            }
        }
        if (method != NULL) {
-           Mat *matToUse = NULL;
+           Mat matToUse;
            
            if (in != NULL && [in isEqualToString:@"rgba"]) {
                matToUse = self.rgba;
            }
            else if (in != NULL && [in isEqualToString:@"rgbat"]) {
-               Mat tMat = self.rgba->t();
-               matToUse = &tMat;
+               matToUse = self.rgba.t();
            }
            else if (in != NULL && [in isEqualToString:@"gray"]) {
                matToUse = self.gray;
            }
            else if (in != NULL && [in isEqualToString:@"grayt"]) {
-               Mat tMat = self.rgba->t();
-               matToUse = &tMat;
+               matToUse = self.rgba.t();
            }
            else if (in != NULL && [self.matParams.allKeys containsObject:in]) {
-               matToUse = (__bridge Mat*)[self.matParams valueForKey:in];
+               MatWrapper2 *MW2 = (MatWrapper2*)[self.matParams valueForKey:in];
+               matToUse = MW2.myMat;
            }
            
            SEL theSelector = method_getName(method);
@@ -326,15 +370,15 @@
                }
            }
            
-           if (matToUse != NULL && [func isEqualToString:@"release"]) {
+           if (matToUse.rows > 0 && [func isEqualToString:@"release"]) {
                // special case deleting the last Mat
-               matToUse->release();
+               matToUse.release();
                [self.matParams removeObjectForKey:in];
            }
            else if (methodSignature != NULL) {
                NSInvocation *invoker = [NSInvocation invocationWithMethodSignature:methodSignature];
                [invoker setSelector:theSelector];
-               [invoker setTarget:(__bridge id)matToUse];
+               [invoker setTarget:dClass];
                
                for (int i=0;i < objects.count;i++) {
                    id parm = [objects objectAtIndex:i];
@@ -353,7 +397,8 @@
        }
        
        if (self.dstMatIndex >= 0) {
-           id dstMat = objects[self.arrMatIndex];
+           MatWrapper2 *dstMatWrapper = (MatWrapper2*)objects[self.arrMatIndex];
+           Mat dstMat = dstMatWrapper.myMat;
            [MatManager.sharedMgr setMat:self.dstMatIndex matToSet:dstMat];
            result = self.dstMatIndex;
            self.dstMatIndex = -1;
