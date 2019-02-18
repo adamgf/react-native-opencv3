@@ -30,6 +30,7 @@
 		5043A78621DDBA3F000BC241 /* haarcascade_lowerbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76E21DDBA3E000BC241 /* haarcascade_lowerbody.xml */; };
 		5043A78721DDBA3F000BC241 /* lbpcascade_frontalface.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76F21DDBA3E000BC241 /* lbpcascade_frontalface.xml */; };
 		5043A78821DDBA3F000BC241 /* haarcascade_mcs_lefteye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A77021DDBA3E000BC241 /* haarcascade_mcs_lefteye.xml */; };
+		50808506221B417B00FF5C39 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 50808501221B410600FF5C39 /* libRNFS.a */; };
 		5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5080B7F121915DC800170E85 /* RNOpencv3.mm */; };
 		5084125722162E00007835FA /* CvInvoke.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5084125622162E00007835FA /* CvInvoke.mm */; };
 		50B7C95321C89F0300A43F6B /* ocvdata.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50B7C94721C89E3F00A43F6B /* ocvdata.bundle */; };
@@ -40,6 +41,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		50808500221B410600FF5C39 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 508084FB221B410600FF5C39 /* RNFS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F12AFB9B1ADAF8F800E0535D;
+			remoteInfo = RNFS;
+		};
+		50808502221B410600FF5C39 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 508084FB221B410600FF5C39 /* RNFS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6456441F1EB8DA9100672408;
+			remoteInfo = "RNFS-tvOS";
+		};
 		50B7C94E21C89EA700A43F6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 58B511D31A9E6C8500147676 /* Project object */;
@@ -87,6 +102,7 @@
 		5043A76E21DDBA3E000BC241 /* haarcascade_lowerbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_lowerbody.xml; sourceTree = "<group>"; };
 		5043A76F21DDBA3E000BC241 /* lbpcascade_frontalface.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = lbpcascade_frontalface.xml; sourceTree = "<group>"; };
 		5043A77021DDBA3E000BC241 /* haarcascade_mcs_lefteye.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_lefteye.xml; sourceTree = "<group>"; };
+		508084FB221B410600FF5C39 /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../../react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		5080B7F121915DC800170E85 /* RNOpencv3.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpencv3.mm; sourceTree = "<group>"; };
 		5080B7F221915DC800170E85 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		5084125622162E00007835FA /* CvInvoke.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CvInvoke.mm; sourceTree = "<group>"; };
@@ -115,6 +131,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50808506221B417B00FF5C39 /* libRNFS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +144,22 @@
 				134814201AA4EA6300B7C361 /* libRNOpencv3.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		508084FC221B410600FF5C39 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				50808501221B410600FF5C39 /* libRNFS.a */,
+				50808503221B410600FF5C39 /* libRNFS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		50808504221B414400FF5C39 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		50B7C94821C89E3F00A43F6B /* ocvdata */ = {
@@ -162,6 +195,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				508084FB221B410600FF5C39 /* RNFS.xcodeproj */,
 				5084125822162EFE007835FA /* CvInvoke.h */,
 				5084125622162E00007835FA /* CvInvoke.mm */,
 				50CC5D5121EEF945004B431E /* MatManager.h */,
@@ -178,6 +212,7 @@
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				50B7C94721C89E3F00A43F6B /* ocvdata.bundle */,
+				50808504221B414400FF5C39 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -248,6 +283,12 @@
 			mainGroup = 58B511D21A9E6C8500147676;
 			productRefGroup = 58B511D21A9E6C8500147676;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 508084FC221B410600FF5C39 /* Products */;
+					ProjectRef = 508084FB221B410600FF5C39 /* RNFS.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* RNOpencv3 */,
@@ -255,6 +296,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		50808501221B410600FF5C39 /* libRNFS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFS.a;
+			remoteRef = 50808500221B410600FF5C39 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		50808503221B410600FF5C39 /* libRNFS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFS.a;
+			remoteRef = 50808502221B410600FF5C39 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		50B7C94521C89E3F00A43F6B /* Resources */ = {

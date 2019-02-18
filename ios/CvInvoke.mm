@@ -283,13 +283,13 @@
            NSBundle *amazingBundle = [NSBundle bundleForClass:[self class]];
 
        NSString *ident = [amazingBundle bundleIdentifier];
-       CFBundleRef br = CFBundleGetBundleWithIdentifier(CFSTR([ident UTF8String]));
-       void* doSomething = CFBundleGetFunctionPointerForName(br,
-                                                             CFSTR("cvtColor"));
+       //CFBundleRef br = CFBundleGetBundleWithIdentifier(CFSTR([ident UTF8String]));
+       //void* doSomething = CFBundleGetFunctionPointerForName(br,
+         //                                           CFSTR("cvtColor"));
            
-           if (doSomething != NULL) {
-               NSLog(@"Stop here");
-           }
+           //if (doSomething != NULL) {
+           //    NSLog(@"Stop here");
+           //}
        //}
        NSString *fuckingmatid = @"cvtColor";
        
