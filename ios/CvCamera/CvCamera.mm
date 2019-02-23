@@ -414,8 +414,9 @@
     NSString *landmarksPath = [FileUtils loadBundleResource:landmarksModel extension:@"yaml"];
 
     if (landmarksPath) {
-        landmarks = face::createFacemarkLBF();
-        landmarks->loadModel( std::string([landmarksPath UTF8String]));
+        face::FacemarkLBF::Params params;
+        params.model_filename = std::string([landmarksPath UTF8String]);
+        landmarks = face::FacemarkLBF::create(params);
         mUseLandmarks = true;
     }
 }

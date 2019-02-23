@@ -11,6 +11,9 @@
 #ifndef CvInvoke_h
 #define CvInvoke_h
 
+template<class... ArgTypes>
+void callOpenCvMethod(ArgTypes... p);
+
 @interface CvInvoke : NSObject
 
 -(id)initWithRgba:(Mat)rgba gray:(Mat)gray;

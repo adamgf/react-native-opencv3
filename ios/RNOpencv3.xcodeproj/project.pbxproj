@@ -7,33 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5034F35021EAF9BD00F0F7B4 /* lbfmodel.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */; };
-		5043A77121DDBA3F000BC241 /* right_ear.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75921DDBA3D000BC241 /* right_ear.xml */; };
-		5043A77221DDBA3F000BC241 /* haarcascade_mcs_upperbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */; };
-		5043A77321DDBA3F000BC241 /* left_eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75B21DDBA3D000BC241 /* left_eye.xml */; };
-		5043A77421DDBA3F000BC241 /* haarcascade_frontalface_alt_tree.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75C21DDBA3D000BC241 /* haarcascade_frontalface_alt_tree.xml */; };
-		5043A77521DDBA3F000BC241 /* haarcascade_mcs_righteye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75D21DDBA3D000BC241 /* haarcascade_mcs_righteye.xml */; };
-		5043A77721DDBA3F000BC241 /* haarcascade_fullbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A75F21DDBA3D000BC241 /* haarcascade_fullbody.xml */; };
-		5043A77821DDBA3F000BC241 /* face.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76021DDBA3E000BC241 /* face.xml */; };
-		5043A77921DDBA3F000BC241 /* haarcascade_mcs_eyepair_small.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76121DDBA3E000BC241 /* haarcascade_mcs_eyepair_small.xml */; };
-		5043A77A21DDBA3F000BC241 /* haarcascade_frontalface_alt2.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76221DDBA3E000BC241 /* haarcascade_frontalface_alt2.xml */; };
-		5043A77B21DDBA3F000BC241 /* eye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76321DDBA3E000BC241 /* eye.xml */; };
-		5043A77C21DDBA3F000BC241 /* haarcascade_righteye_2splits.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76421DDBA3E000BC241 /* haarcascade_righteye_2splits.xml */; };
-		5043A77E21DDBA3F000BC241 /* haarcascade_upperbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76621DDBA3E000BC241 /* haarcascade_upperbody.xml */; };
-		5043A77F21DDBA3F000BC241 /* mouth.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76721DDBA3E000BC241 /* mouth.xml */; };
-		5043A78021DDBA3F000BC241 /* haarcascade_eye_tree_eyeglasses.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76821DDBA3E000BC241 /* haarcascade_eye_tree_eyeglasses.xml */; };
-		5043A78121DDBA3F000BC241 /* haarcascade_profileface.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76921DDBA3E000BC241 /* haarcascade_profileface.xml */; };
-		5043A78221DDBA3F000BC241 /* left_ear.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76A21DDBA3E000BC241 /* left_ear.xml */; };
-		5043A78321DDBA3F000BC241 /* nose.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76B21DDBA3E000BC241 /* nose.xml */; };
-		5043A78421DDBA3F000BC241 /* haarcascade_mcs_eyepair_big.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76C21DDBA3E000BC241 /* haarcascade_mcs_eyepair_big.xml */; };
-		5043A78521DDBA3F000BC241 /* haarcascade_frontalface_default.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76D21DDBA3E000BC241 /* haarcascade_frontalface_default.xml */; };
-		5043A78621DDBA3F000BC241 /* haarcascade_lowerbody.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76E21DDBA3E000BC241 /* haarcascade_lowerbody.xml */; };
-		5043A78721DDBA3F000BC241 /* lbpcascade_frontalface.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A76F21DDBA3E000BC241 /* lbpcascade_frontalface.xml */; };
-		5043A78821DDBA3F000BC241 /* haarcascade_mcs_lefteye.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5043A77021DDBA3E000BC241 /* haarcascade_mcs_lefteye.xml */; };
-		50808506221B417B00FF5C39 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 50808501221B410600FF5C39 /* libRNFS.a */; };
+		500199092220E5AD00857A3C /* CvFunctionWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 500199082220E5AD00857A3C /* CvFunctionWrapper.mm */; };
+		5001994A2220FD0D00857A3C /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 500199452220FB7000857A3C /* libRNFS.a */; };
 		5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5080B7F121915DC800170E85 /* RNOpencv3.mm */; };
 		5084125722162E00007835FA /* CvInvoke.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5084125622162E00007835FA /* CvInvoke.mm */; };
-		50B7C95321C89F0300A43F6B /* ocvdata.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 50B7C94721C89E3F00A43F6B /* ocvdata.bundle */; };
 		50CC5D5321EEF945004B431E /* MatManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50CC5D5221EEF945004B431E /* MatManager.mm */; };
 		50FC7429219953C800A48FE3 /* CvCamera.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7426219953C800A48FE3 /* CvCamera.mm */; };
 		50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7427219953C800A48FE3 /* CvCameraView.m */; };
@@ -41,26 +18,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		50808500221B410600FF5C39 /* PBXContainerItemProxy */ = {
+		500199442220FB7000857A3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 508084FB221B410600FF5C39 /* RNFS.xcodeproj */;
+			containerPortal = 5001993F2220FB7000857A3C /* RNFS.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = F12AFB9B1ADAF8F800E0535D;
 			remoteInfo = RNFS;
 		};
-		50808502221B410600FF5C39 /* PBXContainerItemProxy */ = {
+		500199462220FB7000857A3C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 508084FB221B410600FF5C39 /* RNFS.xcodeproj */;
+			containerPortal = 5001993F2220FB7000857A3C /* RNFS.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 6456441F1EB8DA9100672408;
 			remoteInfo = "RNFS-tvOS";
-		};
-		50B7C94E21C89EA700A43F6B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 58B511D31A9E6C8500147676 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 50B7C94621C89E3F00A43F6B;
-			remoteInfo = ocvdata;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -71,7 +41,6 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				50B7C95321C89F0300A43F6B /* ocvdata.bundle in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +48,9 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		500199052220E5AD00857A3C /* CvFunctionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvFunctionWrapper.h; sourceTree = "<group>"; };
+		500199082220E5AD00857A3C /* CvFunctionWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvFunctionWrapper.mm; sourceTree = "<group>"; };
+		5001993F2220FB7000857A3C /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../../react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lbfmodel.yaml; sourceTree = "<group>"; };
 		5043A75921DDBA3D000BC241 /* right_ear.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = right_ear.xml; sourceTree = "<group>"; };
 		5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_upperbody.xml; sourceTree = "<group>"; };
@@ -102,36 +74,27 @@
 		5043A76E21DDBA3E000BC241 /* haarcascade_lowerbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_lowerbody.xml; sourceTree = "<group>"; };
 		5043A76F21DDBA3E000BC241 /* lbpcascade_frontalface.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = lbpcascade_frontalface.xml; sourceTree = "<group>"; };
 		5043A77021DDBA3E000BC241 /* haarcascade_mcs_lefteye.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_lefteye.xml; sourceTree = "<group>"; };
-		508084FB221B410600FF5C39 /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../../react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		5080B7F121915DC800170E85 /* RNOpencv3.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpencv3.mm; sourceTree = "<group>"; };
 		5080B7F221915DC800170E85 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		5084125622162E00007835FA /* CvInvoke.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CvInvoke.mm; sourceTree = "<group>"; };
 		5084125822162EFE007835FA /* CvInvoke.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CvInvoke.h; sourceTree = "<group>"; };
-		50B7C94721C89E3F00A43F6B /* ocvdata.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ocvdata.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		50CC5D5121EEF945004B431E /* MatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatManager.h; sourceTree = "<group>"; };
 		50CC5D5221EEF945004B431E /* MatManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MatManager.mm; sourceTree = "<group>"; };
-		50FC741A219939E500A48FE3 /* CvCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CvCameraView.h; sourceTree = "<group>"; };
-		50FC7426219953C800A48FE3 /* CvCamera.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvCamera.mm; sourceTree = "<group>"; };
-		50FC7427219953C800A48FE3 /* CvCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CvCameraView.m; sourceTree = "<group>"; };
-		50FC7428219953C800A48FE3 /* CvCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvCamera.h; sourceTree = "<group>"; };
+		50FC741A219939E500A48FE3 /* CvCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CvCameraView.h; path = CvCamera/CvCameraView.h; sourceTree = "<group>"; };
+		50FC7426219953C800A48FE3 /* CvCamera.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CvCamera.mm; path = CvCamera/CvCamera.mm; sourceTree = "<group>"; };
+		50FC7427219953C800A48FE3 /* CvCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CvCameraView.m; path = CvCamera/CvCameraView.m; sourceTree = "<group>"; };
+		50FC7428219953C800A48FE3 /* CvCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CvCamera.h; path = CvCamera/CvCamera.h; sourceTree = "<group>"; };
 		50FC747221997CC000A48FE3 /* FileUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileUtils.mm; sourceTree = "<group>"; };
 		50FC747421997D4000A48FE3 /* FileUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpencv3.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		50B7C94421C89E3F00A43F6B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		58B511D81A9E6C8500147676 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50808506221B417B00FF5C39 /* libRNFS.a in Frameworks */,
+				5001994A2220FD0D00857A3C /* libRNFS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,11 +109,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		508084FC221B410600FF5C39 /* Products */ = {
+		500198DA2220DF4200857A3C /* CvCamera */ = {
 			isa = PBXGroup;
 			children = (
-				50808501221B410600FF5C39 /* libRNFS.a */,
-				50808503221B410600FF5C39 /* libRNFS.a */,
+				50FC7428219953C800A48FE3 /* CvCamera.h */,
+				50FC7426219953C800A48FE3 /* CvCamera.mm */,
+				50FC7427219953C800A48FE3 /* CvCameraView.m */,
+				50FC741A219939E500A48FE3 /* CvCameraView.h */,
+			);
+			name = CvCamera;
+			sourceTree = "<group>";
+		};
+		500199402220FB7000857A3C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				500199452220FB7000857A3C /* libRNFS.a */,
+				500199472220FB7000857A3C /* libRNFS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -195,23 +169,21 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				508084FB221B410600FF5C39 /* RNFS.xcodeproj */,
+				5001993F2220FB7000857A3C /* RNFS.xcodeproj */,
+				500198DA2220DF4200857A3C /* CvCamera */,
 				5084125822162EFE007835FA /* CvInvoke.h */,
 				5084125622162E00007835FA /* CvInvoke.mm */,
 				50CC5D5121EEF945004B431E /* MatManager.h */,
 				50CC5D5221EEF945004B431E /* MatManager.mm */,
 				50FC747421997D4000A48FE3 /* FileUtils.h */,
 				50FC747221997CC000A48FE3 /* FileUtils.mm */,
-				50FC7428219953C800A48FE3 /* CvCamera.h */,
-				50FC7426219953C800A48FE3 /* CvCamera.mm */,
-				50FC7427219953C800A48FE3 /* CvCameraView.m */,
-				50FC741A219939E500A48FE3 /* CvCameraView.h */,
 				5080B7F221915DC800170E85 /* PrefixHeader.pch */,
 				5080B7F121915DC800170E85 /* RNOpencv3.mm */,
 				B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */,
+				500199052220E5AD00857A3C /* CvFunctionWrapper.h */,
+				500199082220E5AD00857A3C /* CvFunctionWrapper.mm */,
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
 				134814211AA4EA7D00B7C361 /* Products */,
-				50B7C94721C89E3F00A43F6B /* ocvdata.bundle */,
 				50808504221B414400FF5C39 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -219,23 +191,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		50B7C94621C89E3F00A43F6B /* ocvdata */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 50B7C94A21C89E3F00A43F6B /* Build configuration list for PBXNativeTarget "ocvdata" */;
-			buildPhases = (
-				50B7C94321C89E3F00A43F6B /* Sources */,
-				50B7C94421C89E3F00A43F6B /* Frameworks */,
-				50B7C94521C89E3F00A43F6B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = ocvdata;
-			productName = ocvdata;
-			productReference = 50B7C94721C89E3F00A43F6B /* ocvdata.bundle */;
-			productType = "com.apple.product-type.bundle";
-		};
 		58B511DA1A9E6C8500147676 /* RNOpencv3 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNOpencv3" */;
@@ -247,7 +202,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				50B7C94F21C89EA700A43F6B /* PBXTargetDependency */,
 			);
 			name = RNOpencv3;
 			productName = RCTDataManager;
@@ -263,11 +217,6 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
-					50B7C94621C89E3F00A43F6B = {
-						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = KPVD84QZHR;
-						ProvisioningStyle = Automatic;
-					};
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
 					};
@@ -285,76 +234,35 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 508084FC221B410600FF5C39 /* Products */;
-					ProjectRef = 508084FB221B410600FF5C39 /* RNFS.xcodeproj */;
+					ProductGroup = 500199402220FB7000857A3C /* Products */;
+					ProjectRef = 5001993F2220FB7000857A3C /* RNFS.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* RNOpencv3 */,
-				50B7C94621C89E3F00A43F6B /* ocvdata */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		50808501221B410600FF5C39 /* libRNFS.a */ = {
+		500199452220FB7000857A3C /* libRNFS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNFS.a;
-			remoteRef = 50808500221B410600FF5C39 /* PBXContainerItemProxy */;
+			remoteRef = 500199442220FB7000857A3C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		50808503221B410600FF5C39 /* libRNFS.a */ = {
+		500199472220FB7000857A3C /* libRNFS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libRNFS.a;
-			remoteRef = 50808502221B410600FF5C39 /* PBXContainerItemProxy */;
+			remoteRef = 500199462220FB7000857A3C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
 
-/* Begin PBXResourcesBuildPhase section */
-		50B7C94521C89E3F00A43F6B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5043A77521DDBA3F000BC241 /* haarcascade_mcs_righteye.xml in Resources */,
-				5043A78321DDBA3F000BC241 /* nose.xml in Resources */,
-				5043A77121DDBA3F000BC241 /* right_ear.xml in Resources */,
-				5034F35021EAF9BD00F0F7B4 /* lbfmodel.yaml in Resources */,
-				5043A77C21DDBA3F000BC241 /* haarcascade_righteye_2splits.xml in Resources */,
-				5043A77A21DDBA3F000BC241 /* haarcascade_frontalface_alt2.xml in Resources */,
-				5043A78121DDBA3F000BC241 /* haarcascade_profileface.xml in Resources */,
-				5043A77F21DDBA3F000BC241 /* mouth.xml in Resources */,
-				5043A78221DDBA3F000BC241 /* left_ear.xml in Resources */,
-				5043A77321DDBA3F000BC241 /* left_eye.xml in Resources */,
-				5043A78721DDBA3F000BC241 /* lbpcascade_frontalface.xml in Resources */,
-				5043A77B21DDBA3F000BC241 /* eye.xml in Resources */,
-				5043A77421DDBA3F000BC241 /* haarcascade_frontalface_alt_tree.xml in Resources */,
-				5043A78621DDBA3F000BC241 /* haarcascade_lowerbody.xml in Resources */,
-				5043A77221DDBA3F000BC241 /* haarcascade_mcs_upperbody.xml in Resources */,
-				5043A77821DDBA3F000BC241 /* face.xml in Resources */,
-				5043A78821DDBA3F000BC241 /* haarcascade_mcs_lefteye.xml in Resources */,
-				5043A77E21DDBA3F000BC241 /* haarcascade_upperbody.xml in Resources */,
-				5043A78521DDBA3F000BC241 /* haarcascade_frontalface_default.xml in Resources */,
-				5043A77921DDBA3F000BC241 /* haarcascade_mcs_eyepair_small.xml in Resources */,
-				5043A77721DDBA3F000BC241 /* haarcascade_fullbody.xml in Resources */,
-				5043A78021DDBA3F000BC241 /* haarcascade_eye_tree_eyeglasses.xml in Resources */,
-				5043A78421DDBA3F000BC241 /* haarcascade_mcs_eyepair_big.xml in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		50B7C94321C89E3F00A43F6B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		58B511D71A9E6C8500147676 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -364,93 +272,14 @@
 				50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */,
 				50CC5D5321EEF945004B431E /* MatManager.mm in Sources */,
 				50FC7429219953C800A48FE3 /* CvCamera.mm in Sources */,
+				500199092220E5AD00857A3C /* CvFunctionWrapper.mm in Sources */,
 				50FC747321997CC000A48FE3 /* FileUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		50B7C94F21C89EA700A43F6B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 50B7C94621C89E3F00A43F6B /* ocvdata */;
-			targetProxy = 50B7C94E21C89EA700A43F6B /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
-		50B7C94B21C89E3F00A43F6B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = KPVD84QZHR;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = ocvdata/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.opencv.reactnative.ocvdata;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
-		50B7C94C21C89E3F00A43F6B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = KPVD84QZHR;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = ocvdata/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = org.opencv.reactnative.ocvdata;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
 		58B511ED1A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -535,7 +364,7 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/OpenCVmin-face";
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/libopencv-contrib";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -553,7 +382,7 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/OpenCVmin-face";
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/libopencv-contrib";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -571,15 +400,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		50B7C94A21C89E3F00A43F6B /* Build configuration list for PBXNativeTarget "ocvdata" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				50B7C94B21C89E3F00A43F6B /* Debug */,
-				50B7C94C21C89E3F00A43F6B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNOpencv3" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

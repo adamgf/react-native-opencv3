@@ -9,6 +9,33 @@
 #import "CvInvoke.h"
 #import "MatManager.h"
 
+std::vector<std::string> lookup = {
+    "cvtColor"
+};
+
+typedef enum fns {
+    CVTCOLOR
+} fns;
+
+template<class... ArgTypes>
+void callOpenCvMethod(ArgTypes... p) {
+    
+    std::string functionName("cvtColor");
+    auto it = std::find(lookup.begin(), lookup.end(), functionName);
+    if (it != lookup.end()) {
+        auto index = std::distance(lookup.begin(), it);
+        
+        switch(index) {
+                case CVTCOLOR: {
+                    cvtColor(p...);
+                    break;
+                }
+            default:
+                break;
+        }
+    }
+}
+
 @interface MatWrapper2 : NSObject
 @property (nonatomic, assign) Mat myMat;
 @end
@@ -267,6 +294,12 @@
    @try {
        Method method = NULL;
        
+       NSString *bundlePath = [[[NSBundle mainBundle] builtInPlugInsPath]           // 1
+                     stringByAppendingPathComponent:@"../opencv2.bundle/opencv2.framework"];
+       
+       NSURL *bundleURL = [NSURL fileURLWithPath:bundlePath];
+       CFBundleRef cfBundle = CFBundleCreate(kCFAllocatorDefault, (CFURLRef)bundleURL);
+
        CFBundleRef ocv2 = CFBundleGetBundleWithIdentifier(CFSTR("opencv2"));
        CFArrayRef loadedFrameworks = CFBundleGetAllBundles();
        
@@ -283,20 +316,38 @@
            NSBundle *amazingBundle = [NSBundle bundleForClass:[self class]];
 
        NSString *ident = [amazingBundle bundleIdentifier];
-       //CFBundleRef br = CFBundleGetBundleWithIdentifier(CFSTR([ident UTF8String]));
-       //void* doSomething = CFBundleGetFunctionPointerForName(br,
-         //                                           CFSTR("cvtColor"));
+       CFBundleRef br = CFBundleGetMainBundle();
+    
+       void* doSomething = CFBundleGetFunctionPointerForName(cfBundle,
+                                                             CFSTR("cvtColorTwoPlane"));
            
-           //if (doSomething != NULL) {
-           //    NSLog(@"Stop here");
-           //}
+           if (doSomething != NULL) {
+               NSLog(@"Stop here");
+           }
        //}
        NSString *fuckingmatid = @"cvtColor";
        
        typedef void (*opencv_t);
        std::string yourfunc("cvtColor");
        
-       std::function<void(cv::InputArray,cv::OutputArray,int,int)> f_display = cvtColor;
+       typedef std::function<void(cv::InputArray,cv::OutputArray,int,int)> fun;
+       
+       fun f_display = cvtColor;
+       
+       Scalar usethisscalar(255,255,0,255);
+       Mat inmat(500,500,CV_8UC4,usethisscalar);
+       Mat outmat;
+       
+       std::vector<void*> ps;
+       
+       ps.push_back(&inmat);
+       ps.push_back(&outmat);
+       int thirdval = 6;
+       ps.push_back(&thirdval);
+       
+       callOpenCvMethod(inmat, outmat, thirdval, 0);
+       
+       //f_display(inmat,outmat,6,0);
        
        Class matclass = [fuckingmatid class]; //NSClassFromString(@"cv::Mat");
        Class imgprocclass = NSClassFromString(@"cv::Imgproc");
