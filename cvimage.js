@@ -12,7 +12,7 @@ import { Platform, Image } from 'react-native';
 const  { RNOpencv3 } = NativeModules;
 import { ColorConv } from './constants';
 
-var RNFS = require('react-native-fs')
+var RNFS = require('../react-native-fs')
 
 export class CvImage extends Component {
 
