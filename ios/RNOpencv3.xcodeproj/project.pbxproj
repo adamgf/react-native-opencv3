@@ -80,10 +80,10 @@
 		5084125822162EFE007835FA /* CvInvoke.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CvInvoke.h; sourceTree = "<group>"; };
 		50CC5D5121EEF945004B431E /* MatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatManager.h; sourceTree = "<group>"; };
 		50CC5D5221EEF945004B431E /* MatManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MatManager.mm; sourceTree = "<group>"; };
-		50FC741A219939E500A48FE3 /* CvCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CvCameraView.h; path = CvCamera/CvCameraView.h; sourceTree = "<group>"; };
-		50FC7426219953C800A48FE3 /* CvCamera.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CvCamera.mm; path = CvCamera/CvCamera.mm; sourceTree = "<group>"; };
-		50FC7427219953C800A48FE3 /* CvCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CvCameraView.m; path = CvCamera/CvCameraView.m; sourceTree = "<group>"; };
-		50FC7428219953C800A48FE3 /* CvCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CvCamera.h; path = CvCamera/CvCamera.h; sourceTree = "<group>"; };
+		50FC741A219939E500A48FE3 /* CvCameraView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CvCameraView.h; sourceTree = "<group>"; };
+		50FC7426219953C800A48FE3 /* CvCamera.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvCamera.mm; sourceTree = "<group>"; };
+		50FC7427219953C800A48FE3 /* CvCameraView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CvCameraView.m; sourceTree = "<group>"; };
+		50FC7428219953C800A48FE3 /* CvCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvCamera.h; sourceTree = "<group>"; };
 		50FC747221997CC000A48FE3 /* FileUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FileUtils.mm; sourceTree = "<group>"; };
 		50FC747421997D4000A48FE3 /* FileUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpencv3.h; sourceTree = "<group>"; };
@@ -107,17 +107,6 @@
 				134814201AA4EA6300B7C361 /* libRNOpencv3.a */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		500198DA2220DF4200857A3C /* CvCamera */ = {
-			isa = PBXGroup;
-			children = (
-				50FC7428219953C800A48FE3 /* CvCamera.h */,
-				50FC7426219953C800A48FE3 /* CvCamera.mm */,
-				50FC7427219953C800A48FE3 /* CvCameraView.m */,
-				50FC741A219939E500A48FE3 /* CvCameraView.h */,
-			);
-			name = CvCamera;
 			sourceTree = "<group>";
 		};
 		500199402220FB7000857A3C /* Products */ = {
@@ -169,8 +158,11 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				50FC7428219953C800A48FE3 /* CvCamera.h */,
+				50FC7426219953C800A48FE3 /* CvCamera.mm */,
+				50FC7427219953C800A48FE3 /* CvCameraView.m */,
+				50FC741A219939E500A48FE3 /* CvCameraView.h */,
 				5001993F2220FB7000857A3C /* RNFS.xcodeproj */,
-				500198DA2220DF4200857A3C /* CvCamera */,
 				5084125822162EFE007835FA /* CvInvoke.h */,
 				5084125622162E00007835FA /* CvInvoke.mm */,
 				50CC5D5121EEF945004B431E /* MatManager.h */,

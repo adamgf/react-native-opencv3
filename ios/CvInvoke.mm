@@ -17,8 +17,8 @@ typedef enum fns {
     CVTCOLOR
 } fns;
 
-template<class... ArgTypes>
-void callOpenCvMethod(ArgTypes... p) {
+template<typename ...ArgTypes>
+void callOpenCvMethod(ArgTypes *...p) {
     
     std::string functionName("cvtColor");
     auto it = std::find(lookup.begin(), lookup.end(), functionName);
@@ -27,7 +27,7 @@ void callOpenCvMethod(ArgTypes... p) {
         
         switch(index) {
                 case CVTCOLOR: {
-                    cvtColor(p...);
+                    cvtColor(*p...);
                     break;
                 }
             default:
@@ -318,12 +318,12 @@ void callOpenCvMethod(ArgTypes... p) {
        NSString *ident = [amazingBundle bundleIdentifier];
        CFBundleRef br = CFBundleGetMainBundle();
     
-       void* doSomething = CFBundleGetFunctionPointerForName(cfBundle,
-                                                             CFSTR("cvtColorTwoPlane"));
+       //void* doSomething = CFBundleGetFunctionPointerForName(cfBundle,
+                                                             //CFSTR("cvtColorTwoPlane"));
            
-           if (doSomething != NULL) {
-               NSLog(@"Stop here");
-           }
+           //if (doSomething != NULL) {
+             //  NSLog(@"Stop here");
+           //}
        //}
        NSString *fuckingmatid = @"cvtColor";
        
@@ -339,13 +339,17 @@ void callOpenCvMethod(ArgTypes... p) {
        Mat outmat;
        
        std::vector<void*> ps;
-       
        ps.push_back(&inmat);
-       ps.push_back(&outmat);
+       std::vector<void*> ps2;
+       ps2.push_back(&outmat);
        int thirdval = 6;
-       ps.push_back(&thirdval);
+       std::vector<void*> ps3;
+       ps3.push_back(&thirdval);
+       int fourthval = 0;
+       std::vector<void*> ps4;
+       ps4.push_back(&fourthval);
        
-       callOpenCvMethod(inmat, outmat, thirdval, 0);
+       callOpenCvMethod(&inmat, &outmat, &thirdval, &fourthval);
        
        //f_display(inmat,outmat,6,0);
        

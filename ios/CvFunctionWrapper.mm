@@ -39,5 +39,5 @@ void callOpenCvMethod2(ArgTypes... p) {
 }
 
 void justdoitplease() {
-    callOpenCvMethod(1, ':', " Hello", ',', " ", "World!" );
+    callOpenCvMethod2(1, ':', " Hello", ',', " ", "World!" );
 }
