@@ -356,6 +356,7 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/libopencv-contrib";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
@@ -374,6 +375,7 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/libopencv-contrib";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
