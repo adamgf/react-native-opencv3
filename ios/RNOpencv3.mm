@@ -106,7 +106,8 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
     [MatManager.sharedMgr setMat:dstMatIndex matToSet:dstMat];
 }
 
-RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat)in ingray:(Mat)ingray) {
+
+RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
     NSArray *responseArr = NULL;
     NSString *lastCall = NULL;
     int dstMatIndex = -1;
@@ -117,7 +118,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat)in ingray:(Ma
             NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
             responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
             for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
-                CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:in gray:ingray];
+                CvInvoke *invoker = [[CvInvoke alloc] init];
                 dstMatIndex = [invoker invokeCvMethods:(NSDictionary*)invokeGroups[i]];
                 if (invoker.callback != NULL) {
                     lastCall = invoker.callback;
@@ -130,7 +131,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap in:(Mat)in ingray:(Ma
         }
     }
     else {
-        CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:in gray:ingray];
+        CvInvoke *invoker = [[CvInvoke alloc] init];
         dstMatIndex = [invoker invokeCvMethods:cvInvokeMap];
         if (invoker.callback != NULL) {
             lastCall = invoker.callback;

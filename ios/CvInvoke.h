@@ -16,8 +16,6 @@ void callOpenCvMethod(ArgTypes... p);
 
 @interface CvInvoke : NSObject
 
--(id)initWithRgba:(Mat)rgba gray:(Mat)gray;
-
 +(NSArray*)populateInvokeGroups:(NSDictionary*)cvInvokeGroup;
 
 -(int)invokeCvMethods:(NSDictionary*)cvInvokeMap;

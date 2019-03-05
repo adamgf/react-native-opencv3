@@ -52,12 +52,12 @@ export class CvImage extends Component {
 
             //alert('cvinvoke is: ' + JSON.stringify(this.props.cvinvoke))
             //RNOpencv3.invokeMethods(cvinvoke)
-            RNOpencv3.invokeMethod("cvtColor", {"p1":srcMat,"p2":dstMat,"p3":ColorConv.COLOR_BGR2GRAY});
+            RNOpencv3.invokeMethod("cvtColor", {"p1":srcMat,"p2":dstMat,"p3":ColorConv.COLOR_BGR2GRAY,"p4":0});
             //RNOpencv3.cvtColor(srcMat, dstMat, ColorConv.COLOR_BGR2GRAY)
             RNOpencv3.matToImage(dstMat, sourceFile)
             .then((image) => {
-              RNOpencv3.deleteMat(srcMat)
-              RNOpencv3.deleteMat(dstMat)
+              //RNOpencv3.deleteMat(srcMat)
+              //RNOpencv3.deleteMat(dstMat)
               const { width, height, uri } = image
               if (uri && uri.length > 0) {
                 this.setState({ destFile : uri })

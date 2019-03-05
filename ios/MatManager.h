@@ -11,6 +11,10 @@
 
 #import <AVFoundation/AVFoundation.h>
 
+@interface MatWrapper : NSObject
+@property (nonatomic, assign) Mat myMat;
+@end
+
 @interface MatManager : NSObject
 
 @property (nonatomic, strong) NSMutableArray *mats;

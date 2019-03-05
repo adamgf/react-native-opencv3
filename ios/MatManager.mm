@@ -9,10 +9,6 @@
 #import "MatManager.h"
 #import <Foundation/Foundation.h>
 
-@interface MatWrapper : NSObject
-@property (nonatomic, assign) Mat myMat;
-@end
-
 // simple opaque object that wraps a cv::Mat or other OpenCV object or other type ...
 @implementation MatWrapper
 @end

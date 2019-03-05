@@ -41,26 +41,26 @@ void invokeIt(std::vector<std::string>lookup, std::string functionName, T *...ar
     }
 }
 
-void callOpenCvMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes*> objects) {
-
-    std::vector<std::string> lookup;
-    NSString *searchStr = [NSString stringWithUTF8String:(searchClass.c_str())];
-    if ([searchStr isEqualToString:@"Imgproc"]) {
-        lookup = Imgproc;
-    }
+void callOpenCvMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes>* ps) {
+    
+    //std::vector<std::string> lookup;
+    //if (searchClass.compare(std::string("Imgproc")) == 0) {
+    //    lookup = Imgproc;
+    //}
     
     unsigned long numParams = 4; //paramTypes.size();
     
     if (numParams == 4) {
-        Mat *firstMat = (Mat*)objects.at(0);
-        auto p1 = *reinterpret_cast<Mat*>(firstMat);
-        Mat *secondMat = (Mat*)objects.at(1);
-        auto p2 = *reinterpret_cast<Mat*>(secondMat);
-        int *firstInt = (int*)objects.at(2);
-        auto p3 = *reinterpret_cast<int*>(firstInt);
-        int *secondInt = (int*)objects.at(3);
-        auto p4 = *reinterpret_cast<int*>(secondInt);
-        invokeIt(lookup, functionName, &p1, &p2, &p3, &p4);
+        ocvtypes firstMat = ps->at(0);
+        auto p1 = *reinterpret_cast<Mat*>(&firstMat);
+        ocvtypes secondMat = ps->at(1);
+        auto p2 = *reinterpret_cast<Mat*>(&secondMat);
+        ocvtypes firstInt = ps->at(2);
+        auto p3 = *reinterpret_cast<int*>(&firstInt);
+        ocvtypes secondInt = ps->at(3);
+        auto p4 = *reinterpret_cast<int*>(&secondInt);
+        cvtColor(p1, p2, p3, p4);
+        //invokeIt(lookup, functionName, &p1, &p2, &p3, &p4);
         int kk = 2002;
         kk++;
     }
@@ -79,24 +79,14 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
     }
 } */
 
-@interface MatWrapper2 : NSObject
-@property (nonatomic, assign) Mat myMat;
-@end
-
 // simple opaque object that wraps a cv::Mat or other OpenCV object or other type ...
-@implementation MatWrapper2
-@end
+//@implementation MatWrapper2
+//@end
 
 @implementation CvInvoke
 
--(id)initWithRgba:(Mat)rgba gray:(Mat)gray {
+-(id)init {
     if (self = [super init]) {
-        if (rgba.rows > 0) {
-            self.rgba = rgba;
-        }
-        if (gray.rows > 0) {
-            self.gray = gray;
-        }
         self.arrMatIndex = -1;
         self.dstMatIndex = -1;
         self.matParams = [[NSMutableDictionary alloc] init];
@@ -108,16 +98,14 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
     return (int)hashMap.allKeys.count;
 }
 
--(NSArray*)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params {
+-(void)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params objects:(std::vector<ocvtypes>&)ps {
     
     int i = 1;
-    NSMutableArray *retObjs = [[NSMutableArray alloc] initWithCapacity:params.count];
-    
-    for (Class paramClass in params) {
+    //NSMutableArray *retObjs = [[NSMutableArray alloc] initWithCapacity:params.count];
+    for (NSString* param in params) {
         NSString* paramNum = [NSString stringWithFormat:@"p%d", i];
-        NSString* param = NSStringFromClass(paramClass);
-        NSString* itsType = NSStringFromClass([hashMap valueForKey:paramNum]);
-        if ([itsType isEqualToString:@"NSString"]) {
+        NSString* itsType = NSStringFromClass([[hashMap valueForKey:paramNum] class]);
+        if ([itsType containsString:@"String"]) {
             // special case for a Mat being represented by a hardcoded string representation ...
             NSString *paramStr = [hashMap valueForKey:paramNum];
             Mat dstMat;
@@ -134,36 +122,53 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
                 dstMat = self.gray.t();
             }
             else if ([self.matParams.allKeys containsObject:paramStr]) {
-                MatWrapper2 *MW2 = (MatWrapper2*)[self.matParams valueForKey:paramStr];
-                dstMat = MW2.myMat;
+                MatWrapper *MW = (MatWrapper*)[self.matParams valueForKey:paramStr];
+                dstMat = MW.myMat;
             }
             if (dstMat.rows > 0) {
                 // whatever the type is the Mat will suffice
-                MatWrapper2 *MW2 = [[MatWrapper2 alloc] init];
-                MW2.myMat = dstMat;
-                [retObjs insertObject:MW2 atIndex:(i-1)];
+                ocvtypes pushMat = dstMat;
+                ps.push_back(pushMat);
+                //MatWrapper *MW = [[MatWrapper alloc] init];
+                //MW.myMat = dstMat;
+                //[retObjs insertObject:MW atIndex:(i-1)];
                 
             }
             else if ([param isEqualToString:@"const char*"]) {
-                [retObjs insertObject:paramStr atIndex:(i-1)];
+                ocvtypes pushStr = [paramStr UTF8String];
+                ps.push_back(pushStr);
+                //[retObjs insertObject:paramStr atIndex:(i-1)];
             }
         }
+        else if ([itsType containsString:@"Number"]) {
+            // not sure what to do here exactly ...
+            NSNumber *dNum = (NSNumber*)[hashMap valueForKey:paramNum];
+            if ([param isEqualToString:@"double"]) {
+                ocvtypes ddNum = [dNum doubleValue];
+                ps.push_back(ddNum);
+            }
+            else if ([param isEqualToString:@"int"]) {
+                int diNum = [dNum intValue];
+                ps.push_back(diNum);
+            }
+            else if ([param isEqualToString:@"float"]) {
+                float dfNum = [dNum floatValue];
+                ps.push_back(dfNum);
+            }
+            //[retObjs insertObject:dNum atIndex:(i-1)];
+        }
         else if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"InputArray"] || [param isEqualToString:@"InputArrayOfArrays"] || [param isEqualToString:@"OutputArray"] || [param isEqualToString:@"OutputArrayOfArrays"]) {
-            if ([itsType isEqualToString:@"NSDictionary"]) {
+            if ([itsType containsString:@"Dictionary"]) {
                 NSDictionary* matMap = (NSDictionary*)[hashMap valueForKey:paramNum];
                 int matIndex = [(NSNumber*)[matMap valueForKey:@"matIndex"] intValue];
-                Mat dMat = [MatManager.sharedMgr  matAtIndex:matIndex];
-                MatWrapper2 *MW2 = [[MatWrapper2 alloc] init];
-                MW2.myMat = dMat;
-                [retObjs insertObject:MW2 atIndex:(i-1)];
+                Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
+                ps.push_back(dMat);
+                //MatWrapper *MW = [[MatWrapper alloc] init];
+                //MW.myMat = dMat;
+                //[retObjs insertObject:MW atIndex:(i-1)];
                 self.arrMatIndex = i - 1;
                 self.dstMatIndex = matIndex;
             }
-        }
-        else if ([itsType isEqualToString:@"NSNumber"]) {
-            // not sure what to do here exactly ...
-            NSNumber *dNum = (NSNumber*)[hashMap valueForKey:paramNum];
-            [retObjs insertObject:dNum atIndex:(i-1)];
         }
         else if ([param isEqualToString:@"Scalar"]) {
             
@@ -176,7 +181,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
         }
         i++;
     }
-    return retObjs;
+    //return ps;
 }
 
 -(int)findMethod:(NSString*)func params:(NSDictionary*)params searchClass:(NSString*)searchClass {
@@ -309,18 +314,26 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
    if (params != NULL) {
        numParams = [CvInvoke getNumKeys:params];
    }
-   NSArray *objects = NULL;
+   //NSArray *objects = NULL;
+   //std::vector<ocvtypes*> ps;
    int methodIndex = -1;
    NSString *searchClass;
    
    @try {
+       /**
        typedef std::function<void(cv::InputArray,cv::OutputArray,int,int)> fun;
        
        fun f_display = cvtColor;
        
        Scalar usethisscalar(255,255,0,255);
-       ocvtypes inmat = Mat(500,500,CV_8UC4,usethisscalar);
-       ocvtypes outmat = Mat();
+       //ocvtypes inmat = Mat(500,500,CV_8UC4,usethisscalar);
+       NSDictionary *fmat = [params valueForKey:@"p1"];
+       int fmatindex = [[fmat valueForKey:@"matIndex"] intValue];
+       ocvtypes inmat = [MatManager.sharedMgr matAtIndex:fmatindex];
+       NSDictionary *fmat2 = [params valueForKey:@"p2"];
+       int fmatindex2 = [[fmat2 valueForKey:@"matIndex"] intValue];
+       ocvtypes outmat = [MatManager.sharedMgr matAtIndex:fmatindex2];
+       //ocvtypes outmat = Mat();
        //ocvtypes inmat2 = arr1;
        //ocvtypes outmat2 = outmat;
        
@@ -334,19 +347,25 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
        ps.push_back(&outmat);
        ps.push_back(&thirdval);
        ps.push_back(&fourthval);
+        */
        
-       callOpenCvMethod(std::string("Imgproc"), std::string("cvtColor"), ps);
+       NSArray *methodParams = [self getParameterTypes:0 searchClass:@"Imgproc"];
+       std::vector<ocvtypes> ps;
+       [self getObjectArr:params params:methodParams objects:ps];
        
-       //callOpenCvMethod((Mat)&ps[0], (Mat)&ps[1], (int)&ps[2], (int)&ps[3]);
+       callOpenCvMethod(std::string("Imgproc"), std::string("cvtColor"), &ps);
        
        //f_display(&ps[0],&ps[1],,0);
        
-       if (in != NULL && ![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || [self.matParams.allKeys containsObject:in]))
-       {
-            methodIndex = [self findMethod:func params:params searchClass:@"Mat"];
-            if (methodIndex >= 0) {
-                searchClass = @"Mat";
-            }
+       if (in != (NSString*)[NSNull null]) {
+           if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
+               
+               methodIndex = [self findMethod:func params:params searchClass:@"Mat"];
+               
+               if (methodIndex >= 0) {
+                    searchClass = @"Mat";
+                }
+           }
        }
        else {
            methodIndex = [self findMethod:func params:params searchClass:@"Imgproc"];
@@ -365,50 +384,61 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
            [NSException raise:@"Method not found" format:@"%@ not found make sure method exists and is part of Opencv Imgproc, Core or Mat.", func];
        }
        if (numParams > 0) {
-           NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
-           objects = [self getObjectArr:params params:methodParams];
+           //NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
+           //[self getObjectArr:params params:methodParams objects:&ps];
            
-           if (numParams != objects.count) {
+           if (numParams != 4) {
                [NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
            }
        }
        if (methodIndex != -1) {
            Mat matToUse;
            
-           if (in != NULL && [in isEqualToString:@"rgba"]) {
-               matToUse = self.rgba;
-           }
-           else if (in != NULL && [in isEqualToString:@"rgbat"]) {
-               matToUse = self.rgba.t();
-           }
-           else if (in != NULL && [in isEqualToString:@"gray"]) {
-               matToUse = self.gray;
-           }
-           else if (in != NULL && [in isEqualToString:@"grayt"]) {
-               matToUse = self.rgba.t();
-           }
-           else if (in != NULL && [self.matParams.allKeys containsObject:in]) {
-               MatWrapper2 *MW2 = (MatWrapper2*)[self.matParams valueForKey:in];
-               matToUse = MW2.myMat;
+           if (in != (NSString*)[NSNull null]) {
+               if ([in isEqualToString:@"rgba"]) {
+                   matToUse = self.rgba;
+               }
+               else if ([in isEqualToString:@"rgbat"]) {
+                   matToUse = self.rgba.t();
+               }
+               else if ([in isEqualToString:@"gray"]) {
+                   matToUse = self.gray;
+               }
+               else if ([in isEqualToString:@"grayt"]) {
+                   matToUse = self.rgba.t();
+               }
+               else if ([self.matParams.allKeys containsObject:in]) {
+                   MatWrapper *MW = (MatWrapper*)[self.matParams valueForKey:in];
+                   matToUse = MW.myMat;
+               }
            }
            
-           if (matToUse.rows > 0 && [func isEqualToString:@"release"]) {
-               // special case deleting the last Mat
-               matToUse.release();
-               [self.matParams removeObjectForKey:in];
+           if (out != (NSString*)[NSNull null]) {
+               // TODO ...
+               //id matParam;
+               //if (matParam != NULL) {
+               //    [self.matParams setObject:matParam forKey:out];
+               //}
            }
            else {
-               id matParam;
-               
-               if (matParam != NULL) {
-                   [self.matParams setObject:matParam forKey:out];
+               if (matToUse.rows > 0 && [func isEqualToString:@"release"]) {
+                   // special case deleting the last Mat
+                   matToUse.release();
+                   [self.matParams removeObjectForKey:in];
+               }
+               else {
+                   std::string dFunc = std::string([func UTF8String]);
+                   std::string dSearchClass = std::string([searchClass UTF8String]);
+                   //callOpenCvMethod(dSearchClass, dFunc);
                }
            }
        }
        
        if (self.dstMatIndex >= 0) {
-           MatWrapper2 *dstMatWrapper = (MatWrapper2*)objects[self.arrMatIndex];
-           Mat dstMat = dstMatWrapper.myMat;
+           //MatWrapper *dstMatWrapper = (MatWrapper*)objects[self.arrMatIndex];
+           Mat *matPtr;// = (Mat*)ps.at(self.arrMatIndex);
+           Mat dstMat = *reinterpret_cast<Mat*>(matPtr);
+           //Mat dstMat = dstMatWrapper.myMat;
            [MatManager.sharedMgr setMat:self.dstMatIndex matToSet:dstMat];
            result = self.dstMatIndex;
            self.dstMatIndex = -1;
