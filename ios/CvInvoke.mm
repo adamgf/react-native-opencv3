@@ -59,8 +59,8 @@ void callOpenCvMethod(std::string searchClass, std::string functionName, std::ve
         auto p3 = *reinterpret_cast<int*>(&firstInt);
         ocvtypes secondInt = ps->at(3);
         auto p4 = *reinterpret_cast<int*>(&secondInt);
-        cvtColor(p1, p2, p3, p4);
-        //invokeIt(lookup, functionName, &p1, &p2, &p3, &p4);
+        //cvtColor(p1, p2, p3, p4);
+        invokeIt(Imgproc, functionName, &p1, &p2, &p3, &p4);
         int kk = 2002;
         kk++;
     }
@@ -127,15 +127,14 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
             }
             if (dstMat.rows > 0) {
                 // whatever the type is the Mat will suffice
-                ocvtypes pushMat = dstMat;
-                ps.push_back(pushMat);
+                ps.push_back(dstMat);
                 //MatWrapper *MW = [[MatWrapper alloc] init];
                 //MW.myMat = dstMat;
                 //[retObjs insertObject:MW atIndex:(i-1)];
                 
             }
             else if ([param isEqualToString:@"const char*"]) {
-                ocvtypes pushStr = [paramStr UTF8String];
+                const char *pushStr = [paramStr UTF8String];
                 ps.push_back(pushStr);
                 //[retObjs insertObject:paramStr atIndex:(i-1)];
             }
@@ -144,7 +143,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
             // not sure what to do here exactly ...
             NSNumber *dNum = (NSNumber*)[hashMap valueForKey:paramNum];
             if ([param isEqualToString:@"double"]) {
-                ocvtypes ddNum = [dNum doubleValue];
+                double ddNum = [dNum doubleValue];
                 ps.push_back(ddNum);
             }
             else if ([param isEqualToString:@"int"]) {
@@ -315,7 +314,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
        numParams = [CvInvoke getNumKeys:params];
    }
    //NSArray *objects = NULL;
-   //std::vector<ocvtypes*> ps;
+   std::vector<ocvtypes> ps;
    int methodIndex = -1;
    NSString *searchClass;
    
@@ -347,7 +346,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
        ps.push_back(&outmat);
        ps.push_back(&thirdval);
        ps.push_back(&fourthval);
-        */
+        
        
        NSArray *methodParams = [self getParameterTypes:0 searchClass:@"Imgproc"];
        std::vector<ocvtypes> ps;
@@ -355,9 +354,9 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
        
        callOpenCvMethod(std::string("Imgproc"), std::string("cvtColor"), &ps);
        
-       //f_display(&ps[0],&ps[1],,0);
+       //f_display(&ps[0],&ps[1],,0); */
        
-       if (in != (NSString*)[NSNull null]) {
+       if (in != nil) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
                
                methodIndex = [self findMethod:func params:params searchClass:@"Mat"];
@@ -384,17 +383,17 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
            [NSException raise:@"Method not found" format:@"%@ not found make sure method exists and is part of Opencv Imgproc, Core or Mat.", func];
        }
        if (numParams > 0) {
-           //NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
-           //[self getObjectArr:params params:methodParams objects:&ps];
+           NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
+           [self getObjectArr:params params:methodParams objects:ps];
            
-           if (numParams != 4) {
+           if (numParams != methodParams.count) {
                [NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
            }
        }
        if (methodIndex != -1) {
            Mat matToUse;
            
-           if (in != (NSString*)[NSNull null]) {
+           if (in != nil) {
                if ([in isEqualToString:@"rgba"]) {
                    matToUse = self.rgba;
                }
@@ -413,7 +412,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
                }
            }
            
-           if (out != (NSString*)[NSNull null]) {
+           if (out != nil) {
                // TODO ...
                //id matParam;
                //if (matParam != NULL) {
@@ -429,15 +428,15 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
                else {
                    std::string dFunc = std::string([func UTF8String]);
                    std::string dSearchClass = std::string([searchClass UTF8String]);
-                   //callOpenCvMethod(dSearchClass, dFunc);
+                   callOpenCvMethod(dSearchClass, dFunc, &ps);
                }
            }
        }
        
        if (self.dstMatIndex >= 0) {
            //MatWrapper *dstMatWrapper = (MatWrapper*)objects[self.arrMatIndex];
-           Mat *matPtr;// = (Mat*)ps.at(self.arrMatIndex);
-           Mat dstMat = *reinterpret_cast<Mat*>(matPtr);
+           ocvtypes dMat = ps.at(self.arrMatIndex);
+           Mat dstMat = *reinterpret_cast<Mat*>(&dMat);
            //Mat dstMat = dstMatWrapper.myMat;
            [MatManager.sharedMgr setMat:self.dstMatIndex matToSet:dstMat];
            result = self.dstMatIndex;
