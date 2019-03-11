@@ -125,12 +125,9 @@ std::tuple<int> intt;
 template <typename TT>
 std::vector<std::tuple<TT>> vect;
 
--(const NSArray*)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params objects:(std::vector<ocvtypes>&)ps {
+-(void)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params objects:(std::vector<ocvtypes>&)ps {
     
     int i = 1;
-    NSMutableArray *retObjs = [[NSMutableArray alloc] initWithCapacity:params.count];
-    //void **retdata = (void**)malloc(hashMap.allKeys.count);
-    
     for (NSString* param in params) {
         NSString* paramNum = [NSString stringWithFormat:@"p%d", i];
         NSString* itsType = NSStringFromClass([[hashMap valueForKey:paramNum] class]);
@@ -157,40 +154,26 @@ std::vector<std::tuple<TT>> vect;
             if (dstMat.rows > 0) {
                 // whatever the type is the Mat will suffice
                 ps.push_back(dstMat);
-                MatWrapper *MW = [[MatWrapper alloc] init];
-                MW.myMat = dstMat;
-                [retObjs insertObject:MW atIndex:(i-1)];
                 
             }
             else if ([param isEqualToString:@"const char*"]) {
                 const char *pushStr = [paramStr UTF8String];
                 ps.push_back(pushStr);
-                [retObjs insertObject:paramStr atIndex:(i-1)];
             }
         }
         else if ([itsType containsString:@"Number"]) {
-            // not sure what to do here exactly ...
             NSNumber *dNum = (NSNumber*)[hashMap valueForKey:paramNum];
-            NumberWrapper *NW = [[NumberWrapper alloc] init];
             if ([param isEqualToString:@"double"]) {
                 double ddNum = [dNum doubleValue];
                 ps.push_back(ddNum);
-                NW.doubleval = ddNum;
-                NW.numbertype = DOUBLETYPE;
             }
             else if ([param isEqualToString:@"int"]) {
                 int diNum = [dNum intValue];
                 ps.push_back(diNum);
-                //NSData *mydata = [NSData dataWithBytes:&diNum length:sizeof(int)];
-                [retObjs insertObject:NW atIndex:(i-1)];
-                NW.doubleval = diNum;
-                NW.numbertype = INTTYPE;
             }
             else if ([param isEqualToString:@"float"]) {
                 float dfNum = [dNum floatValue];
                 ps.push_back(dfNum);
-                NW.doubleval = dfNum;
-                NW.numbertype = FLOATTYPE;
             }
         }
         else if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"InputArray"] || [param isEqualToString:@"InputArrayOfArrays"] || [param isEqualToString:@"OutputArray"] || [param isEqualToString:@"OutputArrayOfArrays"]) {
@@ -200,9 +183,6 @@ std::vector<std::tuple<TT>> vect;
                 Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
                 ps.push_back(dMat);
                 
-                MatWrapper *MW = [[MatWrapper alloc] init];
-                MW.myMat = dMat;
-                [retObjs insertObject:MW atIndex:(i-1)];
                 self.arrMatIndex = i - 1;
                 self.dstMatIndex = matIndex;
             }
@@ -218,7 +198,6 @@ std::vector<std::tuple<TT>> vect;
         }
         i++;
     }
-    return retObjs;
 }
 
 -(int)findMethod:(NSString*)func params:(NSDictionary*)params searchClass:(NSString*)searchClass {
@@ -354,14 +333,9 @@ std::vector<std::tuple<TT>> vect;
    std::vector<ocvtypes> ps;
    int methodIndex = -1;
    NSString *searchClass;
-   const NSArray *zData;
    Mat dstMat;
     
    @try {
-       
-       typedef std::function<void(cv::InputArray,cv::OutputArray,int,int)> fun;
-       
-       fun f_display = cvtColor;
        
        if (in != nil) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
@@ -391,7 +365,7 @@ std::vector<std::tuple<TT>> vect;
        }
        if (numParams > 0) {
            NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
-           zData = [self getObjectArr:params params:methodParams objects:ps];
+           [self getObjectArr:params params:methodParams objects:ps];
            
            if (numParams != methodParams.count) {
                [NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
@@ -439,7 +413,7 @@ std::vector<std::tuple<TT>> vect;
                    Mat m1 = *reinterpret_cast<Mat*>(&ps[0]); Mat m2 = *reinterpret_cast<Mat*>(&ps[1]); int i3 = *reinterpret_cast<int*>(&ps[2]); int i4 = *reinterpret_cast<int*>(&ps[3]);
                    cvtColor(m1, m2, i3, i4);
                    dstMat = m2;
-
+                   
                    int kkwwf = 2007;
                    kkwwf++;
                }
