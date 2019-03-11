@@ -7,37 +7,12 @@
 //
 #import "CvFunctionWrapper.h"
 
-std::vector<std::string> lookup = {
-"cvtColor"
-};
-
-typedef enum fns {
-    CVTCOLOR
-} fns;
-
-// I tried writing code to invoke opencv2.framework at run-time and it turned out to
-// be not something that is easily achievable but I gave that up once I considered that
-// Apple will probably reject any app that invokes run-time code anyways unfortunately
-// you just have to wrap the Opencv functions ...
-template<class... ArgTypes>
-void callOpenCvMethod2(ArgTypes... p) {
-
-    std::string functionName("cvtColor");
-    auto it = std::find(lookup.begin(), lookup.end(), functionName);
-    if (it != lookup.end()) {
-        auto index = std::distance(lookup.begin(), it);
+Mat* cvtColorWrap(const NSArray* zData) {
+    Mat m1;NSData *m1data = zData[0];[m1data getBytes:&m1 length:m1data.length];
+    Mat m2;NSData *m2data = zData[1];[m2data getBytes:&m2 length:m2data.length];
+    int i3;NSData *i3data = zData[2];[i3data getBytes:&i3 length:i3data.length];
+    int i4;NSData *i4data = zData[3];[i4data getBytes:&i4 length:i4data.length];
+    cvtColor(m1, m2, i3, i4);
     
-        switch(index) {
-            case CVTCOLOR: {
-                //cvtColor(p...);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-}
-
-void justdoitplease() {
-    callOpenCvMethod2(1, ':', " Hello", ',', " ", "World!" );
+    return nil;
 }

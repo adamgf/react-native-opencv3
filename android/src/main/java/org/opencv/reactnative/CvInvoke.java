@@ -150,10 +150,6 @@ class CvInvoke {
               if (itsType == ReadableType.Map) {
                   ReadableMap scalarMap = RM.getMap(paramNum);
                   ReadableArray scalarVal = scalarMap.getArray("vals");
-                  if (scalarVal == null) {
-                      Log.d("FUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJFUCKADFASDFJASDFJASDFJAJFUCKJ",
-                        "Fuckin scalar val is null!!!! paramNum is: " + paramNum);
-                  }
                   Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
                       scalarVal.getDouble(2),scalarVal.getDouble(3));
                   retObjs.add(dScalar);

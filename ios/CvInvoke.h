@@ -14,6 +14,19 @@
 template<class... ArgTypes>
 void callOpenCvMethod(ArgTypes... p);
 
+enum NumberType {
+    INTTYPE,
+    FLOATTYPE,
+    DOUBLETYPE
+};
+
+@interface NumberWrapper : NSObject
+@property (nonatomic, assign) int intval;
+@property (nonatomic, assign) float floatval;
+@property (nonatomic, assign) double doubleval;
+@property (nonatomic, assign) NumberType numbertype;
+@end
+
 @interface CvInvoke : NSObject
 
 +(NSArray*)populateInvokeGroups:(NSDictionary*)cvInvokeGroup;
@@ -33,6 +46,8 @@ void callOpenCvMethod(ArgTypes... p);
 @property (nonatomic, assign) Mat gray;
 
 @property (nonatomic, strong) NSMutableDictionary *matParams;
+
+@property (nonatomic, strong) NSMutableDictionary *tupleTypes;
 
 @end
 

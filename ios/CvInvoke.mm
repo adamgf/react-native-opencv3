@@ -8,7 +8,9 @@
 //
 #import "CvInvoke.h"
 #import "MatManager.h"
+#import "CvFunctionWrapper.h"
 #include <variant>
+#include <any>
 
 typedef std::variant<int,double,float,const char*,Mat,Scalar,cv::Point> ocvtypes;
 
@@ -24,15 +26,38 @@ typedef enum fns {
     CVTCOLOR
 } fns;
 
+template <typename K>
+inline K castit(ocvtypes* ocvtype) {
+    return *reinterpret_cast<K*>(ocvtype);
+}
+
+struct MatType { };
+struct IntType { };
+
+struct Cast {
+    auto cast(ocvtypes in, MatType) { return castit<Mat>(&in); }
+    auto cast(ocvtypes in, IntType) { return castit<int>(&in); }
+};
+
+struct allparams {
+    std::tuple<MatType,MatType,IntType,IntType> f0 =  std::make_tuple(MatType(),MatType(),IntType(),IntType());
+    std::tuple<MatType,MatType,IntType> f1 = std::make_tuple(MatType(),MatType(),IntType());
+};
+
 template<typename... T>
-void invokeIt(std::vector<std::string>lookup, std::string functionName, T *...args) {
+void invokeIt(std::string searchClass, std::string functionName, T&... args) {
+    std::vector<std::string> lookup;
+    if (searchClass.compare("Imgproc") == 0) {
+        lookup = Imgproc;
+    }
+    
     auto it = std::find(lookup.begin(), lookup.end(), functionName);
     if (it != lookup.end()) {
         auto index = std::distance(lookup.begin(), it);
         
         switch(index) {
             case CVTCOLOR: {
-                cvtColor(*args...);
+                cvtColor(args...);
                 break;
             }
             default:
@@ -41,47 +66,42 @@ void invokeIt(std::vector<std::string>lookup, std::string functionName, T *...ar
     }
 }
 
-void callOpenCvMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes>* ps) {
-    
-    //std::vector<std::string> lookup;
-    //if (searchClass.compare(std::string("Imgproc")) == 0) {
-    //    lookup = Imgproc;
-    //}
-    
-    unsigned long numParams = 4; //paramTypes.size();
-    
-    if (numParams == 4) {
-        ocvtypes firstMat = ps->at(0);
-        auto p1 = *reinterpret_cast<Mat*>(&firstMat);
-        ocvtypes secondMat = ps->at(1);
-        auto p2 = *reinterpret_cast<Mat*>(&secondMat);
-        ocvtypes firstInt = ps->at(2);
-        auto p3 = *reinterpret_cast<int*>(&firstInt);
-        ocvtypes secondInt = ps->at(3);
-        auto p4 = *reinterpret_cast<int*>(&secondInt);
-        //cvtColor(p1, p2, p3, p4);
-        invokeIt(Imgproc, functionName, &p1, &p2, &p3, &p4);
-        int kk = 2002;
-        kk++;
+template<int fnargnum, typename tup>
+Mat callOpenCvMethod(std::string searchClass, std::string functionName, const std::vector<ocvtypes>& args, tup& tuptypes) {
+
+    std::vector<std::string> lookup;
+    if (searchClass.compare("Imgproc") == 0) {
+        lookup = Imgproc;
     }
+    
+    if (fnargnum == 3) {
+        Cast cast;
+        auto lamb = [&cast](ocvtypes ocvt, auto c){ return cast.cast(ocvt, c); };
+        std::map<std::string, decltype(lamb)> m;
+        m.emplace("cast", lamb);
+        auto p1 = m.at("cast")(args[0], std::get<0>(tuptypes));
+        auto p2 = m.at("cast")(args[1], std::get<1>(tuptypes));
+        auto p3 = m.at("cast")(args[2], std::get<2>(tuptypes));
+        invokeIt(lookup, functionName, p1, p2, p3);
+        return p2;
+    }
+    else if (fnargnum == 4) {
+        Cast cast2;
+        auto lamb = [&cast2](ocvtypes ocvt, auto c){ return cast2.cast(ocvt, c); };
+        std::map<std::string, decltype(lamb)> m2;
+        m2.emplace("cast", lamb);
+        auto p1 = m2.at("cast")(args[0], std::get<0>(tuptypes));
+        auto p2 = m2.at("cast")(args[1], std::get<1>(tuptypes));
+        auto p3 = m2.at("cast")(args[2], std::get<2>(tuptypes));
+        auto p4 = m2.at("cast")(args[3], std::get<3>(tuptypes));
+        invokeIt(lookup, functionName, p1, p2, p3, p4);
+        return p2;
+    }
+    return Mat();
 }
 
-/**
-void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::string sclass) {
-    
-    unsigned long argCount = args.size();
-    
-    if (argCount == 0) {
-        callOpenCvMethod(fname, NULL, sclass);
-    }
-    else if (argCount == 1) {
-        
-    }
-} */
-
-// simple opaque object that wraps a cv::Mat or other OpenCV object or other type ...
-//@implementation MatWrapper2
-//@end
+@implementation NumberWrapper
+@end
 
 @implementation CvInvoke
 
@@ -90,6 +110,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
         self.arrMatIndex = -1;
         self.dstMatIndex = -1;
         self.matParams = [[NSMutableDictionary alloc] init];
+        self.tupleTypes = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -98,10 +119,18 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
     return (int)hashMap.allKeys.count;
 }
 
--(void)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params objects:(std::vector<ocvtypes>&)ps {
+std::tuple<Mat> matt;
+std::tuple<int> intt;
+
+template <typename TT>
+std::vector<std::tuple<TT>> vect;
+
+-(const NSArray*)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params objects:(std::vector<ocvtypes>&)ps {
     
     int i = 1;
-    //NSMutableArray *retObjs = [[NSMutableArray alloc] initWithCapacity:params.count];
+    NSMutableArray *retObjs = [[NSMutableArray alloc] initWithCapacity:params.count];
+    //void **retdata = (void**)malloc(hashMap.allKeys.count);
+    
     for (NSString* param in params) {
         NSString* paramNum = [NSString stringWithFormat:@"p%d", i];
         NSString* itsType = NSStringFromClass([[hashMap valueForKey:paramNum] class]);
@@ -128,33 +157,41 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
             if (dstMat.rows > 0) {
                 // whatever the type is the Mat will suffice
                 ps.push_back(dstMat);
-                //MatWrapper *MW = [[MatWrapper alloc] init];
-                //MW.myMat = dstMat;
-                //[retObjs insertObject:MW atIndex:(i-1)];
+                MatWrapper *MW = [[MatWrapper alloc] init];
+                MW.myMat = dstMat;
+                [retObjs insertObject:MW atIndex:(i-1)];
                 
             }
             else if ([param isEqualToString:@"const char*"]) {
                 const char *pushStr = [paramStr UTF8String];
                 ps.push_back(pushStr);
-                //[retObjs insertObject:paramStr atIndex:(i-1)];
+                [retObjs insertObject:paramStr atIndex:(i-1)];
             }
         }
         else if ([itsType containsString:@"Number"]) {
             // not sure what to do here exactly ...
             NSNumber *dNum = (NSNumber*)[hashMap valueForKey:paramNum];
+            NumberWrapper *NW = [[NumberWrapper alloc] init];
             if ([param isEqualToString:@"double"]) {
                 double ddNum = [dNum doubleValue];
                 ps.push_back(ddNum);
+                NW.doubleval = ddNum;
+                NW.numbertype = DOUBLETYPE;
             }
             else if ([param isEqualToString:@"int"]) {
                 int diNum = [dNum intValue];
                 ps.push_back(diNum);
+                //NSData *mydata = [NSData dataWithBytes:&diNum length:sizeof(int)];
+                [retObjs insertObject:NW atIndex:(i-1)];
+                NW.doubleval = diNum;
+                NW.numbertype = INTTYPE;
             }
             else if ([param isEqualToString:@"float"]) {
                 float dfNum = [dNum floatValue];
                 ps.push_back(dfNum);
+                NW.doubleval = dfNum;
+                NW.numbertype = FLOATTYPE;
             }
-            //[retObjs insertObject:dNum atIndex:(i-1)];
         }
         else if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"InputArray"] || [param isEqualToString:@"InputArrayOfArrays"] || [param isEqualToString:@"OutputArray"] || [param isEqualToString:@"OutputArrayOfArrays"]) {
             if ([itsType containsString:@"Dictionary"]) {
@@ -162,9 +199,19 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
                 int matIndex = [(NSNumber*)[matMap valueForKey:@"matIndex"] intValue];
                 Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
                 ps.push_back(dMat);
-                //MatWrapper *MW = [[MatWrapper alloc] init];
-                //MW.myMat = dMat;
-                //[retObjs insertObject:MW atIndex:(i-1)];
+                /**
+                NSData *mydata;
+                if (dMat.rows > 0) {
+                    mydata = [NSData dataWithBytes:&dMat length:sizeof(dMat)];
+                }
+                else {
+                    // empty Mat just want to store the ptr ...
+                    mydata = [NSData dataWithBytes:&dMat length:sizeof(dMat)];
+                } */
+
+                MatWrapper *MW = [[MatWrapper alloc] init];
+                MW.myMat = dMat;
+                [retObjs insertObject:MW atIndex:(i-1)];
                 self.arrMatIndex = i - 1;
                 self.dstMatIndex = matIndex;
             }
@@ -180,7 +227,9 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
         }
         i++;
     }
-    //return ps;
+    return retObjs;
+    //NSData *myData = [NSData dataWithBytes:&retdata length:sizeof(retdata)];
+    //return myData;
 }
 
 -(int)findMethod:(NSString*)func params:(NSDictionary*)params searchClass:(NSString*)searchClass {
@@ -317,13 +366,16 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
    std::vector<ocvtypes> ps;
    int methodIndex = -1;
    NSString *searchClass;
-   
+   const NSArray *zData;
+   Mat dstMat;
+    
    @try {
-       /**
+       
        typedef std::function<void(cv::InputArray,cv::OutputArray,int,int)> fun;
        
        fun f_display = cvtColor;
        
+       /**
        Scalar usethisscalar(255,255,0,255);
        //ocvtypes inmat = Mat(500,500,CV_8UC4,usethisscalar);
        NSDictionary *fmat = [params valueForKey:@"p1"];
@@ -384,7 +436,7 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
        }
        if (numParams > 0) {
            NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
-           [self getObjectArr:params params:methodParams objects:ps];
+           zData = [self getObjectArr:params params:methodParams objects:ps];
            
            if (numParams != methodParams.count) {
                [NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
@@ -428,15 +480,100 @@ void paramsToFunctionCall(std::string fname, std::vector<void*> args, std::strin
                else {
                    std::string dFunc = std::string([func UTF8String]);
                    std::string dSearchClass = std::string([searchClass UTF8String]);
-                   callOpenCvMethod(dSearchClass, dFunc, &ps);
+                   
+                   /*void **ps = (void**)malloc(4);
+                   void *p1, *p2, *p3, *p4;
+                   int i = 0;
+                   for (id obj in zData) {
+                       if ([obj isKindOfClass:[MatWrapper class]]) {
+                           Mat zMat = ((MatWrapper*)obj).myMat;
+                           if (i == 0) {
+                               p1 = &zMat;
+                               //Mat testmat = *(Mat*)p1;
+                               int quintessentiallyawesome = 1;
+                               quintessentiallyawesome++;
+                           }
+                           else if (i == 1) {
+                               p2 = &zMat;
+                           }
+                       }
+                       else if ([obj isKindOfClass:[NumberWrapper class]]) {
+                           NumberWrapper *NW = (NumberWrapper*)obj;
+                           switch (NW.numbertype) {
+                               case DOUBLETYPE: {
+                                   double dv = NW.doubleval;
+                                   //*ps = &dv;
+                                   break;
+                               }
+                               case INTTYPE: {
+                                   int iv = NW.intval;
+                                   //*ps = &iv;
+                                   if (i == 2) {
+                                       p3 = (&iv);
+                                   }
+                                   else if (i ==3) {
+                                       p4 = (&iv);
+                                   }
+                                   break;
+                               }
+                               case FLOATTYPE: {
+                                   float fv = NW.floatval;
+                                   //*ps = &fv;
+                                   break;
+                               }
+                           }
+                       }
+                       i++;
+                   }
+                   std::string matname = typeid(Mat).name();
+                   
+                   int thirdval = 6;
+                   int *p33 = &thirdval;
+                   int fourthval = 0;
+                   int *p44 = &fourthval;
+                   
+                   //dstMat = cvtColorWrap(zData);
+                   /**
+                   NSUInteger len = [zData[0] length];
+                   void *p1 = malloc(len);
+                   memcpy(p1, [zData[0] bytes], len);
+                   
+                   NSUInteger len2 = [zData[1] length];
+                   void *p2 = malloc(len2);
+                   memcpy(p2, [zData[1] bytes], len2);
+
+                   NSUInteger len3 = [zData[2] length];
+                   void *p3 = malloc(len3);
+                   memcpy(p3, [zData[2] bytes], len3);
+                   
+                   NSUInteger len4 = [zData[3] length];
+                   void *p4 = malloc(len4);
+                   memcpy(p4, [zData[3] bytes], len4); */
+
+                   Mat m1 = *reinterpret_cast<Mat*>(&ps[0]); Mat m2 = *reinterpret_cast<Mat*>(&ps[1]); int i3 = *reinterpret_cast<int*>(&ps[2]); int i4 = *reinterpret_cast<int*>(&ps[3]);
+                   cvtColor(m1, m2, i3, i4);
+                   dstMat = m2;
+
+                   //Mat m1;NSData *m1data = zData[0];[m1data getBytes:&m1 length:m1data.length];
+                   //Mat m2;NSData *m2data = zData[1];[m2data getBytes:&m2 length:m2data.length];
+                   //int i3;NSData *i3data = zData[2];[i3data getBytes:&i3 length:i3data.length];
+                   //int i4;NSData *i4data = zData[3];[i4data getBytes:&i4 length:i4data.length];
+                   
+                   
+                   //cvtColor(m1,m2,i3,i4);
+                   //cvtColor(inmat,outmat,6,0);
+                   //dstMat = m2;
+                   //invokeIt(dSearchClass, dFunc, m1, m2, i3, i4);
+                   int kkwwf = 2007;
+                   kkwwf++;
                }
            }
        }
        
        if (self.dstMatIndex >= 0) {
            //MatWrapper *dstMatWrapper = (MatWrapper*)objects[self.arrMatIndex];
-           ocvtypes dMat = ps.at(self.arrMatIndex);
-           Mat dstMat = *reinterpret_cast<Mat*>(&dMat);
+           //ocvtypes dMat = ps.at(self.arrMatIndex);
+           //Mat dstMat = *reinterpret_cast<Mat*>(&dMat);
            //Mat dstMat = dstMatWrapper.myMat;
            [MatManager.sharedMgr setMat:self.dstMatIndex matToSet:dstMat];
            result = self.dstMatIndex;
