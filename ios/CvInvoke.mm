@@ -199,16 +199,7 @@ std::vector<std::tuple<TT>> vect;
                 int matIndex = [(NSNumber*)[matMap valueForKey:@"matIndex"] intValue];
                 Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
                 ps.push_back(dMat);
-                /**
-                NSData *mydata;
-                if (dMat.rows > 0) {
-                    mydata = [NSData dataWithBytes:&dMat length:sizeof(dMat)];
-                }
-                else {
-                    // empty Mat just want to store the ptr ...
-                    mydata = [NSData dataWithBytes:&dMat length:sizeof(dMat)];
-                } */
-
+                
                 MatWrapper *MW = [[MatWrapper alloc] init];
                 MW.myMat = dMat;
                 [retObjs insertObject:MW atIndex:(i-1)];
@@ -228,8 +219,6 @@ std::vector<std::tuple<TT>> vect;
         i++;
     }
     return retObjs;
-    //NSData *myData = [NSData dataWithBytes:&retdata length:sizeof(retdata)];
-    //return myData;
 }
 
 -(int)findMethod:(NSString*)func params:(NSDictionary*)params searchClass:(NSString*)searchClass {
@@ -362,7 +351,6 @@ std::vector<std::tuple<TT>> vect;
    if (params != NULL) {
        numParams = [CvInvoke getNumKeys:params];
    }
-   //NSArray *objects = NULL;
    std::vector<ocvtypes> ps;
    int methodIndex = -1;
    NSString *searchClass;
@@ -374,39 +362,6 @@ std::vector<std::tuple<TT>> vect;
        typedef std::function<void(cv::InputArray,cv::OutputArray,int,int)> fun;
        
        fun f_display = cvtColor;
-       
-       /**
-       Scalar usethisscalar(255,255,0,255);
-       //ocvtypes inmat = Mat(500,500,CV_8UC4,usethisscalar);
-       NSDictionary *fmat = [params valueForKey:@"p1"];
-       int fmatindex = [[fmat valueForKey:@"matIndex"] intValue];
-       ocvtypes inmat = [MatManager.sharedMgr matAtIndex:fmatindex];
-       NSDictionary *fmat2 = [params valueForKey:@"p2"];
-       int fmatindex2 = [[fmat2 valueForKey:@"matIndex"] intValue];
-       ocvtypes outmat = [MatManager.sharedMgr matAtIndex:fmatindex2];
-       //ocvtypes outmat = Mat();
-       //ocvtypes inmat2 = arr1;
-       //ocvtypes outmat2 = outmat;
-       
-       std::vector<ocvtypes*> ps;
-       ocvtypes thirdval = 6;
-       ocvtypes fourthval = 0;
-       //ocvtypes fiveval = thirdval;
-       //ocvtypes sixval = fourthval;
-       
-       ps.push_back(&inmat);
-       ps.push_back(&outmat);
-       ps.push_back(&thirdval);
-       ps.push_back(&fourthval);
-        
-       
-       NSArray *methodParams = [self getParameterTypes:0 searchClass:@"Imgproc"];
-       std::vector<ocvtypes> ps;
-       [self getObjectArr:params params:methodParams objects:ps];
-       
-       callOpenCvMethod(std::string("Imgproc"), std::string("cvtColor"), &ps);
-       
-       //f_display(&ps[0],&ps[1],,0); */
        
        if (in != nil) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
@@ -481,89 +436,10 @@ std::vector<std::tuple<TT>> vect;
                    std::string dFunc = std::string([func UTF8String]);
                    std::string dSearchClass = std::string([searchClass UTF8String]);
                    
-                   /*void **ps = (void**)malloc(4);
-                   void *p1, *p2, *p3, *p4;
-                   int i = 0;
-                   for (id obj in zData) {
-                       if ([obj isKindOfClass:[MatWrapper class]]) {
-                           Mat zMat = ((MatWrapper*)obj).myMat;
-                           if (i == 0) {
-                               p1 = &zMat;
-                               //Mat testmat = *(Mat*)p1;
-                               int quintessentiallyawesome = 1;
-                               quintessentiallyawesome++;
-                           }
-                           else if (i == 1) {
-                               p2 = &zMat;
-                           }
-                       }
-                       else if ([obj isKindOfClass:[NumberWrapper class]]) {
-                           NumberWrapper *NW = (NumberWrapper*)obj;
-                           switch (NW.numbertype) {
-                               case DOUBLETYPE: {
-                                   double dv = NW.doubleval;
-                                   //*ps = &dv;
-                                   break;
-                               }
-                               case INTTYPE: {
-                                   int iv = NW.intval;
-                                   //*ps = &iv;
-                                   if (i == 2) {
-                                       p3 = (&iv);
-                                   }
-                                   else if (i ==3) {
-                                       p4 = (&iv);
-                                   }
-                                   break;
-                               }
-                               case FLOATTYPE: {
-                                   float fv = NW.floatval;
-                                   //*ps = &fv;
-                                   break;
-                               }
-                           }
-                       }
-                       i++;
-                   }
-                   std::string matname = typeid(Mat).name();
-                   
-                   int thirdval = 6;
-                   int *p33 = &thirdval;
-                   int fourthval = 0;
-                   int *p44 = &fourthval;
-                   
-                   //dstMat = cvtColorWrap(zData);
-                   /**
-                   NSUInteger len = [zData[0] length];
-                   void *p1 = malloc(len);
-                   memcpy(p1, [zData[0] bytes], len);
-                   
-                   NSUInteger len2 = [zData[1] length];
-                   void *p2 = malloc(len2);
-                   memcpy(p2, [zData[1] bytes], len2);
-
-                   NSUInteger len3 = [zData[2] length];
-                   void *p3 = malloc(len3);
-                   memcpy(p3, [zData[2] bytes], len3);
-                   
-                   NSUInteger len4 = [zData[3] length];
-                   void *p4 = malloc(len4);
-                   memcpy(p4, [zData[3] bytes], len4); */
-
                    Mat m1 = *reinterpret_cast<Mat*>(&ps[0]); Mat m2 = *reinterpret_cast<Mat*>(&ps[1]); int i3 = *reinterpret_cast<int*>(&ps[2]); int i4 = *reinterpret_cast<int*>(&ps[3]);
                    cvtColor(m1, m2, i3, i4);
                    dstMat = m2;
 
-                   //Mat m1;NSData *m1data = zData[0];[m1data getBytes:&m1 length:m1data.length];
-                   //Mat m2;NSData *m2data = zData[1];[m2data getBytes:&m2 length:m2data.length];
-                   //int i3;NSData *i3data = zData[2];[i3data getBytes:&i3 length:i3data.length];
-                   //int i4;NSData *i4data = zData[3];[i4data getBytes:&i4 length:i4data.length];
-                   
-                   
-                   //cvtColor(m1,m2,i3,i4);
-                   //cvtColor(inmat,outmat,6,0);
-                   //dstMat = m2;
-                   //invokeIt(dSearchClass, dFunc, m1, m2, i3, i4);
                    int kkwwf = 2007;
                    kkwwf++;
                }
@@ -571,10 +447,6 @@ std::vector<std::tuple<TT>> vect;
        }
        
        if (self.dstMatIndex >= 0) {
-           //MatWrapper *dstMatWrapper = (MatWrapper*)objects[self.arrMatIndex];
-           //ocvtypes dMat = ps.at(self.arrMatIndex);
-           //Mat dstMat = *reinterpret_cast<Mat*>(&dMat);
-           //Mat dstMat = dstMatWrapper.myMat;
            [MatManager.sharedMgr setMat:self.dstMatIndex matToSet:dstMat];
            result = self.dstMatIndex;
            self.dstMatIndex = -1;
