@@ -108,22 +108,22 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
 
 
 RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
-    NSArray *responseArr = NULL;
-    NSString *lastCall = NULL;
+    NSArray *responseArr = nil;
+    NSString *lastCall = nil;
     int dstMatIndex = -1;
-    NSArray *groupids = NULL;
+    NSArray *groupids = nil;
     if ([cvInvokeMap.allKeys containsObject:@"groupids"]) {
         groupids = (NSArray*)[cvInvokeMap valueForKey:@"groupids"];
-        if (groupids != NULL && groupids.count > 0) {
+        if (groupids != nil && groupids.count > 0) {
             NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
             responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
             for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
                 CvInvoke *invoker = [[CvInvoke alloc] init];
                 dstMatIndex = [invoker invokeCvMethods:(NSDictionary*)invokeGroups[i]];
-                if (invoker.callback != NULL) {
+                if (invoker.callback != nil) {
                     lastCall = invoker.callback;
                 }
-                if (lastCall != NULL && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                if (lastCall != nil && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
                     NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
                     [(NSMutableArray*)responseArr addObject:retArr];
                 }
@@ -133,10 +133,10 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
     else {
         CvInvoke *invoker = [[CvInvoke alloc] init];
         dstMatIndex = [invoker invokeCvMethods:cvInvokeMap];
-        if (invoker.callback != NULL) {
+        if (invoker.callback != nil) {
             lastCall = invoker.callback;
         }
-        if (lastCall != NULL && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+        if (lastCall != nil && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
             responseArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
         }
     }
@@ -145,7 +145,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
 
 // IMPT NOTE: retArr can either be one single array or an array of arrays ...
 -(void)sendCallbackData:(NSArray*)retArr callback:(NSString*)callback dstMatIndex:(int)dstMatIndex {
-    if (callback != NULL && ![callback isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+    if (callback != nil && ![callback isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
         // not sure how this should be handled yet for different return objects ...
         //[self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
     }
@@ -166,7 +166,7 @@ RCT_EXPORT_METHOD(invokeMethodWithCallback:(NSString*)in func:(NSString*)func pa
 
 RCT_EXPORT_METHOD(invokeMethod:(NSString*)func params:(NSDictionary*)params) {
     CvInvoke *invoker = [[CvInvoke alloc] init];
-    [invoker invokeCvMethod:NULL func:func params:params out:NULL];
+    [invoker invokeCvMethod:nil func:func params:params out:nil];
 }
 
 RCT_EXPORT_METHOD(invokeInOutMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out) {
@@ -192,7 +192,7 @@ RCT_EXPORT_METHOD(MatWithScalar:(int)rows cols:(int)cols cvtype:(int)cvtype scal
 }
 
 RCT_EXPORT_METHOD(MatWithParams:(int)rows cols:(int)cols cvtype:(int)cvtype resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    int matIndex = [MatManager.sharedMgr createMat:rows cols:cols cvtype:cvtype scalarVal:NULL];
+    int matIndex = [MatManager.sharedMgr createMat:rows cols:cols cvtype:cvtype scalarVal:nil];
     [self resolveMatPromise:matIndex rows:rows cols:cols cvtype:cvtype resolver:resolve];
 }
 

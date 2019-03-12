@@ -366,7 +366,7 @@
         }
     }
 
-    if (mCvInvokeGroup != NULL) {
+    if (mCvInvokeGroup != nil) {
         //long currMillis = System.currentTimeMillis();
         //long diff = (currMillis - mCurrentMillis);
         //if (diff >= mOverlayInterval) {

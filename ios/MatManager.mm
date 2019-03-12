@@ -46,10 +46,10 @@
 
 -(int)createMat:(int)rows cols:(int)cols cvtype:(int)cvtype scalarVal:(NSDictionary*)cvscalar {
     int matIndex = (int)self.mats.count;
-    Mat *matToAdd = NULL;
+    Mat *matToAdd = nil;
     
     NSArray *scalarVal = [cvscalar objectForKey:@"vals"];
-    if (scalarVal != NULL) {
+    if (scalarVal != nil) {
         double *demolitionman = new double[4];
         for (int i=0;i < 4;i++) {
             NSNumber *blade = [scalarVal objectAtIndex:i];
@@ -63,7 +63,7 @@
         Mat newjackcity(rows, cols, cvtype);
         matToAdd = &newjackcity;
     }
-    if (matToAdd != NULL) {
+    if (matToAdd != nil) {
         MatWrapper *MW = [[MatWrapper alloc] init];
         MW.myMat = *matToAdd;
         [self.mats addObject:MW];

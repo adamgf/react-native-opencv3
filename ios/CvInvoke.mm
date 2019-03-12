@@ -9,10 +9,6 @@
 #import "CvInvoke.h"
 #import "MatManager.h"
 #import "CvFunctionWrapper.h"
-#include <variant>
-#include <any>
-
-typedef std::variant<int,double,float,const char*,Mat,Scalar,cv::Point> ocvtypes;
 
 std::vector<std::string> Imgproc = {
     "cvtColor"
@@ -25,11 +21,6 @@ std::vector<std::string> iptypes = {
 typedef enum fns {
     CVTCOLOR
 } fns;
-
-template <typename K>
-inline K castit(ocvtypes* ocvtype) {
-    return *reinterpret_cast<K*>(ocvtype);
-}
 
 struct MatType { };
 struct IntType { };
@@ -203,7 +194,7 @@ std::vector<std::tuple<TT>> vect;
 -(int)findMethod:(NSString*)func params:(NSDictionary*)params searchClass:(NSString*)searchClass {
     int funcIndex = -1;
     int numParams = 0;
-    if (params != NULL) {
+    if (params != nil) {
         numParams = [CvInvoke getNumKeys:params];
     }
     
@@ -249,7 +240,7 @@ std::vector<std::tuple<TT>> vect;
     NSArray *callbacks = [cvInvokeGroup valueForKey:@"callbacks"];
     NSArray *groupids = [cvInvokeGroup valueForKey:@"groupids"];
     
-    if (groupids != NULL && groupids.count > 0) {
+    if (groupids != nil && groupids.count > 0) {
         int i = 0;
         while (i < groupids.count) {
             NSDictionary* invokeGroup = [[NSMutableDictionary alloc] init];
@@ -327,7 +318,7 @@ std::vector<std::tuple<TT>> vect;
    
    int result = -1;
    int numParams = 0;
-   if (params != NULL) {
+   if (params != nil) {
        numParams = [CvInvoke getNumKeys:params];
    }
    std::vector<ocvtypes> ps;
@@ -337,7 +328,7 @@ std::vector<std::tuple<TT>> vect;
     
    @try {
        
-       if (in != nil) {
+       if (in != nil && in != (NSString*)[NSNull null]) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
                
                methodIndex = [self findMethod:func params:params searchClass:@"Mat"];
@@ -374,7 +365,7 @@ std::vector<std::tuple<TT>> vect;
        if (methodIndex != -1) {
            Mat matToUse;
            
-           if (in != nil) {
+           if (in != nil && in != (NSString*)[NSNull null]) {
                if ([in isEqualToString:@"rgba"]) {
                    matToUse = self.rgba;
                }
@@ -393,7 +384,7 @@ std::vector<std::tuple<TT>> vect;
                }
            }
            
-           if (out != nil) {
+           if (out != nil && out != (NSString*)[NSNull null]) {
                // TODO ...
                //id matParam;
                //if (matParam != NULL) {
@@ -410,9 +401,7 @@ std::vector<std::tuple<TT>> vect;
                    std::string dFunc = std::string([func UTF8String]);
                    std::string dSearchClass = std::string([searchClass UTF8String]);
                    
-                   Mat m1 = *reinterpret_cast<Mat*>(&ps[0]); Mat m2 = *reinterpret_cast<Mat*>(&ps[1]); int i3 = *reinterpret_cast<int*>(&ps[2]); int i4 = *reinterpret_cast<int*>(&ps[3]);
-                   cvtColor(m1, m2, i3, i4);
-                   dstMat = m2;
+                   dstMat = cvtColorW(ps);
                    
                    int kkwwf = 2007;
                    kkwwf++;
