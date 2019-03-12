@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		500199092220E5AD00857A3C /* CvFunctionWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 500199082220E5AD00857A3C /* CvFunctionWrapper.mm */; };
 		5001994A2220FD0D00857A3C /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 500199452220FB7000857A3C /* libRNFS.a */; };
+		5031DD6D223743680039D838 /* ImgprocFuncs.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5031DD6C223743680039D838 /* ImgprocFuncs.mm */; };
 		5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5080B7F121915DC800170E85 /* RNOpencv3.mm */; };
 		5084125722162E00007835FA /* CvInvoke.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5084125622162E00007835FA /* CvInvoke.mm */; };
 		50CC5D5321EEF945004B431E /* MatManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50CC5D5221EEF945004B431E /* MatManager.mm */; };
@@ -51,6 +52,8 @@
 		500199052220E5AD00857A3C /* CvFunctionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvFunctionWrapper.h; sourceTree = "<group>"; };
 		500199082220E5AD00857A3C /* CvFunctionWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvFunctionWrapper.mm; sourceTree = "<group>"; };
 		5001993F2220FB7000857A3C /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../../react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
+		5031DD6C223743680039D838 /* ImgprocFuncs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ImgprocFuncs.mm; sourceTree = "<group>"; };
+		5031DD70223743890039D838 /* ImgprocFuncs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImgprocFuncs.h; sourceTree = "<group>"; };
 		5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lbfmodel.yaml; sourceTree = "<group>"; };
 		5043A75921DDBA3D000BC241 /* right_ear.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = right_ear.xml; sourceTree = "<group>"; };
 		5043A75A21DDBA3D000BC241 /* haarcascade_mcs_upperbody.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_upperbody.xml; sourceTree = "<group>"; };
@@ -158,6 +161,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				5031DD70223743890039D838 /* ImgprocFuncs.h */,
+				5031DD6C223743680039D838 /* ImgprocFuncs.mm */,
 				50FC7428219953C800A48FE3 /* CvCamera.h */,
 				50FC7426219953C800A48FE3 /* CvCamera.mm */,
 				50FC7427219953C800A48FE3 /* CvCameraView.m */,
@@ -260,6 +265,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5084125722162E00007835FA /* CvInvoke.mm in Sources */,
+				5031DD6D223743680039D838 /* ImgprocFuncs.mm in Sources */,
 				5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */,
 				50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */,
 				50CC5D5321EEF945004B431E /* MatManager.mm in Sources */,

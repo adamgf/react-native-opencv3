@@ -25,6 +25,6 @@ inline int castint(ocvtypes* ocvtype) {
     return castit<int>(ocvtype);
 }
 
-Mat cvtColorW(std::vector<ocvtypes>& ps);
+Mat callMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes>& args);
 
 #endif /* CvFunctionWrapper_h */

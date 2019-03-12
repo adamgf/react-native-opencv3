@@ -9,18 +9,7 @@
 #import "CvInvoke.h"
 #import "MatManager.h"
 #import "CvFunctionWrapper.h"
-
-std::vector<std::string> Imgproc = {
-    "cvtColor"
-};
-
-std::vector<std::string> iptypes = {
-    "Mat,Mat,int,int"
-};
-
-typedef enum fns {
-    CVTCOLOR
-} fns;
+#import "ImgprocFuncs.h"
 
 struct MatType { };
 struct IntType { };
@@ -34,28 +23,6 @@ struct allparams {
     std::tuple<MatType,MatType,IntType,IntType> f0 =  std::make_tuple(MatType(),MatType(),IntType(),IntType());
     std::tuple<MatType,MatType,IntType> f1 = std::make_tuple(MatType(),MatType(),IntType());
 };
-
-template<typename... T>
-void invokeIt(std::string searchClass, std::string functionName, T&... args) {
-    std::vector<std::string> lookup;
-    if (searchClass.compare("Imgproc") == 0) {
-        lookup = Imgproc;
-    }
-    
-    auto it = std::find(lookup.begin(), lookup.end(), functionName);
-    if (it != lookup.end()) {
-        auto index = std::distance(lookup.begin(), it);
-        
-        switch(index) {
-            case CVTCOLOR: {
-                cvtColor(args...);
-                break;
-            }
-            default:
-                break;
-        }
-    }
-}
 
 template<int fnargnum, typename tup>
 Mat callOpenCvMethod(std::string searchClass, std::string functionName, const std::vector<ocvtypes>& args, tup& tuptypes) {
@@ -401,7 +368,7 @@ std::vector<std::tuple<TT>> vect;
                    std::string dFunc = std::string([func UTF8String]);
                    std::string dSearchClass = std::string([searchClass UTF8String]);
                    
-                   dstMat = cvtColorW(ps);
+                   dstMat = callMethod(dSearchClass, dFunc, ps);
                    
                    int kkwwf = 2007;
                    kkwwf++;

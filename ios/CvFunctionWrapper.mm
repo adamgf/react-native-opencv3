@@ -6,10 +6,27 @@
 //  Copyright © 2019 Facebook. All rights reserved.
 //
 #import "CvFunctionWrapper.h"
+#import "ImgprocFuncs.h"
 
-Mat cvtColorW(std::vector<ocvtypes>& ps) {
-    Mat m2 = castmat(&ps[1]);
-    cvtColor(castmat(&ps[0]), m2, castint(&ps[2]), castint(&ps[3]));
-    return m2;
+Mat callMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes>& args) {
+    
+    std::vector<std::string> lookup;
+    if (searchClass.compare("Imgproc") == 0) {
+        lookup = Imgproc;
+    
+        auto it = std::find(lookup.begin(), lookup.end(), functionName);
+        if (it != lookup.end()) {
+            auto index = std::distance(lookup.begin(), it);
+        
+            switch(index) {
+                case CVTCOLOR: {
+                    return cvtColorW(args);
+                }
+                default:
+                    break;
+            }
+        }
+    }
+    return Mat();
 }
 
