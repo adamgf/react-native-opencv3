@@ -9,57 +9,7 @@
 #import "CvInvoke.h"
 #import "MatManager.h"
 #import "CvFunctionWrapper.h"
-#import "ImgprocFuncs.h"
-
-struct MatType { };
-struct IntType { };
-
-struct Cast {
-    auto cast(ocvtypes in, MatType) { return castit<Mat>(&in); }
-    auto cast(ocvtypes in, IntType) { return castit<int>(&in); }
-};
-
-struct allparams {
-    std::tuple<MatType,MatType,IntType,IntType> f0 =  std::make_tuple(MatType(),MatType(),IntType(),IntType());
-    std::tuple<MatType,MatType,IntType> f1 = std::make_tuple(MatType(),MatType(),IntType());
-};
-
-template<int fnargnum, typename tup>
-Mat callOpenCvMethod(std::string searchClass, std::string functionName, const std::vector<ocvtypes>& args, tup& tuptypes) {
-
-    std::vector<std::string> lookup;
-    if (searchClass.compare("Imgproc") == 0) {
-        lookup = Imgproc;
-    }
-    
-    if (fnargnum == 3) {
-        Cast cast;
-        auto lamb = [&cast](ocvtypes ocvt, auto c){ return cast.cast(ocvt, c); };
-        std::map<std::string, decltype(lamb)> m;
-        m.emplace("cast", lamb);
-        auto p1 = m.at("cast")(args[0], std::get<0>(tuptypes));
-        auto p2 = m.at("cast")(args[1], std::get<1>(tuptypes));
-        auto p3 = m.at("cast")(args[2], std::get<2>(tuptypes));
-        invokeIt(lookup, functionName, p1, p2, p3);
-        return p2;
-    }
-    else if (fnargnum == 4) {
-        Cast cast2;
-        auto lamb = [&cast2](ocvtypes ocvt, auto c){ return cast2.cast(ocvt, c); };
-        std::map<std::string, decltype(lamb)> m2;
-        m2.emplace("cast", lamb);
-        auto p1 = m2.at("cast")(args[0], std::get<0>(tuptypes));
-        auto p2 = m2.at("cast")(args[1], std::get<1>(tuptypes));
-        auto p3 = m2.at("cast")(args[2], std::get<2>(tuptypes));
-        auto p4 = m2.at("cast")(args[3], std::get<3>(tuptypes));
-        invokeIt(lookup, functionName, p1, p2, p3, p4);
-        return p2;
-    }
-    return Mat();
-}
-
-@implementation NumberWrapper
-@end
+#import "OpencvFuncs.h"
 
 @implementation CvInvoke
 
@@ -76,12 +26,6 @@ Mat callOpenCvMethod(std::string searchClass, std::string functionName, const st
 +(int)getNumKeys:(NSDictionary*)hashMap {
     return (int)hashMap.allKeys.count;
 }
-
-std::tuple<Mat> matt;
-std::tuple<int> intt;
-
-template <typename TT>
-std::vector<std::tuple<TT>> vect;
 
 -(void)getObjectArr:(NSDictionary*)hashMap params:(NSArray*)params objects:(std::vector<ocvtypes>&)ps {
     
@@ -158,7 +102,7 @@ std::vector<std::tuple<TT>> vect;
     }
 }
 
--(int)findMethod:(NSString*)func params:(NSDictionary*)params searchClass:(NSString*)searchClass {
+-(int)findMethod:(NSString*)func params:(NSDictionary*)params {
     int funcIndex = -1;
     int numParams = 0;
     if (params != nil) {
@@ -167,12 +111,9 @@ std::vector<std::tuple<TT>> vect;
     
     int i = 0;
     std::vector<std::string>::iterator it;  // declare an iterator to a vector of strings
-    std::vector<std::string> lookup;
-    std::vector<std::string> ptypes;
-    if ([searchClass isEqualToString:@"Imgproc"]) {
-        lookup = Imgproc;
-        ptypes = iptypes;
-    }
+    std::vector<std::string> lookup = Functions;
+    std::vector<std::string> ptypes = types;
+    
     for (it=lookup.begin();it != lookup.end();it++,i++) {
         NSString *lookupStr = [NSString stringWithUTF8String:lookup[i].c_str()];
         if ([lookupStr isEqualToString:func]) {
@@ -272,11 +213,8 @@ std::vector<std::tuple<TT>> vect;
 }
 
 // simple helper function ...
--(NSArray*)getParameterTypes:(int)methodIndex searchClass:(NSString*)searchClass {
-    std::vector<std::string> ptypes;
-    if ([searchClass isEqualToString:@"Imgproc"]) {
-        ptypes = iptypes;
-    }
+-(NSArray*)getParameterTypes:(int)methodIndex {
+    std::vector<std::string> ptypes = types;
     NSString *paramTypesStr = [NSString stringWithUTF8String:ptypes[methodIndex].c_str()];
     return [paramTypesStr componentsSeparatedByString:@","];
 }
@@ -290,11 +228,11 @@ std::vector<std::tuple<TT>> vect;
    }
    std::vector<ocvtypes> ps;
    int methodIndex = -1;
-   NSString *searchClass;
    Mat dstMat;
     
    @try {
        
+       /**
        if (in != nil && in != (NSString*)[NSNull null]) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
                
@@ -305,8 +243,11 @@ std::vector<std::tuple<TT>> vect;
                 }
            }
        }
-       else {
-           methodIndex = [self findMethod:func params:params searchClass:@"Imgproc"];
+       else { */
+       
+       methodIndex = [self findMethod:func params:params];
+       
+       /**
            if (methodIndex >= 0) {
                searchClass = @"Imgproc";
            }
@@ -316,13 +257,13 @@ std::vector<std::tuple<TT>> vect;
                    searchClass = @"Core";
                }
            }
-       }
+       } */
        
        if (methodIndex == -1) {
            [NSException raise:@"Method not found" format:@"%@ not found make sure method exists and is part of Opencv Imgproc, Core or Mat.", func];
        }
        if (numParams > 0) {
-           NSArray *methodParams = [self getParameterTypes:methodIndex searchClass:searchClass];
+           NSArray *methodParams = [self getParameterTypes:methodIndex];
            [self getObjectArr:params params:methodParams objects:ps];
            
            if (numParams != methodParams.count) {
@@ -366,9 +307,8 @@ std::vector<std::tuple<TT>> vect;
                }
                else {
                    std::string dFunc = std::string([func UTF8String]);
-                   std::string dSearchClass = std::string([searchClass UTF8String]);
                    
-                   dstMat = callMethod(dSearchClass, dFunc, ps);
+                   dstMat = callMethod(dFunc, ps);
                    
                    int kkwwf = 2007;
                    kkwwf++;

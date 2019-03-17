@@ -6,26 +6,22 @@
 //  Copyright © 2019 Facebook. All rights reserved.
 //
 #import "CvFunctionWrapper.h"
-#import "ImgprocFuncs.h"
+#import "OpencvFuncs.h"
 
-int getMethodIndex(std::vector<std::string>& lookup, std::string functionName) {
-    auto it = std::find(lookup.begin(), lookup.end(), functionName);
-    if (it != lookup.end()) {
-        int index = (int)std::distance(lookup.begin(), it);
+int getMethodIndex(std::string functionName) {
+    auto it = std::find(Functions.begin(), Functions.end(), functionName);
+    if (it != Functions.end()) {
+        int index = (int)std::distance(Functions.begin(), it);
         return index;
     }
     return -1;
 }
 
-Mat callMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes>& args) {
-    
-    std::vector<std::string> lookup;
-    if (searchClass.compare("Imgproc") == 0) {
-        lookup = Imgproc;
-        int index = getMethodIndex(lookup, functionName);
-        return callImgprocMethod(index, args);
+Mat callMethod(std::string functionName, std::vector<ocvtypes>& args) {
+    int index = getMethodIndex(functionName);
+    if (index >= 0) {
+        return callOpencvMethod(index, args);
     }
-    
     return Mat();
 }
 

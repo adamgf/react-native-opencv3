@@ -22,7 +22,7 @@ RCT_EXPORT_MODULE()
 RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
 
     // Check input parameters validity
-    if (inPath == nil || [inPath isEqualToString:@""]) {
+    if (inPath == nil || inPath == (NSString*)NSNull.null || [inPath isEqualToString:@""]) {
         return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: invalid parameter, param '%@'", inPath], nil);
     }
     // make sure input exists and is not a directory and output not a dir
@@ -56,7 +56,7 @@ RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)
 
 RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
 
-    if (outPath == nil || [outPath isEqualToString:@""]) {
+    if (outPath == nil || outPath == (NSString*)NSNull.null || [outPath isEqualToString:@""]) {
         return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: invalid parameter, param '%@'", outPath], nil);
     }
 
@@ -123,7 +123,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
                 if (invoker.callback != nil) {
                     lastCall = invoker.callback;
                 }
-                if (lastCall != nil && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                if (lastCall != nil && lastCall != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
                     NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
                     [(NSMutableArray*)responseArr addObject:retArr];
                 }
@@ -136,7 +136,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
         if (invoker.callback != nil) {
             lastCall = invoker.callback;
         }
-        if (lastCall != nil && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+        if (lastCall != nil && lastCall != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
             responseArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
         }
     }
@@ -145,7 +145,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
 
 // IMPT NOTE: retArr can either be one single array or an array of arrays ...
 -(void)sendCallbackData:(NSArray*)retArr callback:(NSString*)callback dstMatIndex:(int)dstMatIndex {
-    if (callback != nil && ![callback isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+    if (callback != nil && callback != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
         // not sure how this should be handled yet for different return objects ...
         //[self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
     }

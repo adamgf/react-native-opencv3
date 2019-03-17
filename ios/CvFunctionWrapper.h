@@ -12,19 +12,6 @@
 
 typedef std::variant<int,double,float,const char*,Mat,Scalar,cv::Point> ocvtypes;
 
-template <typename K>
-inline K castit(ocvtypes* ocvtype) {
-    return *reinterpret_cast<K*>(ocvtype);
-}
-
-inline Mat castmat(ocvtypes* ocvtype) {
-    return castit<Mat>(ocvtype);
-}
-
-inline int castint(ocvtypes* ocvtype) {
-    return castit<int>(ocvtype);
-}
-
-Mat callMethod(std::string searchClass, std::string functionName, std::vector<ocvtypes>& args);
+Mat callMethod(std::string functionName, std::vector<ocvtypes>& args);
 
 #endif /* CvFunctionWrapper_h */
