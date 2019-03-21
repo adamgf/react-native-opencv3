@@ -53,7 +53,7 @@ class MatManager {
         int matIndex = mats.size();
         Mat matToAdd = null;
 
-        if (cvscalar != null) {
+        if (scalarMap != null) {
 	        ReadableArray cvscalar = scalarMap.getArray("vals");
 	        Scalar scalarVal = new Scalar(cvscalar.getDouble(0),cvscalar.getDouble(1),
 	          cvscalar.getDouble(2),cvscalar.getDouble(3));
