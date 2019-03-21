@@ -415,8 +415,8 @@
 
     if (landmarksPath) {
         face::FacemarkLBF::Params params;
-        params.model_filename = std::string([landmarksPath UTF8String]);
         landmarks = face::FacemarkLBF::create(params);
+        landmarks->loadModel( std::string([landmarksPath UTF8String]));
         mUseLandmarks = true;
     }
 }
