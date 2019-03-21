@@ -20,7 +20,6 @@ Pod::Spec.new do |s|
   end
 
   s.dependency "libopencv-contrib", "~> 3.4.1"
-  s.dependency "RNFS", "~> 2.13.3"
   # s.dependency "React"
   # s.dependency "others"
 

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		500199092220E5AD00857A3C /* CvFunctionWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 500199082220E5AD00857A3C /* CvFunctionWrapper.mm */; };
-		5001994A2220FD0D00857A3C /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 500199452220FB7000857A3C /* libRNFS.a */; };
 		5031DD6D223743680039D838 /* OpencvFuncs.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5031DD6C223743680039D838 /* OpencvFuncs.mm */; };
 		5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5080B7F121915DC800170E85 /* RNOpencv3.mm */; };
 		5084125722162E00007835FA /* CvInvoke.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5084125622162E00007835FA /* CvInvoke.mm */; };
@@ -17,23 +16,6 @@
 		50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */ = {isa = PBXBuildFile; fileRef = 50FC7427219953C800A48FE3 /* CvCameraView.m */; };
 		50FC747321997CC000A48FE3 /* FileUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 50FC747221997CC000A48FE3 /* FileUtils.mm */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		500199442220FB7000857A3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5001993F2220FB7000857A3C /* RNFS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F12AFB9B1ADAF8F800E0535D;
-			remoteInfo = RNFS;
-		};
-		500199462220FB7000857A3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 5001993F2220FB7000857A3C /* RNFS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6456441F1EB8DA9100672408;
-			remoteInfo = "RNFS-tvOS";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		58B511D91A9E6C8500147676 /* CopyFiles */ = {
@@ -51,7 +33,6 @@
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		500199052220E5AD00857A3C /* CvFunctionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvFunctionWrapper.h; sourceTree = "<group>"; };
 		500199082220E5AD00857A3C /* CvFunctionWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvFunctionWrapper.mm; sourceTree = "<group>"; };
-		5001993F2220FB7000857A3C /* RNFS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFS.xcodeproj; path = "../../react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; };
 		5031DD6C223743680039D838 /* OpencvFuncs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpencvFuncs.mm; sourceTree = "<group>"; };
 		5031DD70223743890039D838 /* OpencvFuncs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpencvFuncs.h; sourceTree = "<group>"; };
 		5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lbfmodel.yaml; sourceTree = "<group>"; };
@@ -97,7 +78,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5001994A2220FD0D00857A3C /* libRNFS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,15 +88,6 @@
 			isa = PBXGroup;
 			children = (
 				134814201AA4EA6300B7C361 /* libRNOpencv3.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		500199402220FB7000857A3C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				500199452220FB7000857A3C /* libRNFS.a */,
-				500199472220FB7000857A3C /* libRNFS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -167,7 +138,6 @@
 				50FC7426219953C800A48FE3 /* CvCamera.mm */,
 				50FC7427219953C800A48FE3 /* CvCameraView.m */,
 				50FC741A219939E500A48FE3 /* CvCameraView.h */,
-				5001993F2220FB7000857A3C /* RNFS.xcodeproj */,
 				5084125822162EFE007835FA /* CvInvoke.h */,
 				5084125622162E00007835FA /* CvInvoke.mm */,
 				50CC5D5121EEF945004B431E /* MatManager.h */,
@@ -229,35 +199,12 @@
 			mainGroup = 58B511D21A9E6C8500147676;
 			productRefGroup = 58B511D21A9E6C8500147676;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 500199402220FB7000857A3C /* Products */;
-					ProjectRef = 5001993F2220FB7000857A3C /* RNFS.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* RNOpencv3 */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		500199452220FB7000857A3C /* libRNFS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNFS.a;
-			remoteRef = 500199442220FB7000857A3C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		500199472220FB7000857A3C /* libRNFS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRNFS.a;
-			remoteRef = 500199462220FB7000857A3C /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
