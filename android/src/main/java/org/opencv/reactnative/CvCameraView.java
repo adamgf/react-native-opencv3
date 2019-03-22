@@ -26,6 +26,7 @@ import android.util.Base64;
 import android.app.Activity;
 import android.hardware.SensorManager;
 import android.view.OrientationEventListener;
+import android.util.Log;
 
 import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
@@ -643,7 +644,29 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             long diff = (currMillis - mCurrentMillis);
             if (diff >= mOverlayInterval) {
                 mCurrentMillis = currMillis;
-                RNOpencv3Module.invokeMethods(mCvInvokeGroup, in, ingray);
+		        CvInvoke invoker = new CvInvoke(in, ingray);
+		        WritableArray responseArr = invoker.parseInvokeMap(mCvInvokeGroup);
+		        String lastCall = invoker.callback;
+				int dstMatIndex = invoker.dstMatIndex;
+				// TODO: move this into RNOpencv3Util class ...
+		        if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+		            WritableMap response = new WritableNativeMap();
+		            response.putArray("payload", responseArr);
+		            mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+		                .emit(lastCall, response);
+		        }
+		        else {
+		            // not necessarily error condition unless dstMatIndex >= 1000
+		            if (dstMatIndex == 1000) {
+		                Log.e(TAG, "SecurityException thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+		            }
+		            else if (dstMatIndex == 1001) {
+		                Log.e(TAG, "IllegalAccessException thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+		            }
+		            else if (dstMatIndex == 1002) {
+		                Log.e(TAG, "InvocationTargetException thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+		            }
+		        }
             }
         }
 

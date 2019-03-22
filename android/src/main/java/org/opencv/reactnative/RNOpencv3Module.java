@@ -48,7 +48,7 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         System.loadLibrary("opencv_java3");
     }
 
-    private static ReactApplicationContext reactContext;
+    private ReactApplicationContext reactContext;
 
 
     public RNOpencv3Module(ReactApplicationContext reactContext) {
@@ -211,46 +211,18 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public static void invokeMethods(ReadableMap cvInvokeMap, Mat in, Mat ingray) {
-        WritableArray responseArr = null;
-        String lastCall = null;
-        int dstMatIndex = -1;
-        ReadableArray groupids = null;
-        if (cvInvokeMap.hasKey("groupids")) {
-            groupids = cvInvokeMap.getArray("groupids");
-            if (groupids != null && groupids.size() > 0) {
-                Object[] invokeGroups = CvInvoke.populateInvokeGroups(cvInvokeMap);
-                responseArr = new WritableNativeArray();
-                for (int i=invokeGroups.length-1;i >= 0;i--) {
-                    CvInvoke invoker = new CvInvoke(in, ingray);
-                    dstMatIndex = invoker.invokeCvMethods((ReadableMap)invokeGroups[i]);
-                    if (invoker.callback != null) {
-                        lastCall = invoker.callback;
-                    }
-                    if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
-                        WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
-                        responseArr.pushArray(retArr);
-                    }
-                }
-            }
-        }
-        else {
-            CvInvoke invoker = new CvInvoke(in, ingray);
-            dstMatIndex = invoker.invokeCvMethods(cvInvokeMap);
-            if (invoker.callback != null) {
-                lastCall = invoker.callback;
-            }
-            if (lastCall != null && !lastCall.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
-                responseArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
-            }
-        }
+    public void invokeMethods(ReadableMap cvInvokeMap) {
+        CvInvoke invoker = new CvInvoke();
+        WritableArray responseArr = invoker.parseInvokeMap(cvInvokeMap);
+        String lastCall = invoker.callback;
+		int dstMatIndex = invoker.dstMatIndex;
         sendCallbackData(responseArr, lastCall, dstMatIndex);
     }
 
     // IMPT NOTE: retArr can either be one single array or an array of arrays ...
-    public static void sendCallbackData(WritableArray retArr, String callback, int dstMatIndex) {
+	// TODO: move this into RNOpencv3Util class ...				
+    public void sendCallbackData(WritableArray retArr, String callback, int dstMatIndex) {
         if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
-            // not sure how this should be handled yet for different return objects ...
             WritableMap response = new WritableNativeMap();
             response.putArray("payload", retArr);
             reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)

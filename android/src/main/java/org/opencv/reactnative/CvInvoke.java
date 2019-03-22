@@ -31,7 +31,7 @@ class CvInvoke {
 
     //private static CvInvoke cvInvoke = null;
     private int arrMatIndex = -1;
-    private int dstMatIndex = -1;
+    public int dstMatIndex = -1;
     // these mats come from the camera or image view ...
     private Mat rgba = null;
     private Mat gray = null;
@@ -469,4 +469,30 @@ class CvInvoke {
             return result;
         }
     }
+	
+	public WritableArray parseInvokeMap(ReadableMap cvInvokeMap) {
+        WritableArray responseArr = null;
+        ReadableArray groupids = null;
+        if (cvInvokeMap.hasKey("groupids")) {
+            groupids = cvInvokeMap.getArray("groupids");
+            if (groupids != null && groupids.size() > 0) {
+                Object[] invokeGroups = CvInvoke.populateInvokeGroups(cvInvokeMap);
+                responseArr = new WritableNativeArray();
+                for (int i=invokeGroups.length-1;i >= 0;i--) {
+                    dstMatIndex = invokeCvMethods((ReadableMap)invokeGroups[i]);
+                    if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                        WritableArray retArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+                        responseArr.pushArray(retArr);
+                    }
+                }
+            }
+        }
+        else {
+            dstMatIndex = invokeCvMethods(cvInvokeMap);
+            if (callback != null && !callback.equals("") && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                responseArr = MatManager.getInstance().getMatData(dstMatIndex, 0, 0);
+            }
+        }
+		return responseArr;
+	}
 }
