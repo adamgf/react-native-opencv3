@@ -8,6 +8,7 @@
 
 #import "CvCamera.h"
 #import "FileUtils.h"
+#import "CvInvoke.h"
 
 @implementation CvCamera {
     // private properties
@@ -367,14 +368,14 @@
     }
 
     if (mCvInvokeGroup != nil) {
-		
 	    CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image gray:gray];
 	    NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
-	    NSString *callback = invoker.lastCall;
+	    NSString *lastCall = invoker.callback;
 	    int dstMatIndex = invoker.dstMatIndex;		
-	    if (callback != nil && callback != (NSString*)NSNull.null && ![callback isEqualToString:@""] 
-				&& dstMatIndex >= 0 && dstMatIndex < 1000) {
-			[self sendEventWithName:@"onPayload" body:@{ @"payload" : responseArr }];
+	    if (lastCall != nil && lastCall != (NSString*)NSNull.null && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+			if (responseArr && responseArr.count > 0 && self && self.onPayload) {
+				self.onPayload(@{ @"payload" : responseArr });
+			}
 	    }
 	    else {
 	        // not necessarily error condition unless dstMatIndex >= 1000

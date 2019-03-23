@@ -349,8 +349,6 @@
 
 -(NSArray*)parseInvokeMap:(NSDictionary*)cvInvokeMap {
     NSArray *responseArr = nil;
-    //NSString *lastCall = nil;
-    //int dstMatIndex = -1;
     NSArray *groupids = nil;
     if ([cvInvokeMap.allKeys containsObject:@"groupids"]) {
         groupids = (NSArray*)[cvInvokeMap valueForKey:@"groupids"];
@@ -358,21 +356,21 @@
             NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
             responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
             for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
-                dstMatIndex = [self invokeCvMethods:(NSDictionary*)invokeGroups[i]];
-
-                if (callback != nil && callback != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
-                    NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+                self.dstMatIndex = [self invokeCvMethods:(NSDictionary*)invokeGroups[i]];
+                if (self.callback != nil && self.callback != (NSString*)NSNull.null && self.dstMatIndex >= 0 && self.dstMatIndex < 1000) {
+                    NSArray *retArr = [MatManager.sharedMgr getMatData:self.dstMatIndex rownum:0 colnum:0];
                     [(NSMutableArray*)responseArr addObject:retArr];
                 }
             }
         }
     }
     else {
-        dstMatIndex = [invoker invokeCvMethods:cvInvokeMap];
-        if (lastCall != nil && lastCall != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
-            responseArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+        [self invokeCvMethods:cvInvokeMap];
+        if (self.callback != nil && self.callback != (NSString*)NSNull.null && self.dstMatIndex >= 0 && self.dstMatIndex < 1000) {
+            responseArr = [MatManager.sharedMgr getMatData:self.dstMatIndex rownum:0 colnum:0];
         }
     }
+	return responseArr;
 }
 
 @end

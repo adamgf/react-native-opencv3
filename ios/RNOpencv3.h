@@ -1,12 +1,7 @@
 
-#if __has_include("RCTBridgeModule.h")
-#import "RCTBridgeModule.h"
-#else
-#import <React/RCTBridgeModule.h>
-#endif
-
+#import <React/RCTEventEmitter.h>
 #import <UIKit/UIKit.h>
 
-@interface RNOpencv3 : NSObject <RCTBridgeModule>
+@interface RNOpencv3 : RCTEventEmitter <RCTBridgeModule>
 
 @end

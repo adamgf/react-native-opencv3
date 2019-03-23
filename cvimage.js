@@ -82,7 +82,13 @@ export class CvImage extends Component {
   }
 
   getFilename = (source_uri) => {
-    const filePortion = source_uri.substring(source_uri.lastIndexOf('/'), source_uri.lastIndexOf('?'))
+	let filePortion = ''
+	if (source_uri.lastIndexOf('?') != -1) {
+      filePortion = source_uri.substring(source_uri.lastIndexOf('/'), source_uri.lastIndexOf('?'))
+	}
+	else {
+      filePortion = source_uri.substring(source_uri.lastIndexOf('/'))
+	}
     if (RNFS) {
       return RNFS.DocumentDirectoryPath + filePortion
     }

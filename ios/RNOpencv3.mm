@@ -110,16 +110,18 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
 RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
     CvInvoke *invoker = [[CvInvoke alloc] init];
     NSArray *responseArr = [invoker parseInvokeMap:cvInvokeMap];
-    NSString *lastCall = invoker.lastCall;
+    NSString *lastCall = invoker.callback;
     int dstMatIndex = invoker.dstMatIndex;
     [self sendCallbackData:responseArr callback:lastCall dstMatIndex:dstMatIndex];
 }
 
 // IMPT NOTE: retArr can either be one single array or an array of arrays ...
 -(void)sendCallbackData:(NSArray*)retArr callback:(NSString*)callback dstMatIndex:(int)dstMatIndex {
-    if (callback != nil && callback != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
-        // not sure how this should be handled yet for different return objects ...
-        [self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
+    if (callback != nil && callback != (NSString*)NSNull.null && ![callback isEqualToString:@""] 
+			&& dstMatIndex >= 0 && dstMatIndex < 1000) {
+        if (self && retArr && retArr.count > 0) {
+            [self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
+        }
     }
     else {
         // not necessarily error condition unless dstMatIndex >= 1000

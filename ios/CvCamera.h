@@ -38,6 +38,8 @@ typedef NSInteger Classifier;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onFrameSize;
 
+@property (nonatomic, copy) RCTBubblingEventBlock onPayload;
+
 - (id)initWithBridge:(RCTBridge *)bridge;
 
 - (void)setCvInvokeGroup:(NSDictionary*)cvinvoke;

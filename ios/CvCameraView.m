@@ -20,8 +20,10 @@
 RCT_EXPORT_MODULE(CvCameraView);
 
 RCT_EXPORT_VIEW_PROPERTY(onFacesDetected, RCTBubblingEventBlock)
-
+	
 RCT_EXPORT_VIEW_PROPERTY(onFrameSize, RCTBubblingEventBlock)
+
+RCT_EXPORT_VIEW_PROPERTY(onPayload, RCTBubblingEventBlock)
 
 // And you sent event you want from objectC to react-native
 - (UIView *)view {
