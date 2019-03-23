@@ -35,6 +35,8 @@ enum NumberType {
 
 -(int)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out;
 
+-(NSArray*)parseInvokeMap:(NSDictionary*)cvInvokeMap;
+
 @property int arrMatIndex;
 
 @property int dstMatIndex;
@@ -46,8 +48,6 @@ enum NumberType {
 @property (nonatomic, assign) Mat gray;
 
 @property (nonatomic, strong) NSMutableDictionary *matParams;
-
-@property (nonatomic, strong) NSMutableDictionary *tupleTypes;
 
 @end
 

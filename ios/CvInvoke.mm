@@ -18,7 +18,21 @@
         self.arrMatIndex = -1;
         self.dstMatIndex = -1;
         self.matParams = [[NSMutableDictionary alloc] init];
-        self.tupleTypes = [[NSMutableDictionary alloc] init];
+    }
+    return self;
+}
+
+-(id)initWithRgba:(Mat)rgba gray:(Mat)gray {
+    if (self = [super init]) {
+        if (rgba.rows > 0) {
+            self.rgba = rgba;
+        }
+        if (gray.rows > 0) {
+            self.gray = gray;
+        }
+        self.arrMatIndex = -1;
+        self.dstMatIndex = -1;
+        self.matParams = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -202,7 +216,6 @@
         if (i == 0) {
             self.callback = [callbacks objectAtIndex:0];
             // last method in invoke group might have callback ...
-            
             ret = [self invokeCvMethod:inobj func:function params:params out:outobj];
         }
         else {
@@ -232,6 +245,8 @@
     
    @try {
        
+	   // TODO: I thought about using multiple search classes but this seemed to be more trouble just have all the
+	   //       functions in OpencvFuncs.mm if you want to break it out go for it!!  -- Adam
        /**
        if (in != nil && in != (NSString*)[NSNull null]) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
@@ -330,6 +345,34 @@
    @finally {
        return result;
    }
+}
+
+-(NSArray*)parseInvokeMap:(NSDictionary*)cvInvokeMap {
+    NSArray *responseArr = nil;
+    //NSString *lastCall = nil;
+    //int dstMatIndex = -1;
+    NSArray *groupids = nil;
+    if ([cvInvokeMap.allKeys containsObject:@"groupids"]) {
+        groupids = (NSArray*)[cvInvokeMap valueForKey:@"groupids"];
+        if (groupids != nil && groupids.count > 0) {
+            NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
+            responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
+            for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
+                dstMatIndex = [self invokeCvMethods:(NSDictionary*)invokeGroups[i]];
+
+                if (callback != nil && callback != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                    NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+                    [(NSMutableArray*)responseArr addObject:retArr];
+                }
+            }
+        }
+    }
+    else {
+        dstMatIndex = [invoker invokeCvMethods:cvInvokeMap];
+        if (lastCall != nil && lastCall != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
+            responseArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
+        }
+    }
 }
 
 @end

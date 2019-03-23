@@ -108,38 +108,10 @@ RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColo
 
 
 RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
-    NSArray *responseArr = nil;
-    NSString *lastCall = nil;
-    int dstMatIndex = -1;
-    NSArray *groupids = nil;
-    if ([cvInvokeMap.allKeys containsObject:@"groupids"]) {
-        groupids = (NSArray*)[cvInvokeMap valueForKey:@"groupids"];
-        if (groupids != nil && groupids.count > 0) {
-            NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
-            responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
-            for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
-                CvInvoke *invoker = [[CvInvoke alloc] init];
-                dstMatIndex = [invoker invokeCvMethods:(NSDictionary*)invokeGroups[i]];
-                if (invoker.callback != nil) {
-                    lastCall = invoker.callback;
-                }
-                if (lastCall != nil && lastCall != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
-                    NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
-                    [(NSMutableArray*)responseArr addObject:retArr];
-                }
-            }
-        }
-    }
-    else {
-        CvInvoke *invoker = [[CvInvoke alloc] init];
-        dstMatIndex = [invoker invokeCvMethods:cvInvokeMap];
-        if (invoker.callback != nil) {
-            lastCall = invoker.callback;
-        }
-        if (lastCall != nil && lastCall != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
-            responseArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
-        }
-    }
+    CvInvoke *invoker = [[CvInvoke alloc] init];
+    NSArray *responseArr = [invoker parseInvokeMap:cvInvokeMap];
+    NSString *lastCall = invoker.lastCall;
+    int dstMatIndex = invoker.dstMatIndex;
     [self sendCallbackData:responseArr callback:lastCall dstMatIndex:dstMatIndex];
 }
 
@@ -147,7 +119,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
 -(void)sendCallbackData:(NSArray*)retArr callback:(NSString*)callback dstMatIndex:(int)dstMatIndex {
     if (callback != nil && callback != (NSString*)NSNull.null && dstMatIndex >= 0 && dstMatIndex < 1000) {
         // not sure how this should be handled yet for different return objects ...
-        //[self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
+        [self sendEventWithName:@"onPayload" body:@{ @"payload" : retArr }];
     }
     else {
         // not necessarily error condition unless dstMatIndex >= 1000

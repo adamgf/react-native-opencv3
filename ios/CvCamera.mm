@@ -367,6 +367,21 @@
     }
 
     if (mCvInvokeGroup != nil) {
+		
+	    CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image gray:gray];
+	    NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
+	    NSString *callback = invoker.lastCall;
+	    int dstMatIndex = invoker.dstMatIndex;		
+	    if (callback != nil && callback != (NSString*)NSNull.null && ![callback isEqualToString:@""] 
+				&& dstMatIndex >= 0 && dstMatIndex < 1000) {
+			[self sendEventWithName:@"onPayload" body:@{ @"payload" : responseArr }];
+	    }
+	    else {
+	        // not necessarily error condition unless dstMatIndex >= 1000
+	        if (dstMatIndex >= 1000) {
+	            NSLog(@"Exception thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+	        }
+	    }
         //long currMillis = System.currentTimeMillis();
         //long diff = (currMillis - mCurrentMillis);
         //if (diff >= mOverlayInterval) {

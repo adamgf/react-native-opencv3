@@ -56,8 +56,8 @@ export class CvImage extends Component {
             //RNOpencv3.cvtColor(srcMat, dstMat, ColorConv.COLOR_BGR2GRAY)
             RNOpencv3.matToImage(dstMat, sourceFile)
             .then((image) => {
-              //RNOpencv3.deleteMat(srcMat)
-              //RNOpencv3.deleteMat(dstMat)
+              RNOpencv3.deleteMat(srcMat)
+              RNOpencv3.deleteMat(dstMat)
               const { width, height, uri } = image
               if (uri && uri.length > 0) {
                 this.setState({ destFile : uri })

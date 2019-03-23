@@ -32,5 +32,6 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation fileTree(include: ['*.aar'], dir: 'libs')
+    // opencv 3.4.4 with contribution packages
+    implementation 'com.quickbirdstudios:opencv:3.4.4-contrib'
 }
