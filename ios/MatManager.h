@@ -37,11 +37,11 @@
 
 -(NSArray*)getMatData:(int)matIndex rownum:(int)rownum colnum:(int)colnum;
 
--(void)setTo:(int)matIndex cvscalar:(NSDictionary*)cvscalar;
+-(void)setToScalar:(int)matIndex cvscalar:(NSDictionary*)cvscalar;
 
--(void)put:(int)matIndex rownum:(int)rownum colnum:(int)colnum data:(NSArray*)data;
+-(void)putData:(int)matIndex rownum:(int)rownum colnum:(int)colnum data:(NSArray*)data;
 
--(void)transpose:(int)matIndex;
+-(void)transposeMat:(int)matIndex;
 
 -(void)deleteMatAtIndex:(int)matIndex;
 

@@ -175,8 +175,33 @@ RCT_EXPORT_METHOD(Mat:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseReject
     [self resolveMatPromise:matIndex rows:0 cols:0 cvtype:-1 resolver:resolve];
 }
 
-RCT_EXPORT_METHOD(MatOfInt:(int)lomatval himatval:(int)himatval resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    int matIndex = [MatManager.sharedMgr createMatOfInt:lomatval himatval:himatval];
+RCT_EXPORT_METHOD(getMatData:(NSDictionary*)mat rownum:(int)rownum colnum:(int)colnum resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    NSNumber *numForKey = (NSNumber*)[mat objectForKey:@"matIndex"];
+    int matIndex = [numForKey intValue];
+    NSArray *retArr = [MatManager.sharedMgr getMatData:matIndex rownum:rownum colnum:colnum];
+    resolve(retArr);
+}
+
+RCT_EXPORT_METHOD(setTo:(NSDictionary*)mat cvscalar:(NSDictionary*)cvscalar) {
+    NSNumber *numForKey = (NSNumber*)[mat objectForKey:@"matIndex"];
+    int matIndex = [numForKey intValue];
+    [MatManager.sharedMgr setToScalar:matIndex cvscalar:cvscalar];
+}
+
+RCT_EXPORT_METHOD(put:(NSDictionary*)mat rownum:(int)rownum colnum:(int)colnum data:(NSArray*)data) {
+    NSNumber *numForKey = (NSNumber*)[mat objectForKey:@"matIndex"];
+    int matIndex = [numForKey intValue];
+    [MatManager.sharedMgr putData:matIndex rownum:rownum colnum:colnum data:data];
+}
+
+RCT_EXPORT_METHOD(transpose:(NSDictionary*)mat) {
+    NSNumber *numForKey = (NSNumber*)[mat objectForKey:@"matIndex"];
+    int matIndex = [numForKey intValue];
+    [MatManager.sharedMgr transposeMat:matIndex];
+}
+
+RCT_EXPORT_METHOD(MatOfInt:(int)matval resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    int matIndex = [MatManager.sharedMgr createMatOfInt:matval himatval:matval];
     resolve(@{ @"matIndex" : [NSNumber numberWithInt:matIndex]});
 }
 

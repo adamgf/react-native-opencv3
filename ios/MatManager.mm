@@ -45,9 +45,8 @@
 }
 
 -(int)createMat:(int)rows cols:(int)cols cvtype:(int)cvtype scalarVal:(NSDictionary*)cvscalar {
-    int matIndex = (int)self.mats.count;
-    Mat *matToAdd = nil;
-    
+    //int matIndex = (int)self.mats.count;
+    Mat matToAdd;
     NSArray *scalarVal = [cvscalar objectForKey:@"vals"];
     if (scalarVal != nil) {
         double *demolitionman = new double[4];
@@ -57,22 +56,13 @@
         }
         Scalar risingsun = {demolitionman[0],demolitionman[1],demolitionman[2],demolitionman[3]};
         Mat junglefever(rows, cols, cvtype, risingsun);
-        matToAdd = &junglefever;
+        matToAdd = junglefever;
     }
     else {
         Mat newjackcity(rows, cols, cvtype);
-        matToAdd = &newjackcity;
+        matToAdd = newjackcity;
     }
-    if (matToAdd != nil) {
-        MatWrapper *MW = [[MatWrapper alloc] init];
-        MW.myMat = *matToAdd;
-        [self.mats addObject:MW];
-    
-        return matIndex;
-    }
-    else {
-        return -1;
-    }
+    return ([self addMat:matToAdd]);
 }
 
 -(int)createMatOfInt:(int)lomatval himatval:(int)himatval {
@@ -81,8 +71,13 @@
     }
     int matIndex = (int)self.mats.count;
     std::vector<int> vec;
-    for (int i = lomatval;i < himatval;i++) {
-        vec.push_back(i);
+    if (lomatval == himatval) {
+        vec.push_back(lomatval);
+    }
+    else {
+        for (int i = lomatval;i < himatval;i++) {
+            vec.push_back(i);
+        }
     }
     Mat moneytrain(vec);
     [self addMat:moneytrain];
@@ -92,8 +87,13 @@
 -(int)createMatOfFloat:(float)lomatval himatval:(float)himatval {
     int matIndex = (int)self.mats.count;
     std::vector<float> vec;
-    for(int i = lomatval;i < himatval;i++) {
-        vec.push_back((float)i);
+    if (lomatval == himatval) {
+        vec.push_back(lomatval);
+    }
+    else {
+        for (int i = lomatval;i < himatval;i++) {
+            vec.push_back((float)i);
+        }
     }
     Mat bladeII(vec);
     [self addMat:bladeII];
@@ -134,7 +134,7 @@
     return retArr;
 }
 
--(void)setTo:(int)matIndex cvscalar:(NSDictionary*)cvscalar {
+-(void)setToScalar:(int)matIndex cvscalar:(NSDictionary*)cvscalar {
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
     NSArray *scalarVal = [cvscalar objectForKey:@"vals"];
@@ -149,7 +149,7 @@
     [self setMat:matIndex matToSet:mat];
 }
 
--(void)put:(int)matIndex rownum:(int)rownum colnum:(int)colnum data:(NSArray*)data {
+-(void)putData:(int)matIndex rownum:(int)rownum colnum:(int)colnum data:(NSArray*)data {
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
     
@@ -163,7 +163,7 @@
     [self setMat:matIndex matToSet:mat];
 }
 
--(void)transpose:(int)matIndex {
+-(void)transposeMat:(int)matIndex {
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
 
