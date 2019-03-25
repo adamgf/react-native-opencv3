@@ -42,6 +42,10 @@ typedef NSInteger Classifier;
 
 - (id)initWithBridge:(RCTBridge *)bridge;
 
+- (void)setOverlay:(NSDictionary*)overlay;
+
+- (void)setOverlayInterval:(NSNumber*)overlayInterval;
+
 - (void)setCvInvokeGroup:(NSDictionary*)cvinvoke;
 
 - (void)changeFacing:(NSString*)facing;

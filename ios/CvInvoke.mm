@@ -22,7 +22,7 @@
     return self;
 }
 
--(id)initWithRgba:(Mat)rgba gray:(Mat)gray {
+-(id)initWithRgba:(const Mat&)rgba gray:(const Mat&)gray {
     if (self = [super init]) {
         if (rgba.rows > 0) {
             self.rgba = rgba;
@@ -92,25 +92,42 @@
                 ps.push_back(dfNum);
             }
         }
-        else if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"InputArray"] || [param isEqualToString:@"InputArrayOfArrays"] || [param isEqualToString:@"OutputArray"] || [param isEqualToString:@"OutputArrayOfArrays"]) {
-            if ([itsType containsString:@"Dictionary"]) {
-                NSDictionary* matMap = (NSDictionary*)[hashMap valueForKey:paramNum];
-                int matIndex = [(NSNumber*)[matMap valueForKey:@"matIndex"] intValue];
+        // TODO: make the check on itsType for NSDictionary* then on param
+        else if ([itsType containsString:@"Dictionary"]) {
+            NSDictionary *dMap = (NSDictionary*)[hashMap valueForKey:paramNum];
+            
+            if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"MatOfInt"] || [param isEqualToString:@"MatOfFloat"]) {
+
+                int matIndex = [(NSNumber*)[dMap valueForKey:@"matIndex"] intValue];
                 Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
                 ps.push_back(dMat);
                 
-                self.arrMatIndex = i - 1;
-                self.dstMatIndex = matIndex;
+                if ([param isEqualToString:@"Mat"]) {
+                    self.arrMatIndex = i - 1;
+                    self.dstMatIndex = matIndex;
+                }
             }
-        }
-        else if ([param isEqualToString:@"Scalar"]) {
-            
-        }
-        else if ([param isEqualToString:@"Point"]) {
-            
-        }
-        else if ([param isEqualToString:@"Size"]) {
-            
+            else if ([param isEqualToString:@"Scalar"]) {
+                NSArray *vals = (NSArray*)[dMap valueForKey:@"vals"];
+                double v0 = [(NSNumber*)vals[0] doubleValue];
+                double v1 = [(NSNumber*)vals[1] doubleValue];
+                double v2 = [(NSNumber*)vals[2] doubleValue];
+                double v3 = [(NSNumber*)vals[3] doubleValue];
+                Scalar dScalar(v0, v1, v2, v3);
+                ps.push_back(dScalar);
+            }
+            else if ([param isEqualToString:@"Point"]) {
+                double xval = [(NSNumber*)[dMap valueForKey:@"x"] doubleValue];
+                double yval = [(NSNumber*)[dMap valueForKey:@"y"] doubleValue];
+                CvPoint dPoint(xval, yval);
+                ps.push_back(dPoint);
+            }
+            else if ([param isEqualToString:@"Size"]) {
+                int wid = [(NSNumber*)[dMap valueForKey:@"width"] intValue];
+                int hei = [(NSNumber*)[dMap valueForKey:@"height"] intValue];
+                CvSize dSize(wid, hei);
+                ps.push_back(dSize);
+            }
         }
         i++;
     }
@@ -204,7 +221,7 @@
     NSArray *functions = (NSArray*)[cvInvokeMap valueForKey:@"functions"];
     NSArray *paramsArr = (NSArray*)[cvInvokeMap valueForKey:@"paramsArr"];
     NSArray *outs = (NSArray*)[cvInvokeMap valueForKey:@"outs"];
-    NSArray *callbacks = (NSArray*)[cvInvokeMap valueForKey:@"callbacks"];
+    NSArray *callbacks = (NSArray*)[cvInvokeMap valueForKey:@"calls"];
     
     // back to front
     for (int i=(int)(functions.count-1);i >= 0;i--) {
@@ -234,6 +251,10 @@
 
 -(int)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out {
    
+    if ([func isEqualToString:@"normalize"] && params.allKeys.count == 5) {
+        int ZZYZX = 0;
+        ZZYZX++;
+    }
    int result = -1;
    int numParams = 0;
    if (params != nil) {
@@ -282,7 +303,8 @@
            [self getObjectArr:params params:methodParams objects:ps];
            
            if (numParams != methodParams.count) {
-               [NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
+               return -1;
+               //[NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
            }
        }
        if (methodIndex != -1) {

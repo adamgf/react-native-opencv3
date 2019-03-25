@@ -29,7 +29,7 @@ enum NumberType {
 
 @interface CvInvoke : NSObject
 
--(id)initWithRgba:(Mat)rgba gray:(Mat)gray;
+-(id)initWithRgba:(const Mat&)rgba gray:(const Mat&)gray;
 
 +(NSArray*)populateInvokeGroups:(NSDictionary*)cvInvokeGroup;
 

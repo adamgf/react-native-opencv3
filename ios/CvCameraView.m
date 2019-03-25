@@ -58,4 +58,12 @@ RCT_CUSTOM_VIEW_PROPERTY(landmarksModel, NSString*, CvCamera) {
     [view setLandmarksModel:json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(overlay, NSDictionary*, CvCamera) {
+    [view setOverlay:json];
+}
+
+RCT_CUSTOM_VIEW_PROPERTY(overlayInterval, NSNumber*, CvCamera) {
+    [view setOverlayInterval:json];
+}
+
 @end

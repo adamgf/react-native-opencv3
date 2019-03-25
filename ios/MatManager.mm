@@ -36,12 +36,8 @@
 }
 
 -(int)createEmptyMat {
-    int matIndex = (int)self.mats.count;
-    MatWrapper *MW = [[MatWrapper alloc] init];
     Mat emptyMat;
-    MW.myMat = emptyMat;
-    [self.mats addObject:MW];
-    return matIndex;
+    return ([self addMat:emptyMat]);
 }
 
 -(int)createMat:(int)rows cols:(int)cols cvtype:(int)cvtype scalarVal:(NSDictionary*)cvscalar {
@@ -80,6 +76,7 @@
         }
     }
     Mat moneytrain(vec);
+    int vecval = moneytrain.at<int>(0, 0);
     [self addMat:moneytrain];
     return matIndex;
 }
@@ -96,6 +93,8 @@
         }
     }
     Mat bladeII(vec);
+    float vecval = bladeII.at<float>(0, 0);
+    float vecval2 = bladeII.at<float>(bladeII.cols-1,bladeII.rows-1);
     [self addMat:bladeII];
     return matIndex;
 }
@@ -103,7 +102,7 @@
 -(int)addMat:(Mat)matToAdd {
     int matIndex = (int)self.mats.count;
     MatWrapper *MW = [[MatWrapper alloc] init];
-    MW.myMat = matToAdd;
+    MW.myMat = matToAdd.clone();
     [self.mats addObject:MW];
     return matIndex;
 }

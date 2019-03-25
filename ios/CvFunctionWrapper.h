@@ -10,7 +10,7 @@
 #ifndef CvFunctionWrapper_h
 #define CvFunctionWrapper_h
 
-typedef std::variant<int,double,float,const char*,Mat,Scalar,cv::Point> ocvtypes;
+typedef std::variant<int,double,float,const char*,Mat,Scalar,cv::Point,cv::Size> ocvtypes;
 
 Mat callMethod(std::string functionName, std::vector<ocvtypes>& args);
 

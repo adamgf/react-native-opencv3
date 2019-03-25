@@ -9,6 +9,7 @@
 #import "CvCamera.h"
 #import "FileUtils.h"
 #import "CvInvoke.h"
+#import "MatManager.h"
 
 @implementation CvCamera {
     // private properties
@@ -25,6 +26,12 @@
     NSString *mFacing;
     CGFloat mRelativeFaceSize;
     int mAbsoluteFaceSize;
+    //double mCurrentMillis;
+    //NSDate *startDate;
+    Mat rgbaFrame;
+    Mat grayFrame;
+    bool framesInitialized;
+    bool overlayInitialized;
     
     CascadeClassifier face_cascade;
     CascadeClassifier eyes_cascade;
@@ -39,6 +46,7 @@
         mOverlayInterval = 0;
         mRelativeFaceSize = 0.2f;
         mAbsoluteFaceSize = 0;
+        //mCurrentMillis = 0;
         self.backgroundColor = [UIColor blackColor];
         self.bridge = bridge;
         CvVideoCamera *videoCamera = [[CvVideoCamera alloc] initWithParentView:self];
@@ -366,9 +374,32 @@
             self.onFacesDetected(@{@"payload":payloadJSON});
         }
     }
-
+    
     if (mCvInvokeGroup != nil) {
-	    CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image gray:gray];
+        //long currMillis = System.currentTimeMillis();
+        //long diff = (currMillis - mCurrentMillis);
+        //if (diff >= mOverlayInterval) {
+        //    mCurrentMillis = currMillis;
+        /*if (startDate == nil) {
+            startDate = [NSDate date];
+        }
+        double currMillis = [startDate timeIntervalSinceNow];
+        double diff = (currMillis - mCurrentMillis) * 1000.0;
+        diff = (diff < 0.0) ? -diff : diff;
+        if (diff >= (double)mOverlayInterval) {
+            
+            mCurrentMillis = currMillis;
+            startDate = [NSDate date]; */
+        
+        if (!framesInitialized) {
+            framesInitialized = true;
+            rgbaFrame = Mat(image.rows, image.cols, CV_8UC4);
+            grayFrame = Mat(image.rows, image.cols, CV_8UC1);
+        }
+        image_copy.copyTo(rgbaFrame);
+        gray.copyTo(gray);
+        
+	    CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:rgbaFrame gray:grayFrame];
 	    NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
 	    NSString *lastCall = invoker.callback;
 	    int dstMatIndex = invoker.dstMatIndex;		
@@ -383,13 +414,8 @@
 	            NSLog(@"Exception thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
 	        }
 	    }
-        //long currMillis = System.currentTimeMillis();
-        //long diff = (currMillis - mCurrentMillis);
-        //if (diff >= mOverlayInterval) {
-        //    mCurrentMillis = currMillis;
-        //[RNOpencv3 invokeMethods:mCvInvokeGroup in:image ingray:gray];
-        //}
     }
+    //}
 
     // invert image
     //bitwise_not(image_copy, image_copy);
@@ -400,6 +426,13 @@
 
     //cvtColor(bgr, image, COLOR_BGR2BGRA);
     //UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
+    
+    if (overlayInitialized) {
+        int matIndex = [[mOverlay valueForKey:@"matIndex"] intValue];
+        Mat overlayMat = [MatManager.sharedMgr matAtIndex:matIndex];
+        addWeighted(image_copy, 1.0, overlayMat, 1.0, 0.0, image_copy);
+    }
+    
     UIImage *videoImage = MatToUIImage(image_copy);
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setImage:videoImage];
@@ -407,6 +440,15 @@
 }
 
 #pragma Properties
+
+-(void)setOverlay:(NSDictionary *)overlay {
+    overlayInitialized = true;
+    mOverlay = overlay;
+}
+
+-(void)setOverlayInterval:(NSNumber*)overlayInterval {
+    mOverlayInterval = [overlayInterval intValue];
+}
 
 -(void)setCvInvokeGroup:(NSDictionary*)cvinvoke {
     mCvInvokeGroup = cvinvoke;
