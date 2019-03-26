@@ -157,7 +157,6 @@
         NSNumber *dataVal = [data objectAtIndex:i];
         dataVals[i] = [dataVal floatValue];
     }
-    Scalar blade = {dataVals[0],dataVals[1],dataVals[2],dataVals[3]};
     mat.at<float>(rownum, 0) = dataVals[0];
     mat.at<float>(rownum, 1) = dataVals[1];
     mat.at<float>(rownum, 2) = dataVals[2];
