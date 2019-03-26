@@ -152,13 +152,17 @@
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
     
-    double* dataVals = new double[data.count];
+    float* dataVals = new float[data.count];
     for (int i=0;i < data.count;i++) {
         NSNumber *dataVal = [data objectAtIndex:i];
-        dataVals[i] = [dataVal doubleValue];
+        dataVals[i] = [dataVal floatValue];
     }
     Scalar blade = {dataVals[0],dataVals[1],dataVals[2],dataVals[3]};
-    mat.at<Scalar>(rownum,colnum) = blade;
+    mat.at<float>(rownum, 0) = dataVals[0];
+    mat.at<float>(rownum, 1) = dataVals[1];
+    mat.at<float>(rownum, 2) = dataVals[2];
+    mat.at<float>(rownum, 3) = dataVals[3];
+    
     [self setMat:matIndex matToSet:mat];
 }
 

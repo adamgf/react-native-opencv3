@@ -11,13 +11,14 @@
 #import "CvInvoke.h"
 #import "MatManager.h"
 
+static CvVideoCamera *videoCamera;
+
 @implementation CvCamera {
     // private properties
     NSDictionary           *mOverlay;
-    Mat                    *mOverlayMat;
     int                    mOverlayInterval;
     NSDictionary           *mCvInvokeGroup;
-
+    
     bool mUseFaceDetection;
     bool mUseEyesDetection;
     bool mUseNoseDetection;
@@ -26,10 +27,8 @@
     NSString *mFacing;
     CGFloat mRelativeFaceSize;
     int mAbsoluteFaceSize;
-    //double mCurrentMillis;
-    //NSDate *startDate;
-    Mat rgbaFrame;
-    Mat grayFrame;
+    double mCurrentMillis;
+    NSDate *startDate;
     bool framesInitialized;
     bool overlayInitialized;
     
@@ -46,34 +45,51 @@
         mOverlayInterval = 0;
         mRelativeFaceSize = 0.2f;
         mAbsoluteFaceSize = 0;
-        //mCurrentMillis = 0;
+        mCurrentMillis = 0;
         self.backgroundColor = [UIColor blackColor];
         self.bridge = bridge;
-        CvVideoCamera *videoCamera = [[CvVideoCamera alloc] initWithParentView:self];
-        videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
-        videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset1280x720;
-        videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
-        videoCamera.defaultFPS = 30;
-        videoCamera.grayscaleMode = false;
-        videoCamera.delegate = self;
-        self.videoCamera = videoCamera;
-
-        [self.videoCamera start];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(bridgeDidBackground:)
+                                                     name:UIApplicationDidEnterBackgroundNotification
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(bridgeDidForeground:)
+                                                     name:UIApplicationWillEnterForegroundNotification
+                                                   object:nil];
+        
+        if (videoCamera != nil) {
+            // if more than one camera instance is used there are memory issues ...
+            //[videoCamera stop];
+            [videoCamera setDelegate:self];
+            [videoCamera setParentView:self];
+            //[videoCamera start];
+        }
+        else {
+            videoCamera = [[CvVideoCamera alloc] initWithParentView:self];
+            videoCamera.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
+            videoCamera.defaultAVCaptureSessionPreset = AVCaptureSessionPreset1280x720;
+            videoCamera.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
+            videoCamera.defaultFPS = 30;
+            videoCamera.grayscaleMode = false;
+            videoCamera.delegate = self;
+            //self.videoCamera = videoCamera;
+            [videoCamera start];
+        }
     }
     return self;
 }
 
 /** TODO: implement notifcations so these methods get called */
 - (void)bridgeDidForeground:(NSNotification *)notification {
-    [self.videoCamera start];
+    [videoCamera start];
 }
 
 - (void)bridgeDidBackground:(NSNotification *)notification {
-    [self.videoCamera stop];
+    [videoCamera stop];
 }
 
 -(void)rotateImage:(cv::Mat&)image deviceOrientation:(UIDeviceOrientation)deviceOrientation {
-
     switch (deviceOrientation) {
         case UIDeviceOrientationLandscapeLeft:
             rotate(image, image, ROTATE_90_COUNTERCLOCKWISE);
@@ -375,73 +391,69 @@
         }
     }
     
-    if (mCvInvokeGroup != nil) {
-        //long currMillis = System.currentTimeMillis();
-        //long diff = (currMillis - mCurrentMillis);
-        //if (diff >= mOverlayInterval) {
-        //    mCurrentMillis = currMillis;
-        /*if (startDate == nil) {
-            startDate = [NSDate date];
-        }
-        double currMillis = [startDate timeIntervalSinceNow];
-        double diff = (currMillis - mCurrentMillis) * 1000.0;
-        diff = (diff < 0.0) ? -diff : diff;
-        if (diff >= (double)mOverlayInterval) {
-            
-            mCurrentMillis = currMillis;
-            startDate = [NSDate date]; */
-        
-        if (!framesInitialized) {
-            framesInitialized = true;
-            rgbaFrame = Mat(image.rows, image.cols, CV_8UC4);
-            grayFrame = Mat(image.rows, image.cols, CV_8UC1);
-        }
-        image_copy.copyTo(rgbaFrame);
-        gray.copyTo(gray);
-        
-	    CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:rgbaFrame gray:grayFrame];
-	    NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
-	    NSString *lastCall = invoker.callback;
-	    int dstMatIndex = invoker.dstMatIndex;		
-	    if (lastCall != nil && lastCall != (NSString*)NSNull.null && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
-			if (responseArr && responseArr.count > 0 && self && self.onPayload) {
-				self.onPayload(@{ @"payload" : responseArr });
-			}
-	    }
-	    else {
-	        // not necessarily error condition unless dstMatIndex >= 1000
-	        if (dstMatIndex >= 1000) {
-	            NSLog(@"Exception thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
-	        }
-	    }
-    }
-    //}
-
-    // invert image
-    //bitwise_not(image_copy, image_copy);
-
-    //Convert BGR to BGRA (three channel to four channel)
-    //Mat bgr;
-    //cvtColor(image_copy, bgr, COLOR_GRAY2BGR);
-
-    //cvtColor(bgr, image, COLOR_BGR2BGRA);
-    //UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
-    
-    if (overlayInitialized) {
-        int matIndex = [[mOverlay valueForKey:@"matIndex"] intValue];
-        Mat overlayMat = [MatManager.sharedMgr matAtIndex:matIndex];
-        addWeighted(image_copy, 1.0, overlayMat, 1.0, 0.0, image_copy);
-    }
-    
-    UIImage *videoImage = MatToUIImage(image_copy);
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (mCvInvokeGroup != nil) {
+            if (startDate == nil) {
+                startDate = [NSDate date];
+            }
+            double currMillis = [startDate timeIntervalSinceNow];
+            double diff = (currMillis - mCurrentMillis) * 1000.0;
+            diff = (diff < 0.0) ? -diff : diff;
+            if (diff >= (double)mOverlayInterval) {
+                
+                mCurrentMillis = currMillis;
+                startDate = [NSDate date];
+                /*
+                 if (!framesInitialized) {
+                 framesInitialized = true;
+                 rgbaFrame = Mat(image.rows, image.cols, CV_8UC4);
+                 grayFrame = Mat(image.rows, image.cols, CV_8UC1);
+                 }
+                 image_copy.copyTo(rgbaFrame);
+                 gray.copyTo(grayFrame); */
+                
+                CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image_copy gray:gray];
+                NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
+                NSString *lastCall = invoker.callback;
+                int dstMatIndex = invoker.dstMatIndex;
+                if (lastCall != nil && lastCall != (NSString*)NSNull.null && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
+                    if (responseArr && responseArr.count > 0 && self && self.onPayload) {
+                        self.onPayload(@{ @"payload" : responseArr });
+                    }
+                }
+                else {
+                    // not necessarily error condition unless dstMatIndex >= 1000
+                    if (dstMatIndex >= 1000) {
+                        NSLog(@"Exception thrown attempting to invoke method.  Check your method name and parameters and make sure they are correct.");
+                    }
+                }
+            }
+        }
+        
+        // invert image
+        //bitwise_not(image_copy, image_copy);
+        
+        //Convert BGR to BGRA (three channel to four channel)
+        //Mat bgr;
+        //cvtColor(image_copy, bgr, COLOR_GRAY2BGR);
+        
+        //cvtColor(bgr, image, COLOR_BGR2BGRA);
+        //UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
+        
+        if (overlayInitialized) {
+            int matIndex = [[mOverlay valueForKey:@"matIndex"] intValue];
+            Mat overlayMat = [MatManager.sharedMgr matAtIndex:matIndex];
+            addWeighted(image_copy, 1.0, overlayMat, 1.0, 0.0, image_copy);
+        }
+    
+        UIImage *videoImage = MatToUIImage(image_copy);
         [self setImage:videoImage];
     });
 }
 
 #pragma Properties
 
--(void)setOverlay:(NSDictionary *)overlay {
+-(void)setOverlay:(NSDictionary*)overlay {
     overlayInitialized = true;
     mOverlay = overlay;
 }
@@ -457,14 +469,14 @@
 - (void)changeFacing:(NSString*)facing {
     if (![facing isEqualToString:mFacing]) {
         mFacing = facing;
-        [self.videoCamera stop];
+        [videoCamera stop];
         if ([mFacing isEqualToString:@"back"]) {
-            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionBack];
+            [videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionBack];
         }
         else {
-            [self.videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionFront];
+            [videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionFront];
         }
-        [self.videoCamera start];
+        [videoCamera start];
     }
 }
 

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		500199092220E5AD00857A3C /* CvFunctionWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 500199082220E5AD00857A3C /* CvFunctionWrapper.mm */; };
 		5031DD6D223743680039D838 /* OpencvFuncs.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5031DD6C223743680039D838 /* OpencvFuncs.mm */; };
 		5080B7F321915DC800170E85 /* RNOpencv3.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5080B7F121915DC800170E85 /* RNOpencv3.mm */; };
 		5084125722162E00007835FA /* CvInvoke.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5084125622162E00007835FA /* CvInvoke.mm */; };
@@ -31,8 +30,6 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNOpencv3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNOpencv3.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		500199052220E5AD00857A3C /* CvFunctionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CvFunctionWrapper.h; sourceTree = "<group>"; };
-		500199082220E5AD00857A3C /* CvFunctionWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CvFunctionWrapper.mm; sourceTree = "<group>"; };
 		5031DD6C223743680039D838 /* OpencvFuncs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpencvFuncs.mm; sourceTree = "<group>"; };
 		5031DD70223743890039D838 /* OpencvFuncs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpencvFuncs.h; sourceTree = "<group>"; };
 		5034F34F21EAF9BD00F0F7B4 /* lbfmodel.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = lbfmodel.yaml; sourceTree = "<group>"; };
@@ -147,8 +144,6 @@
 				5080B7F221915DC800170E85 /* PrefixHeader.pch */,
 				5080B7F121915DC800170E85 /* RNOpencv3.mm */,
 				B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */,
-				500199052220E5AD00857A3C /* CvFunctionWrapper.h */,
-				500199082220E5AD00857A3C /* CvFunctionWrapper.mm */,
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				50808504221B414400FF5C39 /* Frameworks */,
@@ -217,7 +212,6 @@
 				50FC742A219953C800A48FE3 /* CvCameraView.m in Sources */,
 				50CC5D5321EEF945004B431E /* MatManager.mm in Sources */,
 				50FC7429219953C800A48FE3 /* CvCamera.mm in Sources */,
-				500199092220E5AD00857A3C /* CvFunctionWrapper.mm in Sources */,
 				50FC747321997CC000A48FE3 /* FileUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -8,7 +8,6 @@
 //
 #import "CvInvoke.h"
 #import "MatManager.h"
-#import "CvFunctionWrapper.h"
 #import "OpencvFuncs.h"
 
 @implementation CvInvoke
@@ -136,7 +135,7 @@
 -(int)findMethod:(NSString*)func params:(NSDictionary*)params {
     int funcIndex = -1;
     int numParams = 0;
-    if (params != nil) {
+    if (params != nil && params != (NSDictionary*)NSNull.null) {
         numParams = [CvInvoke getNumKeys:params];
     }
     
@@ -257,7 +256,7 @@
     }
    int result = -1;
    int numParams = 0;
-   if (params != nil) {
+   if (params != nil && params != (NSDictionary*)NSNull.null) {
        numParams = [CvInvoke getNumKeys:params];
    }
    std::vector<ocvtypes> ps;
@@ -310,7 +309,7 @@
        if (methodIndex != -1) {
            Mat matToUse;
            
-           if (in != nil && in != (NSString*)[NSNull null]) {
+           if (in != nil && in != (NSString*)[NSNull null] && ![in isEqualToString:@""]) {
                if ([in isEqualToString:@"rgba"]) {
                    matToUse = self.rgba;
                }
@@ -330,6 +329,11 @@
            }
            
            if (out != nil && out != (NSString*)[NSNull null]) {
+               std::string dFunc = std::string([func UTF8String]);
+               Mat matParam = callOpencvMethod(methodIndex, ps, matToUse);
+               MatWrapper *MW = [[MatWrapper alloc] init];
+               MW.myMat = matParam;
+               self.matParams[out] = MW;
                // TODO ...
                //id matParam;
                //if (matParam != NULL) {
@@ -345,7 +349,7 @@
                else {
                    std::string dFunc = std::string([func UTF8String]);
                    
-                   dstMat = callMethod(dFunc, ps);
+                   dstMat = callOpencvMethod(methodIndex, ps);
                    
                    int kkwwf = 2007;
                    kkwwf++;

@@ -11,5 +11,4 @@
 
 @interface CvCameraView : RCTViewManager <RCTBridgeModule>
 
-
 @end

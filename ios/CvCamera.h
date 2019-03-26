@@ -32,7 +32,7 @@ typedef NSInteger Classifier;
 
 @property (nonatomic, weak) RCTBridge *bridge;
 
-@property (nonatomic, strong) CvVideoCamera* videoCamera;
+//@property (nonatomic, retain) CvVideoCamera* videoCamera;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onFacesDetected;
 
@@ -40,7 +40,7 @@ typedef NSInteger Classifier;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onPayload;
 
-- (id)initWithBridge:(RCTBridge *)bridge;
+- (id)initWithBridge:(RCTBridge*)bridge;
 
 - (void)setOverlay:(NSDictionary*)overlay;
 
