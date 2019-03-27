@@ -27,7 +27,8 @@ std::vector<std::string> Functions = {
     "convertScaleAbs",
     "transform",
     "resize",
-    "rectangle"
+    "rectangle",
+    "setTo"
 };
 
 std::vector<std::string> types = {
@@ -45,7 +46,8 @@ std::vector<std::string> types = {
     "Mat,Mat,double,double",
     "Mat,Mat,Mat",
     "Mat,Mat,Size,double,double,int",
-    "Mat,Point,Point,Scalar,int"
+    "Mat,Point,Point,Scalar,int",
+    "Mat,Scalar"
 };
 
 typedef enum fns {
@@ -63,7 +65,8 @@ typedef enum fns {
     CONVERTSCALEABS,
     TRANSFORM,
     RESIZE,
-    RECTANGLE
+    RECTANGLE,
+    SETTO
 } ipfns;
 
 template <typename K>
@@ -98,6 +101,8 @@ inline CvSize castsize(ocvtypes* ocvtype) {
 /** This is casting stuff that would *maybe* make this stuff simpler.
  Thee is really no way to shorten it down because you still have to have the method index number
  in any kind of templating solution ... and the existing code is more readable
+ 
+ also std::visit is not supported until ios 12.0
  
 struct MatType { };
 struct IntType { };
@@ -230,7 +235,12 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = castmat(&args[1]);
             auto p3 = castmat(&args[2]);
             transform(p1, p2, p3);
-            return p3; 
+            // NOTE: this is a bug p3 should not be returned here it is not the out mat
+            // but the infrastructure assumes the last mat is the out mat ...
+            // should only affect things in the case of a callback
+            // of course the infrastructure needs to be fixed to address this but for now
+            // this will work
+            return p3;
         }
         case RESIZE: {
             auto p1 = castmat(&args[0]);
@@ -251,7 +261,12 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             rectangle(p1, p2, p3, p4, p5);
             return p1;
         }
-
+        case SETTO: {
+            auto p1 = castmat(&args[0]);
+            auto p2 = castscalar(&args[1]);
+            p1 = p2;
+            return p1;
+        }
     }
     return Mat();
 }

@@ -76,7 +76,6 @@
         }
     }
     Mat moneytrain(vec);
-    int vecval = moneytrain.at<int>(0, 0);
     [self addMat:moneytrain];
     return matIndex;
 }
@@ -93,8 +92,6 @@
         }
     }
     Mat bladeII(vec);
-    float vecval = bladeII.at<float>(0, 0);
-    float vecval2 = bladeII.at<float>(bladeII.cols-1,bladeII.rows-1);
     [self addMat:bladeII];
     return matIndex;
 }
@@ -122,6 +119,7 @@
 -(NSArray*)getMatData:(int)matIndex rownum:(int)rownum colnum:(int)colnum {
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
+    // TODO: check mat type to return different types of data
     NSMutableArray *retArr = [[NSMutableArray alloc] initWithCapacity:(mat.rows*mat.cols)];
     for (int j=0;j < mat.rows;j++) {
         for (int i=0;i < mat.cols;i++) {
@@ -152,6 +150,7 @@
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
     
+    // TODO: check type of mat to put different data types ...
     float* dataVals = new float[data.count];
     for (int i=0;i < data.count;i++) {
         NSNumber *dataVal = [data objectAtIndex:i];
