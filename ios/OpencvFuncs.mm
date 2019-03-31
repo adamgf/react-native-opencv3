@@ -32,22 +32,22 @@ std::vector<std::string> Functions = {
 };
 
 std::vector<std::string> types = {
-    "Mat,Mat,int",
-    "Mat,Mat,int,int",
-    "Mat,Mat",
-    "Mat,Mat,int",
-    "Mat,Point,Point,Scalar,int",
-    "Mat,Mat,double,double,int",
-    "Mat,MatOfInt,Mat,Mat,MatOfInt,MatOfFloat",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "OutMat,Point,Point,Scalar,int",
+    "Mat,OutMat,double,double,int",
+    "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
     "double,double,double,double",
-    "Mat,Mat,double,double",
+    "Mat,OutMat,double,double",
     "",
-    "Mat,Mat,int,double,double",
-    "Mat,Mat,double,double",
-    "Mat,Mat,Mat",
-    "Mat,Mat,Size,double,double,int",
-    "Mat,Point,Point,Scalar,int",
-    "Mat,Scalar"
+    "Mat,OutMat,int,double,double",
+    "Mat,OutMat,double,double",
+    "Mat,OutMat,Mat",
+    "Mat,OutMat,Size,double,double,int",
+    "OutMat,Point,Point,Scalar,int",
+    "OutMat,Scalar"
 };
 
 typedef enum fns {
@@ -235,12 +235,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = castmat(&args[1]);
             auto p3 = castmat(&args[2]);
             transform(p1, p2, p3);
-            // NOTE: this is a bug p3 should not be returned here it is not the out mat
-            // but the infrastructure assumes the last mat is the out mat ...
-            // should only affect things in the case of a callback
-            // of course the infrastructure needs to be fixed to address this but for now
-            // this will work
-            return p3;
+            return p2;
         }
         case RESIZE: {
             auto p1 = castmat(&args[0]);

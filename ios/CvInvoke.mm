@@ -91,17 +91,16 @@
                 ps.push_back(dfNum);
             }
         }
-        // TODO: make the check on itsType for NSDictionary* then on param
         else if ([itsType containsString:@"Dictionary"]) {
             NSDictionary *dMap = (NSDictionary*)[hashMap valueForKey:paramNum];
             
-            if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"MatOfInt"] || [param isEqualToString:@"MatOfFloat"]) {
+            if ([param isEqualToString:@"Mat"] || [param isEqualToString:@"MatOfInt"] || [param isEqualToString:@"MatOfFloat"] || [param isEqualToString:@"OutMat"]) {
 
                 int matIndex = [(NSNumber*)[dMap valueForKey:@"matIndex"] intValue];
                 Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
                 ps.push_back(dMat);
                 
-                if ([param isEqualToString:@"Mat"]) {
+                if ([param isEqualToString:@"OutMat"]) {
                     self.arrMatIndex = i - 1;
                     self.dstMatIndex = matIndex;
                 }
@@ -265,8 +264,6 @@
     
    @try {
        
-	   // TODO: I thought about using multiple search classes but this seemed to be more trouble just have all the
-	   //       functions in OpencvFuncs.mm if you want to break it out go for it!!  -- Adam
        /**
        if (in != nil && in != (NSString*)[NSNull null]) {
            if (![in isEqualToString:@""] && ([in isEqualToString:@"rgba"] || [in isEqualToString:@"rgbat"] || [in isEqualToString:@"gray"] || [in isEqualToString:@"grayt"] || (self.matParams != nil && [self.matParams.allKeys containsObject:in]))) {
