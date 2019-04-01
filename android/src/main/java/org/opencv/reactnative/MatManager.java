@@ -67,16 +67,28 @@ class MatManager {
         return matIndex;
     }
 
-    public static int createMatOfInt(int matval) {
+    public static int createMatOfInt(int lomatval, int himatval) {
         int matIndex = mats.size();
-        MatOfInt matToAdd = new MatOfInt(matval);
+        MatOfInt matToAdd;
+		if (lomatval == himatval) {
+			matToAdd = new MatOfInt(lomatval);
+		}
+		else {
+			matToAdd = new MatOfInt(lomatval, himatval);
+		}
         mats.add(matToAdd);
         return matIndex;
     }
 
     public static int createMatOfFloat(float lomatval, float himatval) {
         int matIndex = mats.size();
-        MatOfFloat matToAdd = new MatOfFloat(lomatval, himatval);
+        MatOfFloat matToAdd;
+		if (lomatval == himatval) {
+			matToAdd = new MatOfFloat(lomatval);
+		}
+		else {
+			matToAdd = new MatOfFloat(lomatval, himatval);
+		}
         mats.add(matToAdd);
         return matIndex;
     }
@@ -99,6 +111,7 @@ class MatManager {
         mats.set(matIndex, matToSet);
     }
 
+    // This method should only be used for sending data to a callback in the RN app ...
     // TODO: get this to work for different data types checking CvType
     public static WritableArray getMatData(int matIndex, int rownum, int colnum) {
         Mat mat = (Mat)matAtIndex(matIndex);

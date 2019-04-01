@@ -58,12 +58,18 @@ export class Mat {
 }
 
 export class MatOfInt {
-  constructor(intvalue) {
-      this.intvalue = intvalue
+  constructor(lowintvalue, highintvalue) {
+    this.lowintvalue = lowintvalue
+    this.highintvalue = highintvalue
   }
 
   init = async() => {
-    return await RNOpencv3.MatOfInt(this.intvalue)
+	if (this.highintvalue && this.highintvalue != this.lowintvalue) {
+      return await RNOpencv3.MatOfInt(this.lowintvalue, this.highintvalue)
+	}
+	else {
+	  return await RNOpencv3.MatOfInt(this.lowintvalue, this.lowintvalue)
+	}
   }
 }
 
@@ -74,6 +80,13 @@ export class MatOfFloat {
   }
 
   init = async() => {
-    return await RNOpencv3.MatOfFloat(this.lowfloatvalue, this.highfloatvalue)
+  	if (this.highfloatvalue && this.highfloatvalue != this.lowfloatvalue) {
+	  alert('about to instantiate mat of float 2 vals')
+      return await RNOpencv3.MatOfFloat(this.lowfloatvalue, this.highfloatvalue)
+  	}
+  	else {
+	  alert('about to instantiate mat of float 1 val')
+  	  return await RNOpencv3.MatOfFloat(this.lowfloatvalue, this.lowfloatvalue)
+  	}
   }
 }

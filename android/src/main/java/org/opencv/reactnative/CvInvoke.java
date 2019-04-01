@@ -29,7 +29,49 @@ class CvInvoke {
 
     private static final String TAG = CvInvoke.class.getSimpleName();
 
-    //private static CvInvoke cvInvoke = null;
+    // usually the last Mat in the params is used as the return mat except for
+	// these function exceptions in which another Mat besides the dest Mat follows it in
+	// the parameter list ... 
+	// the first index is the ret Mat index the second int is for the number of minimum params for this to occur
+	private final static HashMap<String, int[]> retExcs = new HashMap<String, int[]>();
+	static {
+		retExcs.put("add",new int[]{2,4});
+		retExcs.put("accumulate",new int[]{1,3}); 
+		retExcs.put("accumulateProduct",new int[]{2,4}); 
+		retExcs.put("accumulateSquare",new int[]{1,3}); 
+		retExcs.put("accumulateWeighted",new int[]{1,4}); 
+		retExcs.put("applyColorMap",new int[]{1,3}); 
+		retExcs.put("bitwise_and",new int[]{2,4});
+		retExcs.put("bitwise_not",new int[]{1,3});
+		retExcs.put("bitwise_or",new int[]{2,4});
+		retExcs.put("bitwise_xor",new int[]{2,4});
+		retExcs.put("connectedComponents",new int[]{0,2}); 		
+		retExcs.put("connectedComponentsWithAlgorithm",new int[]{0,5}); 
+		retExcs.put("connectedComponentsWithStatsWithAlgorithm",new int[]{0,7}); 
+		retExcs.put("dilate",new int[]{1,3}); 
+		retExcs.put("distanceTransformWithLabels",new int[]{1,5}); 
+		retExcs.put("erode",new int[]{1,3}); 
+		retExcs.put("filter2D",new int[]{1,4}); 
+		retExcs.put("findContours",new int[]{1,5}); // not a Mat return object? need to deal with this ...	
+		retExcs.put("floodFill",new int[]{0,4}); 
+		retExcs.put("mulTransposed",new int[]{1,4}); 
+		retExcs.put("normalize",new int[]{1,7}); 
+		retExcs.put("morphologyEx",new int[]{1,4}); 
+		retExcs.put("perspectiveTransform",new int[]{1,3}); 
+		retExcs.put("remap",new int[]{1,5}); 
+		retExcs.put("sepFilter2D",new int[]{1,5}); 
+		retExcs.put("spatialGradient",new int[]{0,3}); 
+		retExcs.put("subtract",new int[]{2,4});
+		retExcs.put("transform",new int[]{1,3}); 
+		retExcs.put("undistort",new int[]{1,4}); 
+		retExcs.put("undistortPoints",new int[]{1,4}); 
+		retExcs.put("undistortPointsIter",new int[]{1,7}); 
+		retExcs.put("warpAffine",new int[]{1,4}); 
+		retExcs.put("warpPerspective",new int[]{1,4}); 
+		retExcs.put("warpPolar",new int[]{1,6}); 
+		retExcs.put("watershed",new int[]{0,2}); 
+	}
+	
     private int arrMatIndex = -1;
     public int dstMatIndex = -1;
     // these mats come from the camera or image view ...
@@ -62,7 +104,7 @@ class CvInvoke {
         return numKeys;
     }
 
-    private Object[] getObjectArr(ReadableMap RM, Class[] params) {
+    private Object[] getObjectArr(String func, ReadableMap RM, Class[] params) {
 
         int i = 1;
         ArrayList retObjs = new ArrayList<Object>();
@@ -108,92 +150,85 @@ class CvInvoke {
            }
            // TODO: check the types to make sure they are compatible
            // more exhaustive type-checking and error reporting ...
-           else if (param == Mat.class) {
-                if (itsType == ReadableType.Map) {
-                    ReadableMap matMap = RM.getMap(paramNum);
-                    int matIndex = matMap.getInt("matIndex");
-                    Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-                    retObjs.add(dMat);
+           else if (itsType == ReadableType.Map) {
+               ReadableMap dMap = RM.getMap(paramNum);
+		       if (param == Mat.class || param == List.class) {
+                   int matIndex = dMap.getInt("matIndex");
+                   Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+				   if (param == Mat.class) {
+                       retObjs.add(dMat);
+				   }
+				   else {
+	                   retObjs.add(Arrays.asList(dMat));
+				   }
 
-                    // have to update the dst mat after op ...
-                    // should be last mat in function parameters
-                    arrMatIndex = i - 1;
-                    dstMatIndex = matIndex;
-                }
-           }
-           else if (param == MatOfInt.class) {
-               if (itsType == ReadableType.Map) {
-                  ReadableMap matMap = RM.getMap(paramNum);
-                  int matIndex = matMap.getInt("matIndex");
-                  MatOfInt dMatOfInt = (MatOfInt)MatManager.getInstance().matAtIndex(matIndex);
-                  retObjs.add(dMatOfInt);
+                   // have to update the dst mat after op ...
+                   // should be last mat in function parameters unless exception function
+				   if (retExcs.containsKey(func)) {
+					   int[] testExcs = retExcs.get(func);
+					   int minParams = testExcs[1];
+					   if (params.length >= minParams) {
+					       if (testExcs[0] == (i - 1)) {
+					           arrMatIndex = testExcs[0];
+						       dstMatIndex = matIndex;
+					       }
+				   	   }
+					   else {
+						   arrMatIndex = i - 1;
+						   dstMatIndex = matIndex;
+					   }
+				   }
+				   else {
+                       arrMatIndex = i - 1;
+                       dstMatIndex = matIndex;
+				   }
                }
-           }
-           else if (param == MatOfFloat.class) {
-                if (itsType == ReadableType.Map) {
-                    ReadableMap matMap = RM.getMap(paramNum);
-                    int matIndex = matMap.getInt("matIndex");
-                    MatOfFloat dMatOfFloat = (MatOfFloat)MatManager.getInstance().matAtIndex(matIndex);
-                    retObjs.add(dMatOfFloat);
-                }
-           }
-           else if (param == Point.class) {
-              if (itsType == ReadableType.Map) {
-                  ReadableMap pointMap = RM.getMap(paramNum);
-                  double xval = pointMap.getDouble("x");
-                  double yval = pointMap.getDouble("y");
-                  Point dPoint = new Point(xval, yval);
-                  retObjs.add(dPoint);
-              }
-           }
-           else if (param == Scalar.class) {
-              if (itsType == ReadableType.Map) {
-                  ReadableMap scalarMap = RM.getMap(paramNum);
-                  ReadableArray scalarVal = scalarMap.getArray("vals");
-                  Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
-                      scalarVal.getDouble(2),scalarVal.getDouble(3));
-                  retObjs.add(dScalar);
-              }
-           }
-           else if (param == Size.class) {
-              if (itsType == ReadableType.Map) {
-                  ReadableMap sizeMap = RM.getMap(paramNum);
-                  double width = sizeMap.getDouble("width");
-                  double height = sizeMap.getDouble("height");
-                  Size dSize = new Size(width, height);
-                  retObjs.add(dSize);
-              }
-           }
-           else if (param == int.class) {
-                if (itsType == ReadableType.Number) {
+               else if (param == MatOfInt.class) {
+                   int matIndex = dMap.getInt("matIndex");
+                   MatOfInt dMatOfInt = (MatOfInt)MatManager.getInstance().matAtIndex(matIndex);
+                   retObjs.add(dMatOfInt);
+           	   }
+               else if (param == MatOfFloat.class) {
+                   int matIndex = dMap.getInt("matIndex");
+                   MatOfFloat dMatOfFloat = (MatOfFloat)MatManager.getInstance().matAtIndex(matIndex);
+                   retObjs.add(dMatOfFloat);
+               }
+               else if (param == Point.class) {
+                   double xval = dMap.getDouble("x");
+                   double yval = dMap.getDouble("y");
+                   Point dPoint = new Point(xval, yval);
+                   retObjs.add(dPoint);
+               }
+               else if (param == Scalar.class) {
+                   ReadableArray scalarVal = dMap.getArray("vals");
+                   Scalar dScalar = new Scalar(scalarVal.getDouble(0),scalarVal.getDouble(1),
+                       scalarVal.getDouble(2),scalarVal.getDouble(3));
+                   retObjs.add(dScalar);
+               }
+               else if (param == Size.class) {
+                   double width = dMap.getDouble("width");
+                   double height = dMap.getDouble("height");
+                   Size dSize = new Size(width, height);
+                   retObjs.add(dSize);
+               }
+	   	   }
+		   else if (itsType == ReadableType.Number) {
+               if (param == int.class) {
                   int dInt = RM.getInt(paramNum);
                   retObjs.add(dInt);
-                }
-           }
-           else if (param == double.class) {
-                if (itsType == ReadableType.Number) {
+               }
+               else if (param == double.class) {
                   double dDouble = RM.getDouble(paramNum);
-                    retObjs.add(dDouble);
-                }
+                  retObjs.add(dDouble);
+			   } 
            }
-           else if (param == List.class) {
+           else if (itsType == ReadableType.Array) {
                 // TODO: not sure how to check the objects here yet ... Adam
-                if (itsType == ReadableType.Map) {
-                    ReadableMap matMap = RM.getMap(paramNum);
-                    int matIndex = matMap.getInt("matIndex");
-                    Mat dMat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-                    retObjs.add(Arrays.asList(dMat));
-
-                    // have to update the dst mat after op ...
-                    // should be last mat in function parameters probably
-                    arrMatIndex = i - 1;
-                    dstMatIndex = matIndex;
-                }
-                else if (itsType == ReadableType.Array) {
+                if (param == List.class) {
                     // this has not been tested yet ...
                     ReadableArray arr = RM.getArray(paramNum);
                     retObjs.add(arr.toArrayList());
-                }
+				}
            }
            i++;
         }
@@ -403,7 +438,7 @@ class CvInvoke {
             }
             if (numParams > 0) {
                 Class<?>[] methodParams = method.getParameterTypes();
-                objects = getObjectArr(params, methodParams);
+                objects = getObjectArr(func, params, methodParams);
 
                 if (numParams != objects.length) {
                     throw new Exception("One of the parameters is invalid and " + func + " cannot be invoked.");
