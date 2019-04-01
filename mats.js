@@ -81,11 +81,9 @@ export class MatOfFloat {
 
   init = async() => {
   	if (this.highfloatvalue && this.highfloatvalue != this.lowfloatvalue) {
-	  alert('about to instantiate mat of float 2 vals')
       return await RNOpencv3.MatOfFloat(this.lowfloatvalue, this.highfloatvalue)
   	}
   	else {
-	  alert('about to instantiate mat of float 1 val')
   	  return await RNOpencv3.MatOfFloat(this.lowfloatvalue, this.lowfloatvalue)
   	}
   }
