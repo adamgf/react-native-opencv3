@@ -336,4 +336,6 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         result.putInt("matIndex", matIndex);
         promise.resolve(result);
     }
+	
+	
 }

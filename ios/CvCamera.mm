@@ -522,4 +522,16 @@ static CvVideoCamera *videoCamera;
     }
 }
 
+- (void)takePicture {
+    NSLog(@"Entered takePicture");
+}
+
+- (void)startRecording {
+    NSLog(@"Entered startRecording");
+}
+
+- (void)stopRecording {
+    NSLog(@"Entered stopRecording");
+}
+
 @end

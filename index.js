@@ -1,10 +1,11 @@
 
 // @author Adam G. Freeman, adamgf@gmail.com
-import { NativeModules, requireNativeComponent, View, UIManager } from 'react-native';
+import { NativeModules, requireNativeComponent, View, UIManager, Platform } from 'react-native';
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-const  { RNOpencv3 } = NativeModules;
+const { RNOpencv3 } = NativeModules;
+
 import { ColorConv, CvType, Imgproc, Core } from './constants';
 import { CvScalar, CvPoint, CvSize } from './coretypes';
 import { Mat, MatOfInt, MatOfFloat, setTo, get } from './mats';
@@ -18,11 +19,17 @@ class CvCamera extends Component {
     super(props)
   }
   setOverlay(overlayMat) {
-    UIManager.dispatchViewManagerCommand(
-      findNodeHandle(this),
-      UIManager.CvCameraView.Commands.setOverlay,
-      [overlayMat],
-    )
+	if (Platform.OS === 'android') {
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this),
+        UIManager.CvCameraView.Commands.setOverlay,
+        [overlayMat],
+      )
+    }
+	else {
+	  const options = { 'overlayMat' : overlayMat }
+	  NativeModules.CvCameraView.setOverlay(options, findNodeHandle(this))
+	}
   }
   render() {
     return (<CvCameraView {...this.props} />);

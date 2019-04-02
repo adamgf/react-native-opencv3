@@ -4,6 +4,7 @@
 #import "FileUtils.h"
 #import "MatManager.h"
 #import "CvInvoke.h"
+#import "CvCamera.h"
 #import "RNOpencv3.h"
 
 @implementation RNOpencv3
@@ -200,8 +201,8 @@ RCT_EXPORT_METHOD(transpose:(NSDictionary*)mat) {
     [MatManager.sharedMgr transposeMat:matIndex];
 }
 
-RCT_EXPORT_METHOD(MatOfInt:(int)matval resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    int matIndex = [MatManager.sharedMgr createMatOfInt:matval himatval:matval];
+RCT_EXPORT_METHOD(MatOfInt:(int)lomatval himatval:(int)himatval resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    int matIndex = [MatManager.sharedMgr createMatOfInt:lomatval himatval:himatval];
     resolve(@{ @"matIndex" : [NSNumber numberWithInt:matIndex]});
 }
 

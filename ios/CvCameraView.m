@@ -66,4 +66,67 @@ RCT_CUSTOM_VIEW_PROPERTY(overlayInterval, NSNumber*, CvCamera) {
     [view setOverlayInterval:json];
 }
 
+#pragma remapped methods
+
+RCT_REMAP_METHOD(setOverlay,
+                 options:(NSDictionary *)options
+                 reactTag:(nonnull NSNumber *)reactTag)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CvCamera *> *viewRegistry) {
+        CvCamera *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[CvCamera class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
+        }
+        else {
+            NSDictionary *overlayMat = [options valueForKey:@"overlayMat"];
+            [view setOverlay:overlayMat];
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(takePicture,
+                 withOptions:(NSDictionary *)options
+                 reactTag:(nonnull NSNumber *)reactTag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CvCamera *> *viewRegistry) {
+        CvCamera *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[CvCamera class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
+        }
+        else {
+            [view takePicture];
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(startRecording,
+                 withOptions:(NSDictionary *)options
+                 reactTag:(nonnull NSNumber *)reactTag)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CvCamera *> *viewRegistry) {
+        CvCamera *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[CvCamera class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
+        }
+        else {
+            [view startRecording];
+        }
+    }];
+}
+
+RCT_REMAP_METHOD(stopRecording,
+                 reactTag:(nonnull NSNumber *)reactTag)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CvCamera *> *viewRegistry) {
+        CvCamera *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[CvCamera class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
+        }
+        else {
+            [view stopRecording];
+        }
+    }];
+}
 @end

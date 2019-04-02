@@ -54,6 +54,12 @@ typedef NSInteger Classifier;
 
 - (void)setLandmarksModel:(NSString*)landmarksModel;
 
+- (void)takePicture;
+
+- (void)startRecording;
+
+- (void)stopRecording;
+
 @end
 
 #endif
