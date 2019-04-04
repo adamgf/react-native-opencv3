@@ -21,74 +21,21 @@ RCT_EXPORT_MODULE()
 }
 
 RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-
-    // Check input parameters validity
-    if (inPath == nil || inPath == (NSString*)NSNull.null || [inPath isEqualToString:@""]) {
-        return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: invalid parameter, param '%@'", inPath], nil);
-    }
-    // make sure input exists and is not a directory and output not a dir
-    if (![[NSFileManager defaultManager] fileExistsAtPath: inPath]) {
-        return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", inPath], nil);
-    }
-    BOOL isDir = NO;
-    if([[NSFileManager defaultManager] fileExistsAtPath:inPath isDirectory:&isDir] && isDir) {
-        return reject(@"EISDIR", [NSString stringWithFormat:@"EISDIR: illegal operation on a directory, open '%@'", inPath], nil);
-    }
-
-    UIImage *sourceImage = [UIImage imageWithContentsOfFile:inPath];
-
-    if (sourceImage == nil) {
-        return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", inPath], nil);
-    }
-
-    UIImage *normalizedImage = [FileUtils normalizeImage:sourceImage];
-
-    Mat outputMat;
-    UIImageToMat(normalizedImage, outputMat);
-    int matIndex = [MatManager.sharedMgr addMat:outputMat];
-
-    NSNumber *wid = [NSNumber numberWithInt:(int)sourceImage.size.width];
-    NSNumber *hei = [NSNumber numberWithInt:(int)sourceImage.size.height];
-    NSNumber *matI = [NSNumber numberWithInt:matIndex];
-
-    NSDictionary *returnDict = @{ @"cols" : wid, @"rows" : hei, @"matIndex" : matI };
-    resolve(returnDict);
+    [FileUtils imageToMat:inPath resolver:resolve rejecter:reject];
 }
 
-RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-
+RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
     if (outPath == nil || outPath == (NSString*)NSNull.null || [outPath isEqualToString:@""]) {
         return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: invalid parameter, param '%@'", outPath], nil);
     }
-
+    
     NSNumber *srcMatNum = [src valueForKey:@"matIndex"];
     int matIndex = (int)[srcMatNum integerValue];
-
-    Mat inputMat = [MatManager.sharedMgr matAtIndex:matIndex];
-
-    UIImage *destImage = MatToUIImage(inputMat);
-    if (destImage == nil) {
-        return reject(@"ENOENT", [NSString stringWithFormat:@"ENOENT: no such file, open '%@'", destImage], nil);
-    }
-
-    NSString *fileType = [[outPath lowercaseString] pathExtension];
-    if ([fileType isEqualToString:@"png"]) {
-        [UIImagePNGRepresentation(destImage) writeToFile:outPath atomically:YES];
-    }
-    else if ([fileType isEqualToString:@"jpg"] || [fileType isEqualToString:@"jpeg"]) {
-        [UIImageJPEGRepresentation(destImage, 92) writeToFile:outPath atomically:YES];
-    }
-    else {
-        return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: unsupported file type, write '%@'", fileType], nil);
-    }
-
-    NSNumber *wid = [NSNumber numberWithInt:(int)destImage.size.width];
-    NSNumber *hei = [NSNumber numberWithInt:(int)destImage.size.height];
-
-    NSDictionary *returnDict = @{ @"width" : wid, @"height" : hei,
-                                  @"uri" : outPath };
-
-    resolve(returnDict);
+    
+    MatWrapper *inputMatWrapper = [MatManager.sharedMgr objectAtIndex:matIndex];
+    //Mat inputMat = [MatManager.sharedMgr matAtIndex:matIndex];
+    [FileUtils matToImage:inputMatWrapper outPath:outPath resolver:resolve rejecter:reject];
 }
 
 RCT_EXPORT_METHOD(cvtColor:(NSDictionary*)src dstMat:(NSDictionary*)dst convColorCode:(int)convColorCode) {

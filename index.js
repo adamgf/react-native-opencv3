@@ -14,6 +14,8 @@ import { findNodeHandle } from 'react-native';
 
 const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
 
+var RNFS = require('react-native-fs')
+
 class CvCamera extends Component {
   constructor(props) {
     super(props)
@@ -30,6 +32,20 @@ class CvCamera extends Component {
 	  const options = { 'overlayMat' : overlayMat }
 	  NativeModules.CvCameraView.setOverlay(options, findNodeHandle(this))
 	}
+  }
+  async takePicture(filename) {
+	  if (Platform.OS === 'android') {
+		  UIManager.dispatchViewManagerCommand(
+			  findNodeHandle(this),
+			  UIManager.CvCameraView.Commands.takePicture,
+			  [pictureOptions],
+		  )
+	  }
+	  else {
+		  const outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
+		  const pictureOptions = { 'filename' : outputFilename }
+		  return await NativeModules.CvCameraView.takePicture(pictureOptions, findNodeHandle(this))
+	  }
   }
   render() {
     return (<CvCameraView {...this.props} />);

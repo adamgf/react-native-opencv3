@@ -8,6 +8,7 @@
 
 #import "CvCamera.h"
 #import "CvCameraView.h"
+#import "FileUtils.h"
 #import <React/RCTBridge.h>
 #import <React/RCTUIManager.h>
 #import <React/RCTEventDispatcher.h>
@@ -66,8 +67,6 @@ RCT_CUSTOM_VIEW_PROPERTY(overlayInterval, NSNumber*, CvCamera) {
     [view setOverlayInterval:json];
 }
 
-#pragma remapped methods
-
 RCT_REMAP_METHOD(setOverlay,
                  options:(NSDictionary *)options
                  reactTag:(nonnull NSNumber *)reactTag)
@@ -85,7 +84,7 @@ RCT_REMAP_METHOD(setOverlay,
 }
 
 RCT_REMAP_METHOD(takePicture,
-                 withOptions:(NSDictionary *)options
+                 options:(NSDictionary *)options
                  reactTag:(nonnull NSNumber *)reactTag
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
@@ -96,7 +95,11 @@ RCT_REMAP_METHOD(takePicture,
             RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
         }
         else {
-            [view takePicture];
+            TakePicBlock takePicBlock = ^(MatWrapper* MW) {
+                [FileUtils matToImage:MW outPath:[options valueForKey:@"filename"] resolver:resolve rejecter:reject];
+            };
+            
+            [view takePicture:takePicBlock];
         }
     }];
 }

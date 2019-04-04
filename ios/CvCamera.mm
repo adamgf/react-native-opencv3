@@ -7,8 +7,8 @@
 //
 
 #import "CvCamera.h"
-#import "FileUtils.h"
 #import "CvInvoke.h"
+#import "FileUtils.h"
 #import "MatManager.h"
 
 static CvVideoCamera *videoCamera;
@@ -28,6 +28,7 @@ static CvVideoCamera *videoCamera;
     CGFloat mRelativeFaceSize;
     int mAbsoluteFaceSize;
     double mCurrentMillis;
+    bool mTakePicture;
     NSDate *startDate;
     bool framesInitialized;
     bool overlayInitialized;
@@ -446,6 +447,12 @@ static CvVideoCamera *videoCamera;
             addWeighted(image_copy, 1.0, overlayMat, 1.0, 0.0, image_copy);
         }
     
+        if (mTakePicture) {
+            mTakePicture = false;
+            MatWrapper *MW = [[MatWrapper alloc] init];
+            MW.myMat = image_copy;
+            self.takePicBlock(MW);
+        }
         UIImage *videoImage = MatToUIImage(image_copy);
         [self setImage:videoImage];
     });
@@ -522,7 +529,10 @@ static CvVideoCamera *videoCamera;
     }
 }
 
-- (void)takePicture {
+- (void)takePicture:(TakePicBlock)takePicBlock {
+    mTakePicture = true;
+    self.takePicBlock = takePicBlock;
+    
     NSLog(@"Entered takePicture");
 }
 
