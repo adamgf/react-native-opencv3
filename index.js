@@ -19,6 +19,7 @@ var RNFS = require('react-native-fs')
 class CvCamera extends Component {
   constructor(props) {
     super(props)
+	this.cvCamera = React.createRef()
   }
   setOverlay(overlayMat) {
 	if (Platform.OS === 'android') {
@@ -48,7 +49,7 @@ class CvCamera extends Component {
 	  }
   }
   render() {
-    return (<CvCameraView {...this.props} />);
+    return (<CvCameraView ref={this.cvCamera} {...this.props} />);
   }
 }
 
