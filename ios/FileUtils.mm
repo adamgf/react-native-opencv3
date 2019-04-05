@@ -88,6 +88,7 @@
     }
     else if ([fileType isEqualToString:@"jpg"] || [fileType isEqualToString:@"jpeg"]) {
         [UIImageJPEGRepresentation(destImage, 92) writeToFile:outPath atomically:YES];
+        //UIImageWriteToSavedPhotosAlbum(destImage, self, nil, nil);
     }
     else {
         return reject(@"EINVAL", [NSString stringWithFormat:@"EINVAL: unsupported file type, write '%@'", fileType], nil);
