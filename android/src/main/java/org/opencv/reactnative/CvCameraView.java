@@ -29,6 +29,7 @@ import android.hardware.SensorManager;
 import android.view.OrientationEventListener;
 import android.util.Log;
 
+import org.opencv.videoio.VideoWriter;
 import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -66,6 +67,35 @@ enum whichOne {
     EYES_CLASSIFIER,
     NOSE_CLASSIFIER,
     MOUTH_CLASSIFIER
+}
+
+class RecordVideoBlock implements Runnable {
+
+	ReadableMap options;
+	int width;
+	int height;
+	Promise promise;
+	
+   	public RecordVideoBlock(ReadableMap options, Promise promise) {
+		this.options = options;
+		this.promise = promise;
+   	}
+   
+    public void setWidth(int width) {
+        this.width = width;	
+    }
+	
+    public void setHeight(int height) {
+        this.height = height;	
+    }
+	
+   	public void run() {
+        WritableNativeMap result = new WritableNativeMap();
+        result.putInt("width", width);
+        result.putInt("height", height);
+        result.putInt("uri", options.getString("filename"));
+        promise.resolve(result);
+   	}
 }
 
 class TakePicBlock implements Runnable {
@@ -120,6 +150,12 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private int                    mCurrOverlayIndex   = -1;
     private boolean				   mTakePicture	       = false;
 	private TakePicBlock	       takePicBlock;
+	private RecordVideoBlock	   recordVideoBlock;
+	
+	// video and audio recording stuff
+	private VideoWriter 	       mVideoWriter        = null;
+	private boolean	               mRecording          = false;
+	private String	   			   mOutfile;
 	
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -700,6 +736,27 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 			this.takePicBlock.run();
 		}
 
+        if (mRecording) {
+		    if (mVideoWriter == null) {
+		        //'P','I','M','1'
+		        // 'M','P','E','G'
+		        // 'M','J','P','G'
+		        mVideoWriter = new VideoWriter(mOutfile, VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
+		        mVideoWriter.open(mOutfile, VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
+		    }
+
+		    mVideoWriter.write(in);
+		} 
+		else {
+			if (mVideoWriter != null) {
+		    	mVideoWriter.release();
+				mVideoWriter = null;
+				recordVideoBlock.setWidth(in.size().width);
+				recordVideoBlock.setHeight(in.size().height);
+				recordVideoBlock.run();
+		    }
+		}
+        
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
         //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
@@ -748,6 +805,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         this.takePicBlock = takePicBlock;
 		mTakePicture = true;
     }
+	
+	public void startRecording(String filename) {
+		mOutfile = filename;
+		mRecording = true;
+	}
+	
+	public void stopRecording(RecordVideoBlock recordVideoBlock) {
+		this.recordVideoBlock = recordVideoBlock;
+		mRecording = false;
+	}
 	
     @Override
     protected boolean connectCamera(int width, int height) {

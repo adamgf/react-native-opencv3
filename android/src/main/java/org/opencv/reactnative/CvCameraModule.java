@@ -30,6 +30,8 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
         return "CvCameraModule";
     }
 
+    private ReadableMap videoOptions;
+	
     @ReactMethod
     public void takePicture(final ReadableMap options, final int viewTag, final Promise promise) {
       final ReactApplicationContext context = getReactApplicationContext();
@@ -43,6 +45,53 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
 				  
 			  TakePicBlock takePicBlock = new TakePicBlock(options, promise);
               cameraView.takePicture(takePicBlock);
+              //} else {
+              //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
+              //}
+          } 
+		  catch (Exception e) {
+              promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
+          }
+        }
+      });
+    }
+	
+    @ReactMethod
+    public void startRecording(final ReadableMap options, final int viewTag, final Promise promise) {
+      final ReactApplicationContext context = getReactApplicationContext();
+      UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        @Override
+        public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+            CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
+            try {
+              //if (cameraView.isCameraOpened()) {
+				videoOptions = options;
+                cameraView.startRecording(videoOptions.getString("filename"));
+              //} else {
+              //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
+              //}
+          } 
+		  catch (Exception e) {
+              promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
+          }
+        }
+      });
+    }
+	
+    @ReactMethod
+    public void stopRecording(final int viewTag) {
+      final ReactApplicationContext context = getReactApplicationContext();
+      UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        @Override
+        public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+            CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
+            try {
+              //if (cameraView.isCameraOpened()) {
+				  
+			  RecordVideoBlock recordVideoBlock = new RecordVideoBlock(videoOptions, promise);
+              cameraView.stopRecording(recordVideoBlock);
               //} else {
               //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
               //}

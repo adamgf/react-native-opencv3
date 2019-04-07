@@ -45,6 +45,25 @@ class CvCamera extends Component {
       return await NativeModules.CvCameraView.takePicture(pictureOptions, findNodeHandle(this))
 	}
   }
+  startRecording(filename) {
+	const outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
+	const pictureOptions = { 'filename' : outputFilename }
+	
+	if (Platform.OS === 'android') {
+	  NativeModules.CvCameraModule.startRecording(pictureOptions, findNodeHandle(this))	
+	}
+	else {	  
+      NativeModules.CvCameraView.startRecording(pictureOptions, findNodeHandle(this))
+	}
+  }
+  stopRecording() {	
+	if (Platform.OS === 'android') {
+	  return await NativeModules.CvCameraModule.stopRecording(findNodeHandle(this))	
+	}
+	else {	  
+      return await NativeModules.CvCameraView.stopRecording(findNodeHandle(this))
+	}
+  }
   render() {
     return (<CvCameraView ref={this.cvCamera} {...this.props} />);
   }
