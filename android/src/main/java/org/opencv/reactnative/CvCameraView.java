@@ -1,6 +1,7 @@
 // @author Adam G. Freeman - adamgf@gmail.com
 package org.opencv.reactnative;
 
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.bridge.WritableNativeMap;
@@ -67,6 +68,26 @@ enum whichOne {
     MOUTH_CLASSIFIER
 }
 
+class TakePicBlock implements Runnable {
+
+	Mat mat;
+	ReadableMap options;
+	Promise promise;
+	
+   	public TakePicBlock(ReadableMap options, Promise promise) {
+		this.options = options;
+		this.promise = promise;
+   	}
+
+   	public void setMat(Mat mat) {
+	   this.mat = mat;
+   	}
+   
+   	public void run() {
+        FileUtils.getInstance().matToImage(mat, options.getString("filename"), promise);
+   	}
+}
+
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
     private static final String TAG = CvCameraView.class.getSimpleName();
@@ -97,7 +118,9 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private int                    mRotation           = -1;
     private long                   mCurrentMillis      = -1;
     private int                    mCurrOverlayIndex   = -1;
-
+    private boolean				   mTakePicture	       = false;
+	private TakePicBlock	       takePicBlock;
+	
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
       Log.d(TAG, "Creating and setting view");
@@ -635,9 +658,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         }
 
         boolean sendCallbackData = false;
-        if (mOverlayMat != null) {
-            Core.addWeighted(in, 1.0, mOverlayMat, 1.0, 0.0, in);
-        }
 
         if (mCvInvokeGroup != null) {
             long currMillis = System.currentTimeMillis();
@@ -669,6 +689,16 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 		        }
             }
         }
+		
+        if (mOverlayMat != null) {
+            Core.addWeighted(in, 1.0, mOverlayMat, 1.0, 0.0, in);
+        }
+		
+		if (mTakePicture) {
+			mTakePicture = false;
+			this.takePicBlock.setMat(in);
+			this.takePicBlock.run();
+		}
 
         // hardcoded for right now to make sure it iw working ...
         // This is for CvInvoke outer tags ...
@@ -714,6 +744,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         return in;
     }
 
+    public void takePicture(TakePicBlock takePicBlock) {
+        this.takePicBlock = takePicBlock;
+		mTakePicture = true;
+    }
+	
     @Override
     protected boolean connectCamera(int width, int height) {
       boolean supVal = super.connectCamera( width, height);

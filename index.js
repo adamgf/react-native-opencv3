@@ -35,18 +35,15 @@ class CvCamera extends Component {
 	}
   }
   async takePicture(filename) {
-	  if (Platform.OS === 'android') {
-		  UIManager.dispatchViewManagerCommand(
-			  findNodeHandle(this),
-			  UIManager.CvCameraView.Commands.takePicture,
-			  [pictureOptions],
-		  )
-	  }
-	  else {
-		  const outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
-		  const pictureOptions = { 'filename' : outputFilename }
-		  return await NativeModules.CvCameraView.takePicture(pictureOptions, findNodeHandle(this))
-	  }
+	const outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
+	const pictureOptions = { 'filename' : outputFilename }
+	
+	if (Platform.OS === 'android') {
+	  return await NativeModules.CvCameraModule.takePicture(pictureOptions, findNodeHandle(this))	
+	}
+	else {	  
+      return await NativeModules.CvCameraView.takePicture(pictureOptions, findNodeHandle(this))
+	}
   }
   render() {
     return (<CvCameraView ref={this.cvCamera} {...this.props} />);

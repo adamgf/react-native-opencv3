@@ -23,7 +23,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Environment;
 import android.util.Log;
 
-import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
@@ -33,11 +32,7 @@ import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc.*;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-
+// just for testing purposes ...
 import android.widget.Toast;
 
 public class RNOpencv3Module extends ReactContextBaseJavaModule {
@@ -61,27 +56,6 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
         return "RNOpencv3";
     }
 
-    private void reject(Promise promise, String filepath, Exception ex) {
-        if (ex instanceof FileNotFoundException) {
-            rejectFileNotFound(promise, filepath);
-            return;
-        }
-
-        promise.reject(null, ex.getMessage());
-    }
-
-    private void rejectFileNotFound(Promise promise, String filepath) {
-        promise.reject("ENOENT", "ENOENT: no such file or directory, open '" + filepath + "'");
-    }
-
-    private void rejectFileIsDirectory(Promise promise, String filepath) {
-        promise.reject("EISDIR", "EISDIR: illegal operation on a directory, open '" + filepath + "'");
-    }
-
-    private void rejectInvalidParam(Promise promise, String param) {
-        promise.reject("EINVAL", "EINVAL: invalid parameter, read '" + param + "'");
-    }
-
     private void MakeAToast(String message) {
         Toast.makeText(reactContext, message, Toast.LENGTH_LONG).show();
     }
@@ -102,103 +76,6 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void imageToMat(String inPath, final Promise promise) {
-        try {
-            if (inPath == null || inPath.length() == 0) {
-                rejectInvalidParam(promise, inPath);
-                return;
-            }
-
-            java.io.File inFileTest = new java.io.File(inPath);
-            if(!inFileTest.exists()) {
-                rejectFileNotFound(promise, inPath);
-                return;
-            }
-            if (inFileTest.isDirectory()) {
-                rejectFileIsDirectory(promise, inPath);
-                return;
-            }
-
-            Bitmap bitmap = BitmapFactory.decodeFile(inPath);
-            if (bitmap == null) {
-                throw new IOException("Decoding error unable to decode: " + inPath);
-            }
-            Mat img = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC4);
-            Utils.bitmapToMat(bitmap, img);
-            int matIndex = MatManager.getInstance().addMat(img);
-
-            WritableNativeMap result = new WritableNativeMap();
-            result.putInt("cols", img.cols());
-            result.putInt("rows", img.rows());
-            result.putInt("matIndex", matIndex);
-            promise.resolve(result);
-        }
-        catch (Exception ex) {
-            reject(promise, "EGENERIC", ex);
-        }
-    }
-
-    @ReactMethod
-    public void matToImage(ReadableMap srcMat, String outPath, final Promise promise) {
-        try {
-            if (outPath == null || outPath.length() == 0) {
-                // TODO: if no path sent in then auto-generate??!!!?
-                rejectInvalidParam(promise, outPath);
-                return;
-            }
-
-            int matIndex = srcMat.getInt("matIndex");
-            Mat mat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
-            Bitmap bm = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(mat, bm);
-
-            int width = bm.getWidth();
-            int height = bm.getHeight();
-
-            FileOutputStream file = new FileOutputStream(outPath);
-
-            if (file != null) {
-                String fileType = "";
-                int i = outPath.lastIndexOf('.');
-                if (i > 0) {
-                    fileType = outPath.substring(i+1).toLowerCase();
-                }
-                else {
-                    rejectInvalidParam(promise, outPath);
-                    file.close();
-                    return;
-                }
-
-                if (fileType.equals("png")) {
-                    bm.compress(Bitmap.CompressFormat.PNG, 100, file);
-                }
-                else if (fileType.equals("jpg") || fileType.equals("jpeg")) {
-                    bm.compress(Bitmap.CompressFormat.JPEG, 92, file);
-                }
-                else {
-                    rejectInvalidParam(promise, outPath);
-                    file.close();
-                    return;
-                }
-                file.close();
-            }
-            else {
-                rejectFileNotFound(promise, outPath);
-                return;
-            }
-
-            WritableNativeMap result = new WritableNativeMap();
-            result.putInt("width", width);
-            result.putInt("height", height);
-            result.putString("uri", outPath);
-            promise.resolve(result);
-        }
-        catch (Exception ex) {
-            reject(promise, "EGENERIC", ex);
-        }
-    }
-
-    @ReactMethod
     public void cvtColor(ReadableMap sourceMat, ReadableMap destMat, int convColorCode) {
         int srcMatIndex = sourceMat.getInt("matIndex");
         int dstMatIndex = destMat.getInt("matIndex");
@@ -208,6 +85,18 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
         Imgproc.cvtColor(srcMat, dstMat, convColorCode);
         MatManager.getInstance().setMat(dstMatIndex, dstMat);
+    }
+	
+    @ReactMethod
+    public void imageToMat(String inPath, final Promise promise) {
+        FileUtils.getInstance().imageToMat(inPath, promise);
+    }
+
+    @ReactMethod
+    public void matToImage(ReadableMap srcMat, String outPath, final Promise promise) {
+        int matIndex = srcMat.getInt("matIndex");
+        Mat mat = (Mat)MatManager.getInstance().matAtIndex(matIndex);
+		FileUtils.getInstance().matToImage(mat, outPath, promise);
     }
 
     @ReactMethod
@@ -272,7 +161,6 @@ public class RNOpencv3Module extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void MatWithScalar(int rows, int cols, int cvtype, ReadableMap scalarMap, final Promise promise) {
-        //MakeAToast("Scalar values are: " + scalarVal.getDouble(0) + "," + scalarVal.getDouble(1) + "," + scalarVal.getDouble(2) + "," + scalarVal.getDouble(3)  );
         int matIndex = MatManager.getInstance().createMat(cols, rows, cvtype, scalarMap);
         resolveMatPromise(matIndex, rows, cols, cvtype, promise);
     }

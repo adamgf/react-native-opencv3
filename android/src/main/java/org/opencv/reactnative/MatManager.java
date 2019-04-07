@@ -26,6 +26,8 @@ import org.opencv.core.MatOfFloat;
  */
 class MatManager {
 
+    private static final String TAG = MatManager.class.getSimpleName();
+
     private static ArrayList mats = new ArrayList<Object>();
 
     private static MatManager matManager = null;

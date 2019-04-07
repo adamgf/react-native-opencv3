@@ -4,6 +4,10 @@ package org.opencv.reactnative;
 import android.hardware.Camera;
 import android.util.Log;
 
+import com.facebook.react.uimanager.NativeViewHierarchyManager;
+import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.UIBlock;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -26,6 +30,30 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
         return "CvCameraModule";
     }
 
+    @ReactMethod
+    public void takePicture(final ReadableMap options, final int viewTag, final Promise promise) {
+      final ReactApplicationContext context = getReactApplicationContext();
+      UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
+      uiManager.addUIBlock(new UIBlock() {
+        @Override
+        public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+            CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
+            try {
+              //if (cameraView.isCameraOpened()) {
+				  
+			  TakePicBlock takePicBlock = new TakePicBlock(options, promise);
+              cameraView.takePicture(takePicBlock);
+              //} else {
+              //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
+              //}
+          } 
+		  catch (Exception e) {
+              promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
+          }
+        }
+      });
+    }
+	
     /**
     @ReactMethod
     public void capturePicture(final Promise promise) {
