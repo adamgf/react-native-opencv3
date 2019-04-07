@@ -87,7 +87,7 @@
         [UIImagePNGRepresentation(destImage) writeToFile:outPath atomically:YES];
     }
     else if ([fileType isEqualToString:@"jpg"] || [fileType isEqualToString:@"jpeg"]) {
-        [UIImageJPEGRepresentation(destImage, 92) writeToFile:outPath atomically:YES];
+        [UIImageJPEGRepresentation(destImage, 80) writeToFile:outPath atomically:YES];
         //UIImageWriteToSavedPhotosAlbum(destImage, self, nil, nil);
     }
     else {
