@@ -57,30 +57,25 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
     }
 	
     @ReactMethod
-    public void startRecording(final ReadableMap options, final int viewTag, final Promise promise) {
+    public void startRecording(final ReadableMap options, final int viewTag) {
       final ReactApplicationContext context = getReactApplicationContext();
       UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
         @Override
         public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
             CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
-            try {
-              //if (cameraView.isCameraOpened()) {
-				videoOptions = options;
-                cameraView.startRecording(videoOptions.getString("filename"));
-              //} else {
-              //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
-              //}
-          } 
-		  catch (Exception e) {
-              promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
-          }
+            //if (cameraView.isCameraOpened()) {
+		    videoOptions = options;
+            cameraView.startRecording(options);
+            //} else {
+            //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
+            //}
         }
       });
     }
 	
     @ReactMethod
-    public void stopRecording(final int viewTag) {
+    public void stopRecording(final int viewTag, final Promise promise) {
       final ReactApplicationContext context = getReactApplicationContext();
       UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
@@ -97,7 +92,7 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
               //}
           } 
 		  catch (Exception e) {
-              promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
+              promise.reject("E_CAMERA_BAD_VIEWTAG", "stopRecording: Expected a Camera component");
           }
         }
       });

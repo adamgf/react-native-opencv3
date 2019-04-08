@@ -56,7 +56,7 @@ class CvCamera extends Component {
       NativeModules.CvCameraView.startRecording(pictureOptions, findNodeHandle(this))
 	}
   }
-  stopRecording() {	
+  async stopRecording() {	
 	if (Platform.OS === 'android') {
 	  return await NativeModules.CvCameraModule.stopRecording(findNodeHandle(this))	
 	}

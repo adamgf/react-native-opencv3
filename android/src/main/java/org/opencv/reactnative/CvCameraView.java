@@ -93,7 +93,7 @@ class RecordVideoBlock implements Runnable {
         WritableNativeMap result = new WritableNativeMap();
         result.putInt("width", width);
         result.putInt("height", height);
-        result.putInt("uri", options.getString("filename"));
+        result.putString("uri", options.getString("filename"));
         promise.resolve(result);
    	}
 }
@@ -751,8 +751,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 			if (mVideoWriter != null) {
 		    	mVideoWriter.release();
 				mVideoWriter = null;
-				recordVideoBlock.setWidth(in.size().width);
-				recordVideoBlock.setHeight(in.size().height);
+				recordVideoBlock.setWidth((int)in.size().width);
+				recordVideoBlock.setHeight((int)in.size().height);
 				recordVideoBlock.run();
 		    }
 		}
@@ -806,8 +806,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 		mTakePicture = true;
     }
 	
-	public void startRecording(String filename) {
-		mOutfile = filename;
+	public void startRecording(ReadableMap options) {
+		mOutfile = options.getString("filename");
 		mRecording = true;
 	}
 	
