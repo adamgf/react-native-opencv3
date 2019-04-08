@@ -155,7 +155,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 	// video and audio recording stuff
 	private VideoWriter 	       mVideoWriter        = null;
 	private boolean	               mRecording          = false;
-	private String	   			   mOutfile;
+	private ReadableMap	   		   mVideoOptions;
 	
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
       super( context, cameraFacing);
@@ -738,11 +738,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
         if (mRecording) {
 		    if (mVideoWriter == null) {
-		        //'P','I','M','1'
-		        // 'M','P','E','G'
-		        // 'M','J','P','G'
-		        mVideoWriter = new VideoWriter(mOutfile, VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
-		        mVideoWriter.open(mOutfile, VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
+		        mVideoWriter = new VideoWriter(mVideoOptions.getString("filename"), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
+		        mVideoWriter.open(mVideoOptions.getString("filename"), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
 		    }
 
 		    mVideoWriter.write(in);
@@ -807,7 +804,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     }
 	
 	public void startRecording(ReadableMap options) {
-		mOutfile = options.getString("filename");
+		mVideoOptions = options;
 		mRecording = true;
 	}
 	
