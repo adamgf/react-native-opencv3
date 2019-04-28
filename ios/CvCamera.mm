@@ -38,6 +38,14 @@ static CvVideoCamera *videoCamera;
     CascadeClassifier mouth_cascade;
     CascadeClassifier nose_cascade;
     Ptr<face::Facemark> landmarks;
+    
+    // recording
+    cv::VideoWriter mVideoWriter;
+    bool mRecording;
+    bool mRecordingFinished;
+    NSString *mFilename;
+    int mWidth;
+    int mHeight;
 }
 
 - (id)initWithBridge:(RCTBridge *)bridge
@@ -203,6 +211,9 @@ static CvVideoCamera *videoCamera;
     cv::Mat image_copy; // image in corrected colorspace ...
     cvtColor(image, image_copy, COLOR_BGR2RGBA);
     cvtColor(image, gray, COLOR_BGR2GRAY);
+    
+    mWidth = image.cols;
+    mHeight = image.rows;
     
     //Log.d(TAG, "payload is: " + faceInfo);
     if (self && self.onFrameSize) {
@@ -404,14 +415,6 @@ static CvVideoCamera *videoCamera;
                 
                 mCurrentMillis = currMillis;
                 startDate = [NSDate date];
-                /*
-                 if (!framesInitialized) {
-                 framesInitialized = true;
-                 rgbaFrame = Mat(image.rows, image.cols, CV_8UC4);
-                 grayFrame = Mat(image.rows, image.cols, CV_8UC1);
-                 }
-                 image_copy.copyTo(rgbaFrame);
-                 gray.copyTo(grayFrame); */
                 
                 CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image_copy gray:gray];
                 NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
@@ -431,16 +434,6 @@ static CvVideoCamera *videoCamera;
             }
         }
         
-        // invert image
-        //bitwise_not(image_copy, image_copy);
-        
-        //Convert BGR to BGRA (three channel to four channel)
-        //Mat bgr;
-        //cvtColor(image_copy, bgr, COLOR_GRAY2BGR);
-        
-        //cvtColor(bgr, image, COLOR_BGR2BGRA);
-        //UIImage *videoImage = [FileUtils UIImageFromCVMat:image_copy];
-        
         if (overlayInitialized) {
             int matIndex = [[mOverlay valueForKey:@"matIndex"] intValue];
             Mat overlayMat = [MatManager.sharedMgr matAtIndex:matIndex];
@@ -452,6 +445,17 @@ static CvVideoCamera *videoCamera;
             MatWrapper *MW = [[MatWrapper alloc] init];
             MW.myMat = image_copy;
             self.takePicBlock(MW);
+        }
+        else if (mRecording) {
+            if (mVideoWriter.isOpened()) {
+                Mat flippedColors;
+                cvtColor(image_copy, flippedColors, COLOR_RGBA2BGR);
+                mVideoWriter.write(flippedColors);
+            }
+        }
+        else if (mRecordingFinished) {
+            mRecordingFinished = false;
+            self.recordVidBlock([NSNumber numberWithInt:mWidth], [NSNumber numberWithInt:mHeight], mFilename);
         }
         UIImage *videoImage = MatToUIImage(image_copy);
         [self setImage:videoImage];
@@ -532,16 +536,30 @@ static CvVideoCamera *videoCamera;
 - (void)takePicture:(TakePicBlock)takePicBlock {
     mTakePicture = true;
     self.takePicBlock = takePicBlock;
+}
+
+- (void)startRecording:(NSString*)filename {
+    cv::Size size(mWidth, mHeight);
+    int fourcc = CV_FOURCC('m', 'p', '4', 'v');
+
+    mFilename = filename;
+    cv::VideoWriter VW;
+    VW.open([filename UTF8String], fourcc, 30, size, true);
     
-    NSLog(@"Entered takePicture");
+    if (!VW.isOpened() ){
+        NSLog(@"Cannot open video writer.");
+        return;
+    }
+    mVideoWriter = VW;
+    mRecording = true;
 }
 
-- (void)startRecording {
-    NSLog(@"Entered startRecording");
-}
-
-- (void)stopRecording {
-    NSLog(@"Entered stopRecording");
+- (void)stopRecording:(RecordVidBlock)recordVidBlock {
+    mRecording = false;
+    mRecordingFinished = true;
+    mVideoWriter.release();
+    mVideoWriter.~VideoWriter();
+    self.recordVidBlock = recordVidBlock;
 }
 
 @end

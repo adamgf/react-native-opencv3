@@ -32,11 +32,15 @@ typedef NSInteger Classifier;
 
 typedef void (^TakePicBlock)(MatWrapper*);
 
+typedef void (^RecordVidBlock)(NSNumber*,NSNumber*,NSString*);
+
 @interface CvCamera : UIImageView <CvVideoCameraDelegate>
 
 @property (nonatomic, weak) RCTBridge *bridge;
 
 @property (nonatomic, copy) TakePicBlock takePicBlock;
+
+@property (nonatomic, copy) RecordVidBlock recordVidBlock;
 
 //@property (nonatomic, retain) CvVideoCamera* videoCamera;
 
@@ -62,9 +66,9 @@ typedef void (^TakePicBlock)(MatWrapper*);
 
 - (void)takePicture:(TakePicBlock)takePicBlock;
 
-- (void)startRecording;
+- (void)startRecording:(NSString*)filename;
 
-- (void)stopRecording;
+- (void)stopRecording:(RecordVidBlock)recordVidBlock;
 
 @end
 

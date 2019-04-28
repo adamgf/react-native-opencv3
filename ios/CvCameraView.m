@@ -114,13 +114,15 @@ RCT_REMAP_METHOD(startRecording,
             RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
         }
         else {
-            [view startRecording];
+            [view startRecording:[options valueForKey:@"filename"]];
         }
     }];
 }
 
 RCT_REMAP_METHOD(stopRecording,
-                 reactTag:(nonnull NSNumber *)reactTag)
+                 reactTag:(nonnull NSNumber *)reactTag
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, CvCamera *> *viewRegistry) {
         CvCamera *view = viewRegistry[reactTag];
@@ -128,7 +130,13 @@ RCT_REMAP_METHOD(stopRecording,
             RCTLogError(@"Invalid view returned from registry, expecting CvCamera, got: %@", view);
         }
         else {
-            [view stopRecording];
+            RecordVidBlock recordVidBlock = ^(NSNumber *wid, NSNumber *hei, NSString *outPath) {
+                NSDictionary *returnDict = @{ @"width" : wid, @"height" : hei,
+                                              @"uri" : outPath };
+                
+                resolve(returnDict);
+            };
+            [view stopRecording:recordVidBlock];
         }
     }];
 }
