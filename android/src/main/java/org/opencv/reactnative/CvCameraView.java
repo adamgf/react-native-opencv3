@@ -739,7 +739,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         if (mRecording) {
 		    if (mVideoWriter == null) {
 		        mVideoWriter = new VideoWriter(mVideoOptions.getString("filename"), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
-		        mVideoWriter.open(mVideoOptions.getString("filename"), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
 		    }
 
 		    mVideoWriter.write(in);
@@ -754,36 +753,6 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 		    }
 		}
         
-        // hardcoded for right now to make sure it iw working ...
-        // This is for CvInvoke outer tags ...
-        //Log.d(TAG, "functions: " + this.mFunctions.getString(0) + " paramsArr: " + this.mParamsArr.getMap(0).toString() + " callbacks: " + this.mCallbacks.getString(0));
-        //Log.d(TAG, "functions: " + this.mFunctions.getString(1) + " paramsArr: " + this.mParamsArr.getMap(1).toString() + " callbacks: " + this.mCallbacks.getString(1));
-
-        //String dMap = this.mParamsArr.getMap(1).toString();
-
-        //ReadableMap secondObject = dMap.getMap("p2");
-        //Log.d(TAG, "Mat index is: " + dMap);
-
-        //Log.d(TAG, "functions: " + this.functions.getString(2) + " paramsArr: " + this.paramsArr.getString(2) + " callbacks: " + this.callbacks.getString(2));
-        //Log.d(TAG, "functions: " + this.functions.getString(3) + " paramsArr: " + this.paramsArr.getString(3) + " callbacks: " + this.callbacks.getString(3));
-
-
-        //Mat in1 = new Mat(src.rows(), src.cols(), CvType.CV_8UC4);
-        /**
-        int numRows = src.rows();
-        int numCols = src.cols();
-        //Core.transpose(in.t(), in);
-        Mat flipEm = src.t();
-        Mat in = new Mat();
-
-        Core.flip(flipEm, in, 1);
-        Size sz = new Size(numCols, numRows);
-        Imgproc.resize( in, in, sz );
-
-        MakeAToast("width is: " + in.cols() + " height is: " + in.rows());
-         */
-
-        //Core.flip(src.t(), src, 1);
         if (mSuckUpFrames) {
             // AKA bowel movement!
             Bitmap bm = Bitmap.createBitmap(in.cols(), in.rows(), Bitmap.Config.ARGB_8888);
