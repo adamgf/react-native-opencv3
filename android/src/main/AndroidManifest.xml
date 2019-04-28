@@ -1,6 +1,6 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.opencv.reactnative">
+          package="com.adamfreeman.rnocv3">
 <!-- required permissions put this in your app if you use CvCamera
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

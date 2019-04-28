@@ -1,5 +1,5 @@
 // @author Adam G. Freeman - adamgf@gmail.com
-package org.opencv.reactnative;
+package com.adamfreeman.rnocv3;
 
 import com.facebook.react.uimanager.ThemedReactContext;
 //import com.facebook.react.uimanager.ViewGroupManager;

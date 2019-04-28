@@ -1,5 +1,5 @@
 
-package org.opencv.reactnative;
+package com.adamfreeman.rnocv3;
 
 import java.util.Arrays;
 import java.util.Collections;

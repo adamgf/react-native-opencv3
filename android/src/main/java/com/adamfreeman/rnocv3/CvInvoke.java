@@ -1,5 +1,5 @@
 // @author Adam G. Freeman - adamgf@gmail.com, 01/26/2019
-package org.opencv.reactnative;
+package com.adamfreeman.rnocv3;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
