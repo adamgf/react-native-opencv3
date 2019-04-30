@@ -66,6 +66,7 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
         public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
             CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
             //if (cameraView.isCameraOpened()) {
+				
 		    mVideoOptions = options;
             cameraView.startRecording(mVideoOptions);
             //} else {
@@ -86,8 +87,8 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
             try {
               //if (cameraView.isCameraOpened()) {
 				  
-			  RecordVideoBlock recordVideoBlock = new RecordVideoBlock(mVideoOptions, promise);
-              cameraView.stopRecording(recordVideoBlock);
+              RecordVidBlock recordVidBlock = new RecordVidBlock(mVideoOptions, promise);
+              cameraView.stopRecording(recordVidBlock);
               //} else {
               //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
               //}

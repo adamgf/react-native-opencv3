@@ -46,7 +46,10 @@ class CvCamera extends Component {
 	}
   }
   startRecording(filename) {
-	const outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
+	var outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
+	if (Platform.OS === 'android') {
+	  outputFilename = RNFS.ExternalStorageDirectoryPath + '/' + filename
+	}
 	const pictureOptions = { 'filename' : outputFilename }
 	
 	if (Platform.OS === 'android') {

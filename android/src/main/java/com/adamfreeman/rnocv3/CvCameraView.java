@@ -69,14 +69,14 @@ enum whichOne {
     MOUTH_CLASSIFIER
 }
 
-class RecordVideoBlock implements Runnable {
+class RecordVidBlock implements Runnable {
 
 	ReadableMap options;
 	int width;
 	int height;
 	Promise promise;
 	
-   	public RecordVideoBlock(ReadableMap options, Promise promise) {
+   	public RecordVidBlock(ReadableMap options, Promise promise) {
 		this.options = options;
 		this.promise = promise;
    	}
@@ -146,11 +146,12 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private float                  mRelativeFaceSize   = 0.2f;
     private int                    mAbsoluteFaceSize   = 0;
     private int                    mRotation           = -1;
+    private int                    mRecRotation        = -1;
     private long                   mCurrentMillis      = -1;
     private int                    mCurrOverlayIndex   = -1;
     private boolean				   mTakePicture	       = false;
 	private TakePicBlock	       takePicBlock;
-	private RecordVideoBlock	   recordVideoBlock;
+	private RecordVidBlock	       recordVidBlock;
 	
 	// video and audio recording stuff
 	private VideoWriter 	       mVideoWriter        = null;
@@ -738,18 +739,32 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
         if (mRecording) {
 		    if (mVideoWriter == null) {
-		        mVideoWriter = new VideoWriter(mVideoOptions.getString("filename"), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, in.size());
+                Size dSize = in.size();
+				mRecRotation = mRotation;
+				if (mRecRotation == Core.ROTATE_90_CLOCKWISE || mRecRotation == Core.ROTATE_90_COUNTERCLOCKWISE) {
+				    dSize = new Size(in.size().height, in.size().width);
+			    }
+				
+		        mVideoWriter = new VideoWriter(mVideoOptions.getString("filename"), VideoWriter.fourcc('M', 'J', 'P', 'G'), 30.0, dSize);
 		    }
-
-		    mVideoWriter.write(in);
+			Mat rotMat = new Mat();
+			Core.rotate(in, rotMat, mRecRotation);
+		    mVideoWriter.write(rotMat);
+			rotMat.release();
 		} 
 		else {
 			if (mVideoWriter != null) {
 		    	mVideoWriter.release();
 				mVideoWriter = null;
-				recordVideoBlock.setWidth((int)in.size().width);
-				recordVideoBlock.setHeight((int)in.size().height);
-				recordVideoBlock.run();
+				if (mRecRotation == Core.ROTATE_90_CLOCKWISE || mRecRotation == Core.ROTATE_90_COUNTERCLOCKWISE) {
+					recordVidBlock.setWidth((int)in.size().height);
+					recordVidBlock.setHeight((int)in.size().width);
+				}
+				else {
+					recordVidBlock.setWidth((int)in.size().width);
+					recordVidBlock.setHeight((int)in.size().height);					
+				}
+				recordVidBlock.run();
 		    }
 		}
         
@@ -777,8 +792,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 		mRecording = true;
 	}
 	
-	public void stopRecording(RecordVideoBlock recordVideoBlock) {
-		this.recordVideoBlock = recordVideoBlock;
+	public void stopRecording(RecordVidBlock recordVidBlock) {
+		this.recordVidBlock = recordVidBlock;
 		mRecording = false;
 	}
 	
