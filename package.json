@@ -1,6 +1,6 @@
 {
   "_from": "git+https://github.com/adamgf/react-native-opencv3.git",
-  "_id": "react-native-opencv3@1.0.4",
+  "_id": "react-native-opencv3@1.0.5",
   "_inBundle": false,
   "_integrity": "",
   "_location": "/react-native-opencv3",
@@ -27,7 +27,7 @@
   "bundleDependencies": false,
   "dependencies": {},
   "deprecated": false,
-  "description": "OpenCV 3.4.5 ported to React-Native for both iOS and Android",
+  "description": "OpenCV+contrib ported to React-Native for both iOS (v3.4.1) and Android (v3.4.4)",
   "keywords": [
     "react-native OpenCV"
   ],
@@ -35,7 +35,7 @@
   "main": "index.js",
   "name": "react-native-opencv3",
   "peerDependencies": {
-    "react-native": "^0.57.4",
+    "react-native": "0.59.5",
     "react-native-fs": "^2.13.3"
   },
   "rnpm": {
@@ -46,5 +46,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.4"
+  "version": "1.0.5"
 }
