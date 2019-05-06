@@ -33,7 +33,7 @@ RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resol
     NSNumber *srcMatNum = [src valueForKey:@"matIndex"];
     int matIndex = (int)[srcMatNum integerValue];
     
-    MatWrapper *inputMatWrapper = [MatManager.sharedMgr objectAtIndex:matIndex];
+    MatWrapper *inputMatWrapper = [((MatManager*)MatManager.sharedMgr).mats objectAtIndex:matIndex];
     //Mat inputMat = [MatManager.sharedMgr matAtIndex:matIndex];
     [FileUtils matToImage:inputMatWrapper outPath:outPath resolver:resolve rejecter:reject];
 }
