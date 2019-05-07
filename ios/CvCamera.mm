@@ -51,7 +51,7 @@ static CvVideoCamera *videoCamera;
 - (id)initWithBridge:(RCTBridge *)bridge
 {
     if ((self = [super init])) {
-        mOverlayInterval = 0;
+        mOverlayInterval = 300;
         mRelativeFaceSize = 0.2f;
         mAbsoluteFaceSize = 0;
         mCurrentMillis = 0;

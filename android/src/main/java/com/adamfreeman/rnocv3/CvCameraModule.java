@@ -37,22 +37,17 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
       final ReactApplicationContext context = getReactApplicationContext();
       UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
       uiManager.addUIBlock(new UIBlock() {
-        @Override
-        public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-            CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
-            try {
-              //if (cameraView.isCameraOpened()) {
-				  
-			  TakePicBlock takePicBlock = new TakePicBlock(options, promise);
-              cameraView.takePicture(takePicBlock);
-              //} else {
-              //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
-              //}
-          } 
-		  catch (Exception e) {
-              promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
+          @Override
+          public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+              CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
+              try {				  
+			      TakePicBlock takePicBlock = new TakePicBlock(options, promise);
+                  cameraView.takePicture(takePicBlock);
+              } 
+		      catch (Exception e) {
+                  promise.reject("E_CAMERA_BAD_VIEWTAG", "takePicture: Expected a Camera component");
+              }
           }
-        }
       });
     }
 	
@@ -62,17 +57,12 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
       UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
 	  	  
       uiManager.addUIBlock(new UIBlock() {
-        @Override
-        public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-            CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
-            //if (cameraView.isCameraOpened()) {
-				
-		    mVideoOptions = options;
-            cameraView.startRecording(mVideoOptions);
-            //} else {
-            //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
-            //}
-        }
+          @Override
+          public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+              CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);				
+		      mVideoOptions = options;
+              cameraView.startRecording(mVideoOptions);
+          }
       });
     }
 	
@@ -84,59 +74,14 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
         @Override
         public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
             CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
-            try {
-              //if (cameraView.isCameraOpened()) {
-				  
-              RecordVidBlock recordVidBlock = new RecordVidBlock(mVideoOptions, promise);
-              cameraView.stopRecording(recordVidBlock);
-              //} else {
-              //  promise.reject("E_CAMERA_UNAVAILABLE", "Camera is not running");
-              //}
-          } 
-		  catch (Exception e) {
-              promise.reject("E_CAMERA_BAD_VIEWTAG", "stopRecording: Expected a Camera component");
-          }
+            try {				  
+                RecordVidBlock recordVidBlock = new RecordVidBlock(mVideoOptions, promise);
+                cameraView.stopRecording(recordVidBlock);
+            } 
+		    catch (Exception e) {
+                promise.reject("E_CAMERA_BAD_VIEWTAG", "stopRecording: Expected a Camera component");
+            }
         }
       });
     }
-	
-    /**
-    @ReactMethod
-    public void capturePicture(final Promise promise) {
-        CameraManager cameraManager = CameraManager.getInstance();
-        takePicture(cameraManager.getCurrentCamera(), promise);
-    }
-
-    private void takePicture(Camera camera, final Promise promise) {
-        if (camera == null) {
-            promise.reject("CAMERA_NOT_FOUND");
-            return;
-        } */
-
-/**
-        camera.takePicture(null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                FileOutputStream fos = null;
-                try {
-                    File outputFile = ImageFileUtils.getImageOutputFile();
-                    Log.d(TAG, outputFile.getAbsolutePath());
-                    fos = new FileOutputStream(outputFile);
-                    fos.write(data);
-                    ImageFileUtils.addToGalleryAndNotify(getReactApplicationContext(), outputFile, promise);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    promise.reject(e);
-                } finally {
-                    try {
-                        fos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    camera.startPreview();
-                }
-            }
-        });
-    } */
 }

@@ -148,8 +148,6 @@ class CvInvoke {
                    retObjs.add(paramStr);
                }
            }
-           // TODO: check the types to make sure they are compatible
-           // more exhaustive type-checking and error reporting ...
            else if (itsType == ReadableType.Map) {
                ReadableMap dMap = RM.getMap(paramNum);
 		       if (param == Mat.class || param == List.class) {
