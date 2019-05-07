@@ -511,13 +511,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
                         Rect faceROI = facesArray[i];
                         Mat dFace = ingray.submat(faceROI);
-						double dFaceW = (double)dFace.cols();
-						double dFaceH = (double)dFace.rows();
 						
                         if (mEyesClassifier != null) {
                             MatOfRect eyes = new MatOfRect();
-                            //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2);
-                            mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(dFaceW, dFaceH), new Size());
+                            mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2);
+                            //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(dFaceW, dFaceH), new Size());
                             Rect[] eyesArray = eyes.toArray();
 
                             int eye1Index = -1;
@@ -556,8 +554,8 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 
                         if (mNoseClassifier != null) {
                             MatOfRect noses = new MatOfRect();
-                            //mNoseClassifier.detectMultiScale(dFace, noses, 1.1, 2);
-                            mNoseClassifier.detectMultiScale(dFace, noses, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(dFaceW, dFaceH), new Size());
+                            mNoseClassifier.detectMultiScale(dFace, noses, 1.1, 2);
+                            //mNoseClassifier.detectMultiScale(dFace, noses, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(dFaceW, dFaceH), new Size());
                             Rect[] nosesArray = noses.toArray();
                             if (nosesArray.length > 0) {
                                 double minDist = 10000.0;
@@ -580,12 +578,10 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                         if (mMouthClassifier != null) {
                             Rect mouthROI = new Rect(0,(int)Math.round(dFace.rows()*0.6),dFace.cols(),(int)Math.round(dFace.rows()*0.4));
                             Mat dFaceForMouthDetecting = dFace.submat(mouthROI);
-							dFaceW = dFaceForMouthDetecting.cols();
-							dFaceH = dFaceForMouthDetecting.rows();
 							
                             MatOfRect mouths = new MatOfRect();
-                            //mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2);
-                            mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(dFaceW, dFaceH), new Size());
+                            mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2);
+                            //mMouthClassifier.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size(dFaceW, dFaceH), new Size());
                             Rect[] mouthsArray = mouths.toArray();
                             if (mouthsArray.length > 0) {
                                 double minDist = 10000.0;
