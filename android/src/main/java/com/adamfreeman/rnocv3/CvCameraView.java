@@ -125,7 +125,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     // params
     private ReadableMap            mOverlay;
     private Mat                    mOverlayMat;
-    private int                    mOverlayInterval = 1000;
+    private int                    mOverlayInterval = 0;
     private ReadableMap            mCvInvokeGroup;
     private int                    mCameraFacing;
     private CascadeClassifier      mFaceClassifier;
