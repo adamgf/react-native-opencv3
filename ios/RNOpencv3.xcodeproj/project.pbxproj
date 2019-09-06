@@ -56,7 +56,7 @@
 		5043A76F21DDBA3E000BC241 /* lbpcascade_frontalface.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = lbpcascade_frontalface.xml; sourceTree = "<group>"; };
 		5043A77021DDBA3E000BC241 /* haarcascade_mcs_lefteye.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_mcs_lefteye.xml; sourceTree = "<group>"; };
 		5080B7F121915DC800170E85 /* RNOpencv3.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RNOpencv3.mm; sourceTree = "<group>"; };
-		5080B7F221915DC800170E85 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		5080B7F221915DC800170E85 /* External.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = External.h; sourceTree = "<group>"; };
 		5084125622162E00007835FA /* CvInvoke.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CvInvoke.mm; sourceTree = "<group>"; };
 		5084125822162EFE007835FA /* CvInvoke.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CvInvoke.h; sourceTree = "<group>"; };
 		50CC5D5121EEF945004B431E /* MatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatManager.h; sourceTree = "<group>"; };
@@ -141,7 +141,7 @@
 				50CC5D5221EEF945004B431E /* MatManager.mm */,
 				50FC747421997D4000A48FE3 /* FileUtils.h */,
 				50FC747221997CC000A48FE3 /* FileUtils.mm */,
-				5080B7F221915DC800170E85 /* PrefixHeader.pch */,
+				5080B7F221915DC800170E85 /* External.h */,
 				5080B7F121915DC800170E85 /* RNOpencv3.mm */,
 				B3E7B5881CC2AC0600A0062D /* RNOpencv3.h */,
 				50B7C94821C89E3F00A43F6B /* ocvdata */,
@@ -189,6 +189,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
@@ -303,10 +304,11 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/libopencv-contrib";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -324,10 +326,11 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/../../../ios/Pods/libopencv-contrib";
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PREFIX_HEADER = ./PrefixHeader.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",

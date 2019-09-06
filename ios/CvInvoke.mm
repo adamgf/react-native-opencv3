@@ -68,27 +68,31 @@
             }
             if (dstMat.rows > 0) {
                 // whatever the type is the Mat will suffice
-                ps.push_back(dstMat);
-                
+                ocvtypes matType(dstMat);
+                ps.push_back(matType);
             }
             else if ([param isEqualToString:@"const char*"]) {
                 const char *pushStr = [paramStr UTF8String];
-                ps.push_back(pushStr);
+                ocvtypes strType(pushStr);
+                ps.push_back(strType);
             }
         }
         else if ([itsType containsString:@"Number"]) {
             NSNumber *dNum = (NSNumber*)[hashMap valueForKey:paramNum];
             if ([param isEqualToString:@"double"]) {
                 double ddNum = [dNum doubleValue];
-                ps.push_back(ddNum);
+                ocvtypes doubleType(ddNum);
+                ps.push_back(doubleType);
             }
             else if ([param isEqualToString:@"int"]) {
                 int diNum = [dNum intValue];
-                ps.push_back(diNum);
+                ocvtypes intType(diNum);
+                ps.push_back(intType);
             }
             else if ([param isEqualToString:@"float"]) {
                 float dfNum = [dNum floatValue];
-                ps.push_back(dfNum);
+                ocvtypes floatType(dfNum);
+                ps.push_back(floatType);
             }
         }
         else if ([itsType containsString:@"Dictionary"]) {
@@ -98,7 +102,10 @@
 
                 int matIndex = [(NSNumber*)[dMap valueForKey:@"matIndex"] intValue];
                 Mat dMat = [MatManager.sharedMgr matAtIndex:matIndex];
-                ps.push_back(dMat);
+                //void *matmem = malloc(sizeof(Mat));
+                //memcpy(matmem, dMat.ptr(), sizeof(Mat));
+                ocvtypes matType(dMat);
+                ps.push_back(matType);
                 
                 if ([param isEqualToString:@"OutMat"]) {
                     self.arrMatIndex = i - 1;
@@ -112,19 +119,22 @@
                 double v2 = [(NSNumber*)vals[2] doubleValue];
                 double v3 = [(NSNumber*)vals[3] doubleValue];
                 Scalar dScalar(v0, v1, v2, v3);
-                ps.push_back(dScalar);
+                ocvtypes scalarType(dScalar);
+                ps.push_back(scalarType);
             }
             else if ([param isEqualToString:@"Point"]) {
                 double xval = [(NSNumber*)[dMap valueForKey:@"x"] doubleValue];
                 double yval = [(NSNumber*)[dMap valueForKey:@"y"] doubleValue];
                 CvPoint dPoint(xval, yval);
-                ps.push_back(dPoint);
+                ocvtypes pointType(dPoint);
+                ps.push_back(pointType);
             }
             else if ([param isEqualToString:@"Size"]) {
                 int wid = [(NSNumber*)[dMap valueForKey:@"width"] intValue];
                 int hei = [(NSNumber*)[dMap valueForKey:@"height"] intValue];
                 CvSize dSize(wid, hei);
-                ps.push_back(dSize);
+                ocvtypes sizeType(dSize);
+                ps.push_back(sizeType);
             }
         }
         i++;

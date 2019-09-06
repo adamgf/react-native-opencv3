@@ -9,6 +9,7 @@
 #ifndef MatManager_h
 #define MatManager_h
 
+#import "External.h"
 #import <AVFoundation/AVFoundation.h>
 
 @interface MatWrapper : NSObject

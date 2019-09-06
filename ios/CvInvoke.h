@@ -5,6 +5,7 @@
 //  Created by Adam G Freeman on 2/14/19.
 //  Copyright © 2019 Adam G. Freeman. All rights reserved.
 //
+#import "External.h"
 #import <objc/runtime.h>
 #import <Foundation/Foundation.h>
 

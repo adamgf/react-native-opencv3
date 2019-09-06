@@ -69,6 +69,7 @@ typedef enum fns {
     SETTO
 } ipfns;
 
+// these were functions used in conjunction with std::variant
 template <typename K>
 inline K castit(ocvtypes* ocvtype) {
     return *reinterpret_cast<K*>(ocvtype);
@@ -125,58 +126,59 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
 
     switch (index) {
         case CVTCOLOR: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castint(&args[2]);
+            // auto p1 = castmat(&args[0]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
             cvtColor(p1, p2, p3);
             return p2;
         }
         case CVTCOLOR2: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castint(&args[2]);
-            auto p4 = castint(&args[3]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
             cvtColor(p1, p2, p3, p4);
             return p2;
         }
         case BITWISE_NOT: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
             bitwise_not(p1, p2);
             return p2;
         }
         case ROTATE: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castint(&args[2]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
             rotate(p1, p2, p3);
             return p2;
         }
         case LINE: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castpoint(&args[1]);
-            auto p3 = castpoint(&args[2]);
-            auto p4 = castscalar(&args[3]);
-            auto p5 = castint(&args[4]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
             line(p1, p2, p3, p4, p5);
             return p1;
         }
         case NORMALIZE: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castdub(&args[2]);
-            auto p4 = castdub(&args[3]);
-            auto p5 = castint(&args[4]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
+            auto p5 = args[4].i;
             normalize(p1, p2, p3, p4, p5);
             return p2;
         }
         case CALCHIST: {
-            Mat p1 = castmat(&args[0]);
-            Mat p2 = castmat(&args[1]);
-            Mat p3 = castmat(&args[2]);
-            Mat p4 = castmat(&args[3]);
-            Mat p5 = castmat(&args[4]);
-            Mat p6 = castmat(&args[5]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].m;
+            auto p6 = args[5].m;
             
             int channel = p2.at<int>(0,0);
             if (channel == 0) {
@@ -198,67 +200,67 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             return p4;
         }
         case SUBMAT: {
-            auto p1 = castdub(&args[0]);
-            auto p2 = castdub(&args[1]);
-            auto p3 = castdub(&args[2]);
-            auto p4 = castdub(&args[3]);
+            auto p1 = args[0].d;
+            auto p2 = args[1].d;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
             cv::Rect rct(p3,p1,p4-p3,p2-p1);
             return dMat(rct);
         }
         case CANNY: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castdub(&args[2]);
-            auto p4 = castdub(&args[3]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
             Canny(p1, p2, p3, p4);
             return p2;
         }
         case SOBEL: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castint(&args[2]);
-            auto p4 = castdub(&args[3]);
-            auto p5 = castdub(&args[4]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
             Sobel(p1, p2, p3, p4, p5);
             return p2;
         }
         case CONVERTSCALEABS: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castdub(&args[2]);
-            auto p4 = castdub(&args[3]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
             convertScaleAbs(p1, p2, p3, p4);
             return p2;
         }
         case TRANSFORM: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castmat(&args[2]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
             transform(p1, p2, p3);
             return p2;
         }
         case RESIZE: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castmat(&args[1]);
-            auto p3 = castsize(&args[2]);
-            auto p4 = castdub(&args[3]);
-            auto p5 = castdub(&args[4]);
-            auto p6 = castint(&args[5]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].i;
             resize(p1, p2, p3, p4, p5, p6);
             return p2;
         }
         case RECTANGLE: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castpoint(&args[1]);
-            auto p3 = castpoint(&args[2]);
-            auto p4 = castscalar(&args[3]);
-            auto p5 = castint(&args[4]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
             rectangle(p1, p2, p3, p4, p5);
             return p1;
         }
         case SETTO: {
-            auto p1 = castmat(&args[0]);
-            auto p2 = castscalar(&args[1]);
+            auto p1 = args[0].m;
+            auto p2 = args[1].sc;
             p1 = p2;
             return p1;
         }

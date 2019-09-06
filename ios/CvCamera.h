@@ -9,6 +9,7 @@
 #ifndef CvCamera_h
 #define CvCamera_h
 
+#import "External.h"
 #import <AVFoundation/AVFoundation.h>
 #import <React/RCTBridge.h>
 #import <React/RCTBridgeModule.h>
