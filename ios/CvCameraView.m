@@ -32,7 +32,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPayload, RCTBubblingEventBlock)
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(cvinvoke, NSDictionary*, CvCamera) {
-    [view setCvInvokeGroup:json];
+    view.mCvInvokeGroup = json;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(facing, NSString*, CvCamera) {
@@ -60,11 +60,11 @@ RCT_CUSTOM_VIEW_PROPERTY(landmarksModel, NSString*, CvCamera) {
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(overlay, NSDictionary*, CvCamera) {
-    [view setOverlay:json];
+    view.mOverlay = json;
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(overlayInterval, NSNumber*, CvCamera) {
-    [view setOverlayInterval:json];
+    view.mOverlayInterval = json;
 }
 
 RCT_REMAP_METHOD(setOverlay,
@@ -78,7 +78,7 @@ RCT_REMAP_METHOD(setOverlay,
         }
         else {
             NSDictionary *overlayMat = [options valueForKey:@"overlayMat"];
-            [view setOverlay:overlayMat];
+            view.mOverlay = overlayMat;
         }
     }];
 }

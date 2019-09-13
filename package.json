@@ -38,11 +38,6 @@
     "react-native": "0.59.5",
     "react-native-fs": "^2.13.3"
   },
-  "rnpm": {
-    "Assets": [
-      "./assets/classifiers/"
-    ]
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

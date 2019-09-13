@@ -11,7 +11,6 @@ Pod::Spec.new do |s|
   s.author             = { "Adam G. Freeman" => "adamgf@gmail.com" }
   s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/adamgf/react-native-opencv3.git", :tag => "master" }
-  s.requires_arc = false 
 
   s.subspec "CvCamera" do |ss|
     ss.source_files = "*.{h,m,mm}"
@@ -20,7 +19,6 @@ Pod::Spec.new do |s|
 
   s.dependency "libopencv-contrib", "~> 3.4.1"
   s.dependency "React"
-  s.dependency 'boost-for-react-native'
   
   # s.dependency "others"
 

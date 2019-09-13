@@ -51,13 +51,19 @@ typedef void (^RecordVidBlock)(NSNumber*,NSNumber*,NSString*);
 
 @property (nonatomic, copy) RCTBubblingEventBlock onPayload;
 
+@property (nonatomic, copy) NSDictionary *mCvInvokeGroup;
+
+@property (nonatomic, copy) NSDictionary *mOverlay;
+
+@property (nonatomic, copy) NSNumber *mOverlayInterval;
+
+@property (nonatomic, copy) NSString *mFilename;
+
+@property (nonatomic, copy) NSString *mFacing;
+
+@property (nonatomic, strong) NSDate *startDate;
+
 - (id)initWithBridge:(RCTBridge*)bridge;
-
-- (void)setOverlay:(NSDictionary*)overlay;
-
-- (void)setOverlayInterval:(NSNumber*)overlayInterval;
-
-- (void)setCvInvokeGroup:(NSDictionary*)cvinvoke;
 
 - (void)changeFacing:(NSString*)facing;
 

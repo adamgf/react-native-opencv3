@@ -259,10 +259,6 @@
 
 -(int)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out {
    
-    if ([func isEqualToString:@"normalize"] && params.allKeys.count == 5) {
-        int ZZYZX = 0;
-        ZZYZX++;
-    }
    int result = -1;
    int numParams = 0;
    if (params != nil && params != (NSDictionary*)NSNull.null) {
@@ -327,7 +323,7 @@
                    matToUse = self.gray;
                }
                else if ([in isEqualToString:@"grayt"]) {
-                   matToUse = self.rgba.t();
+                   matToUse = self.gray.t();
                }
                else if ([self.matParams.allKeys containsObject:in]) {
                    MatWrapper *MW = (MatWrapper*)[self.matParams valueForKey:in];
@@ -357,9 +353,6 @@
                    std::string dFunc = std::string([func UTF8String]);
                    
                    dstMat = callOpencvMethod(methodIndex, ps);
-                   
-                   int kkwwf = 2007;
-                   kkwwf++;
                }
            }
        }

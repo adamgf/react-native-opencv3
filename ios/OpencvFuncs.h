@@ -23,7 +23,7 @@ class ocvtypes
 public:
     enum {MAT, DOUBLE, FLOAT, INT, STR, SCALAR, POINT, SIZE} tag;
 
-    ocvtypes(Mat val) {
+    ocvtypes(const Mat& val) {
         this->tag = MAT;
         this->m = val;
     }
@@ -43,19 +43,24 @@ public:
         this->tag = STR;
         this->str = val;
     }
-    ocvtypes(Scalar val) {
+    ocvtypes(const Scalar& val) {
         this->tag = SCALAR;
         this->sc = val;
     }
-    ocvtypes(cv::Point val) {
+    ocvtypes(const cv::Point& val) {
         this->tag = POINT;
         this->pt = val;
     }
-    ocvtypes(cv::Size val) {
+    ocvtypes(const cv::Size& val) {
         this->tag = SIZE;
         this->sz = val;
     }
-    ~ocvtypes() { }
+    ~ocvtypes() {
+        if (this->tag == MAT) {
+            (this->m).release();
+            (this->m).~Mat();
+        }
+    }
 
     // TODO: put these in a union?
     Mat m;

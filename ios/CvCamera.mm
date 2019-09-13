@@ -15,23 +15,16 @@ static CvVideoCamera *videoCamera;
 
 @implementation CvCamera {
     // private properties
-    NSDictionary           *mOverlay;
-    int                    mOverlayInterval;
-    NSDictionary           *mCvInvokeGroup;
-    
     bool mUseFaceDetection;
     bool mUseEyesDetection;
     bool mUseNoseDetection;
     bool mUseMouthDetection;
     bool mUseLandmarks;
-    NSString *mFacing;
     CGFloat mRelativeFaceSize;
     int mAbsoluteFaceSize;
     double mCurrentMillis;
     bool mTakePicture;
-    NSDate *startDate;
     bool framesInitialized;
-    bool overlayInitialized;
     
     CascadeClassifier face_cascade;
     CascadeClassifier eyes_cascade;
@@ -43,7 +36,6 @@ static CvVideoCamera *videoCamera;
     cv::VideoWriter mVideoWriter;
     bool mRecording;
     bool mRecordingFinished;
-    NSString *mFilename;
     int mWidth;
     int mHeight;
 }
@@ -51,7 +43,8 @@ static CvVideoCamera *videoCamera;
 - (id)initWithBridge:(RCTBridge *)bridge
 {
     if ((self = [super init])) {
-        mOverlayInterval = 0;
+        self.startDate = [NSDate date];
+        self.mOverlayInterval = 0;
         mRelativeFaceSize = 0.2f;
         mAbsoluteFaceSize = 0;
         mCurrentMillis = 0;
@@ -403,23 +396,21 @@ static CvVideoCamera *videoCamera;
         }
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (mCvInvokeGroup != nil) {
-            if (startDate == nil) {
-                startDate = [NSDate date];
-            }
-            double currMillis = [startDate timeIntervalSinceNow];
+    
+        if (self.mCvInvokeGroup != nil) {
+            double currMillis = [self.startDate timeIntervalSinceNow];
             double diff = (currMillis - mCurrentMillis) * 1000.0;
             diff = (diff < 0.0) ? -diff : diff;
-            if (diff >= (double)mOverlayInterval) {
+            if (diff >= (double)[self.mOverlayInterval doubleValue]) {
                 
                 mCurrentMillis = currMillis;
-                startDate = [NSDate date];
+                self.startDate = [NSDate date];
                 
                 CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image_copy gray:gray];
-                NSArray *responseArr = [invoker parseInvokeMap:mCvInvokeGroup];
+                NSArray *responseArr = [invoker parseInvokeMap:self.mCvInvokeGroup];
                 NSString *lastCall = invoker.callback;
                 int dstMatIndex = invoker.dstMatIndex;
+                
                 if (lastCall != nil && lastCall != (NSString*)NSNull.null && ![lastCall isEqualToString:@""] && dstMatIndex >= 0 && dstMatIndex < 1000) {
                     if (responseArr && responseArr.count > 0 && self && self.onPayload) {
                         self.onPayload(@{ @"payload" : responseArr });
@@ -434,8 +425,11 @@ static CvVideoCamera *videoCamera;
             }
         }
         
-        if (overlayInitialized) {
-            int matIndex = [[mOverlay valueForKey:@"matIndex"] intValue];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        if (self.mOverlay != nil) {
+            int matIndex = [[self.mOverlay valueForKey:@"matIndex"] intValue];
             Mat overlayMat = [MatManager.sharedMgr matAtIndex:matIndex];
             addWeighted(image_copy, 1.0, overlayMat, 1.0, 0.0, image_copy);
         }
@@ -455,33 +449,21 @@ static CvVideoCamera *videoCamera;
         }
         else if (mRecordingFinished) {
             mRecordingFinished = false;
-            self.recordVidBlock([NSNumber numberWithInt:mWidth], [NSNumber numberWithInt:mHeight], mFilename);
+            self.recordVidBlock([NSNumber numberWithInt:mWidth], [NSNumber numberWithInt:mHeight], self.mFilename);
         }
         UIImage *videoImage = MatToUIImage(image_copy);
+        
         [self setImage:videoImage];
     });
 }
 
 #pragma Properties
 
--(void)setOverlay:(NSDictionary*)overlay {
-    overlayInitialized = true;
-    mOverlay = overlay;
-}
-
--(void)setOverlayInterval:(NSNumber*)overlayInterval {
-    mOverlayInterval = [overlayInterval intValue];
-}
-
--(void)setCvInvokeGroup:(NSDictionary*)cvinvoke {
-    mCvInvokeGroup = cvinvoke;
-}
-
 - (void)changeFacing:(NSString*)facing {
-    if (![facing isEqualToString:mFacing]) {
-        mFacing = facing;
+    if (![facing isEqualToString:self.mFacing]) {
+        self.mFacing = facing;
         [videoCamera stop];
-        if ([mFacing isEqualToString:@"back"]) {
+        if ([self.mFacing isEqualToString:@"back"]) {
             [videoCamera setDefaultAVCaptureDevicePosition:AVCaptureDevicePositionBack];
         }
         else {
@@ -542,7 +524,8 @@ static CvVideoCamera *videoCamera;
     cv::Size size(mWidth, mHeight);
     int fourcc = CV_FOURCC('m', 'p', '4', 'v');
 
-    mFilename = filename;
+    self.mFilename = filename;
+
     cv::VideoWriter VW;
     VW.open([filename UTF8String], fourcc, 30, size, true);
     
@@ -555,11 +538,15 @@ static CvVideoCamera *videoCamera;
 }
 
 - (void)stopRecording:(RecordVidBlock)recordVidBlock {
-    mRecording = false;
-    mRecordingFinished = true;
-    mVideoWriter.release();
-    mVideoWriter.~VideoWriter();
-    self.recordVidBlock = recordVidBlock;
+    if (mRecording) {
+        mRecording = false;
+        mRecordingFinished = true;
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            mVideoWriter.release();
+            mVideoWriter.~VideoWriter();
+        });
+        self.recordVidBlock = recordVidBlock;
+    }
 }
 
 @end
