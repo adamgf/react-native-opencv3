@@ -410,9 +410,11 @@ std::tuple<std::tuple<MatType,MatType,IntType>,std::tuple<MatType,MatType>,std::
 };
  */
 
+// this function blows!!
 Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
 
     switch (index) {
+        // Horrific monolithic Imgproc madness!!  Cthulhu is awakened!
         case CVTCOLOR: {
             // auto p1 = castmat(&args[0]);
             auto p1 = args[0].m;
