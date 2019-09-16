@@ -18,13 +18,15 @@ void callOpenCvMethod(ArgTypes... p);
 enum NumberType {
     INTTYPE,
     FLOATTYPE,
-    DOUBLETYPE
+    DOUBLETYPE,
+    BOOLTYPE
 };
 
 @interface NumberWrapper : NSObject
 @property (nonatomic, assign) int intval;
 @property (nonatomic, assign) float floatval;
 @property (nonatomic, assign) double doubleval;
+@property (nonatomic, assign) bool boolval;
 @property (nonatomic, assign) NumberType numbertype;
 @end
 

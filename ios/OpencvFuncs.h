@@ -21,7 +21,7 @@ extern std::vector<std::string> types;
 class ocvtypes
 {
 public:
-    enum {MAT, DOUBLE, FLOAT, INT, STR, SCALAR, POINT, SIZE} tag;
+    enum {MAT, DOUBLE, FLOAT, INT, BOOLEAN, STR, SCALAR, POINT, SIZE} tag;
 
     ocvtypes(const Mat& val) {
         this->tag = MAT;
@@ -38,6 +38,10 @@ public:
     ocvtypes(int val) {
         this->tag = INT;
         this->i = val;
+    }
+    ocvtypes(bool val) {
+        this->tag = BOOLEAN;
+        this->b = val;
     }
     ocvtypes(const char* val) {
         this->tag = STR;
@@ -67,6 +71,7 @@ public:
     double d;
     float f;
     int i;
+    bool b;
     const char *str;
     Scalar sc;
     cv::Point pt;

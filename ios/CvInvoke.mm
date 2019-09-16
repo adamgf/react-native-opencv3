@@ -95,6 +95,12 @@
                 ps.push_back(floatType);
             }
         }
+        else if ([itsType containsString:@"Boolean"]) {
+            NSNumber *dBool = (NSNumber*)[hashMap valueForKey:paramNum];
+            bool boolVal = [dBool boolValue];
+            ocvtypes boolType(boolVal);
+            ps.push_back(boolType);
+        }
         else if ([itsType containsString:@"Dictionary"]) {
             NSDictionary *dMap = (NSDictionary*)[hashMap valueForKey:paramNum];
             
