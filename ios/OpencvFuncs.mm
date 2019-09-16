@@ -410,6 +410,7 @@ std::tuple<std::tuple<MatType,MatType,IntType>,std::tuple<MatType,MatType>,std::
 };
  */
 
+// if you figure out a way around this using variable arguments or something go for it!
 // this function blows!!
 Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
 
