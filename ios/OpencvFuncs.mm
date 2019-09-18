@@ -124,7 +124,9 @@ std::vector<std::string> Functions = {
     "warpPerspective",
     "warpPerspective",
     "warpPerspective",
-    "warpPerspective"
+    "warpPerspective",
+    "circle",
+    "addWeighted"
 };
 
 std::vector<std::string> types = {
@@ -135,7 +137,7 @@ std::vector<std::string> types = {
     "OutMat,Point,Point,Scalar,int",
     "Mat,OutMat,double,double,int",
     "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
-    "double,double,double,double",
+    "double,double,double,double", // OutMat is implicitly incoming Mat ...
     "Mat,OutMat,double,double",
     "Mat,OutMat,double,double,int",
     "Mat,OutMat,double,double,int,bool",
@@ -239,7 +241,9 @@ std::vector<std::string> types = {
     "Mat,OutMat,Mat,Size",
     "Mat,OutMat,Mat,Size,int",
     "Mat,OutMat,Mat,Size,int,int",
-    "Mat,OutMat,Mat,Size,int,int,Scalar"
+    "Mat,OutMat,Mat,Size,int,int,Scalar",
+    "OutMat,Point,int,Scalar,int,int,int",
+    "Mat,double,Mat,double,double,OutMat"
 };
 
 typedef enum fns {
@@ -354,7 +358,9 @@ typedef enum fns {
     WARPPERSPECTIVE,
     WARPPERSPECTIVE2,
     WARPPERSPECTIVE3,
-    WARPPERSPECTIVE4
+    WARPPERSPECTIVE4,
+    CIRCLE,
+    ADDWEIGHTED
 } ipfns;
 
 // these were functions used in conjunction with std::variant
@@ -1486,7 +1492,27 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             warpPerspective(p1, p2, p3, p4, p5, p6, p7);
             return p2;
         }
-
+        case CIRCLE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].i;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            circle(p1, p2, p3, p4, p5, p6, p7);
+            return p1;
+        }
+        case ADDWEIGHTED: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].d;
+            auto p3 = args[2].m;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].m;
+            addWeighted(p1, p2, p3, p4, p5, p6);
+            return p6;
+        }
     }
     return Mat();
 }

@@ -105,8 +105,14 @@
 }
 
 -(Mat)matAtIndex:(int)matIndex {
-    MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
-    return MW.myMat;
+    if (matIndex >= 0 && matIndex < self.mats.count) {
+        MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
+        return MW.myMat;
+    }
+    else {
+        NSLog(@"Requested mat index %d out of range!", matIndex);
+        return Mat();
+    }
 }
 
 -(void)setMat:(int)matIndex matToSet:(Mat)matToSet {
@@ -119,13 +125,28 @@
 -(NSArray*)getMatData:(int)matIndex rownum:(int)rownum colnum:(int)colnum {
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
-    // TODO: check mat type to return different types of data
-    NSMutableArray *retArr = [[NSMutableArray alloc] initWithCapacity:(mat.rows*mat.cols)];
+
+    int matType = mat.type();
+    uchar depth = matType & CV_MAT_DEPTH_MASK;
+    uchar chans = 1 + (matType >> CV_CN_SHIFT);
+    
+    NSMutableArray *retArr = [[NSMutableArray alloc] initWithCapacity:(mat.rows*mat.cols*chans)];
+    
     for (int j=0;j < mat.rows;j++) {
-        for (int i=0;i < mat.cols;i++) {
-            float dFloat = mat.at<float>(i,j);
-            NSNumber *num = [NSNumber numberWithFloat:dFloat];
-            [retArr addObject:num];
+        for (int i=0;i < mat.cols*chans;i+=chans) {
+            for (int ch=0;ch < chans;ch++) {
+                
+                switch ( depth ) {
+                    default:
+                    case CV_8U: { uchar dUChar = mat.at<uchar>(j, i + ch);NSNumber *ucnum = [NSNumber numberWithUnsignedChar:dUChar];[retArr addObject:ucnum]; break; }
+                    case CV_8S: { schar dSChar = mat.at<schar>(j, i + ch);NSNumber *scnum = [NSNumber numberWithChar:dSChar];[retArr addObject:scnum]; break; }
+                    case CV_16U: { ushort dUShort = mat.at<ushort>(j, i + ch);NSNumber *usnum = [NSNumber numberWithUnsignedShort:dUShort];[retArr addObject:usnum]; break; }
+                    case CV_16S: { short dShort = mat.at<short>(j, i + ch);NSNumber *snum = [NSNumber numberWithShort:dShort];[retArr addObject:snum]; break; }
+                    case CV_32S: { int dInt = mat.at<int>(j, i + ch);NSNumber *inum = [NSNumber numberWithInt:dInt];[retArr addObject:inum]; break; }
+                    case CV_32F: { float dFloat = mat.at<float>(j, i + ch);NSNumber *fnum = [NSNumber numberWithFloat:dFloat];[retArr addObject:fnum]; break; }
+                    case CV_64F: { double dDouble = mat.at<double>(j, i + ch);NSNumber *dnum = [NSNumber numberWithDouble:dDouble];[retArr addObject:dnum]; break; }
+                }
+            }
         }
     }
     return retArr;

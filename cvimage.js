@@ -25,7 +25,9 @@ export class CvImage extends Component {
   componentDidMount = () => {
     const assetSource = this.props.source
     const uri = this.resolveAssetSource(assetSource).uri
-    this.downloadAssetSource(uri)
+	const downloadAssetSource = require('./downloadAssetSource');
+	
+    downloadAssetSource(uri)
     .then((sourceFile) => {
       let srcMat
       let dstMat
@@ -37,38 +39,65 @@ export class CvImage extends Component {
 
             // replace srcMat and dstMat strings with actual srcMat and dstMat
             const { cvinvoke } = this.props
-            for (let i=0;i < cvinvoke.paramsArr.length;i++) {
-              let params = cvinvoke.paramsArr[i]
-              for (let j=0;j < Object.keys(params).length;j++) {
-                const pnum = 'p' + (j + 1).toString()
-                if (params[pnum] && params[pnum] === 'srcMat') {
-                  params[pnum] = srcMat
-                }
-                if (params[pnum] && params[pnum] === 'dstMat') {
-                  params[pnum] = dstMat
+			if (cvinvoke) {
+              for (let i=0;i < cvinvoke.paramsArr.length;i++) {
+                let params = cvinvoke.paramsArr[i]
+                for (let j=0;j < Object.keys(params).length;j++) {
+                  const pnum = 'p' + (j + 1).toString()
+                  if (params[pnum] && params[pnum] === 'srcMat') {
+                    params[pnum] = srcMat
+                  }
+                  if (params[pnum] && params[pnum] === 'dstMat') {
+                    params[pnum] = dstMat
+                  }
                 }
               }
-            }
-
-            //alert('cvinvoke is: ' + JSON.stringify(this.props.cvinvoke))
-            RNOpencv3.invokeMethods(cvinvoke)
+              //alert('cvinvoke is: ' + JSON.stringify(this.props.cvinvoke))
+              RNOpencv3.invokeMethods(cvinvoke)
+		    }
+						
+			if (dstMat.rows == 0 && dstMat.cols == 0) {	
+				if (this.props.overlay) {
+				  RNOpencv3.invokeMethod("addWeighted", {"p1":srcMat,"p2":1.0,"p3":this.props.overlay,"p4":1.0,"p5":0.0,"p6":srcMat})
+			    }
+				RNOpencv3.matToImage(srcMat, sourceFile)
+				.then((image) => {
+					const { width, height, uri } = image
+					if (uri && uri.length > 0) {
+						this.setState({ destFile : uri })
+					}
+					else {
+						console.error('Error getting image information.')
+					}
+				})
+				.catch((err) => {
+					console.error(err)
+				})
+			}
+			
             //RNOpencv3.invokeMethod("cvtColor", {"p1":srcMat,"p2":dstMat,"p3":ColorConv.COLOR_BGR2GRAY});
             //RNOpencv3.cvtColor(srcMat, dstMat, ColorConv.COLOR_BGR2GRAY)
-            RNOpencv3.matToImage(dstMat, sourceFile)
-            .then((image) => {
-              RNOpencv3.deleteMat(srcMat)
-              RNOpencv3.deleteMat(dstMat)
-              const { width, height, uri } = image
-              if (uri && uri.length > 0) {
-                this.setState({ destFile : uri })
-              }
-              else {
-                console.error('Error getting image information.')
-              }
-            })
-            .catch((err) => {
-              console.error(err)
-            })
+			else {
+			  if (this.props.overlay) {
+			    RNOpencv3.invokeMethod("addWeighted", {"p1":dstMat,"p2":1.0,"p3":this.props.overlay,"p4":1.0,"p5":0.0,"p6":dstMat})
+			  }
+				
+              RNOpencv3.matToImage(dstMat, sourceFile)
+              .then((image) => {
+                RNOpencv3.deleteMat(srcMat)
+                RNOpencv3.deleteMat(dstMat)
+                const { width, height, uri } = image
+                if (uri && uri.length > 0) {
+                  this.setState({ destFile : uri })
+                }
+                else {
+                  console.error('Error getting image information.')
+                }
+              })
+              .catch((err) => {
+                console.error(err)
+              })
+			}
           })
           .catch((err) => {
             console.error(err)
@@ -78,65 +107,6 @@ export class CvImage extends Component {
     })
     .catch((err) => {
       console.error(err)
-    })
-  }
-
-  getFilename = (source_uri) => {
-	let filePortion = ''
-	if (source_uri.lastIndexOf('?') != -1) {
-      filePortion = source_uri.substring(source_uri.lastIndexOf('/'), source_uri.lastIndexOf('?'))
-	}
-	else {
-      filePortion = source_uri.substring(source_uri.lastIndexOf('/'))
-	}
-    if (RNFS) {
-      return RNFS.DocumentDirectoryPath + filePortion
-    }
-    else {
-      console.error('RNFS is null filePortion is: ' + filePortion)
-      return ''
-    }
-  }
-
-  downloadAssetSource = (uri) => {
-    return new Promise((resolve, reject) => {
-      const filename = this.getFilename(uri)
-
-      RNFS.exists(filename)
-      .then((itExists) => {
-        if (itExists) {
-          RNFS.unlink(filename)
-          .then(() => {})
-          .catch((err) => {
-            console.error(err)
-            reject('Unable to unlink file at: ' + filename)
-          })
-        }
-
-        const ret = RNFS.downloadFile({
-          fromUrl: uri,
-          toFile: filename
-        })
-
-        ret.promise.then((res) => {
-          console.log('statusCode is: ' + res.statusCode)
-          if (res.statusCode === 200) {
-            resolve(filename)
-          }
-          else {
-            reject('File at ' + filename + ' not downloaded.  Status code: ' + ret.statusCode)
-          }
-        })
-        .catch((err) => {
-          console.error(err)
-          reject('File at ' + filename + ' not downloaded')
-        })
-
-      })
-      .catch((err) => {
-        console.error(err)
-        reject('File at ' + filename + ' not downloaded')
-      })
     })
   }
 

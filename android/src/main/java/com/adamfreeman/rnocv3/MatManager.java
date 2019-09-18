@@ -117,7 +117,7 @@ class MatManager {
     // TODO: get this to work for different data types checking CvType
     public static WritableArray getMatData(int matIndex, int rownum, int colnum) {
         Mat mat = (Mat)matAtIndex(matIndex);
-        float[] retFloats = new float[mat.rows() * mat.cols()];
+        float[] retFloats = new float[mat.rows() * mat.cols() * mat.channels()];
         mat.get(rownum, colnum, retFloats);
         WritableArray retArr = new WritableNativeArray();
         for (float retFloat : retFloats) {
