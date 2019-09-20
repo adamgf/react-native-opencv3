@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import android.util.Log;
 
 class FileUtils {
 
@@ -74,8 +75,8 @@ class FileUtils {
             Bitmap bitmap = BitmapFactory.decodeFile(inPath);
             if (bitmap == null) {
                 throw new IOException("Decoding error unable to decode: " + inPath);
-            }
-            Mat img = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC4);
+            }			
+            Mat img = new Mat(bitmap.getHeight(), bitmap.getWidth(), CvType.CV_8UC4);
             Utils.bitmapToMat(bitmap, img);
             int matIndex = MatManager.getInstance().addMat(img);
 

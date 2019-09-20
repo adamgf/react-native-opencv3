@@ -57,11 +57,12 @@ export class CvImage extends Component {
 		    }
 						
 			if (dstMat.rows == 0 && dstMat.cols == 0) {	
-				if (this.props.overlay) {
-				  RNOpencv3.invokeMethod("addWeighted", {"p1":srcMat,"p2":1.0,"p3":this.props.overlay,"p4":1.0,"p5":0.0,"p6":srcMat})
-			    }
+		      if (this.props.overlay) {
+				RNOpencv3.invokeMethod("addWeighted", {"p1":srcMat,"p2":1.0,"p3":this.props.overlay,"p4":1.0,"p5":0.0,"p6":srcMat})
+			    
 				RNOpencv3.matToImage(srcMat, sourceFile)
 				.then((image) => {
+					RNOpencv3.deleteMat(srcMat)
 					const { width, height, uri } = image
 					if (uri && uri.length > 0) {
 						this.setState({ destFile : uri })
@@ -73,15 +74,12 @@ export class CvImage extends Component {
 				.catch((err) => {
 					console.error(err)
 				})
+			  }
 			}
 			
             //RNOpencv3.invokeMethod("cvtColor", {"p1":srcMat,"p2":dstMat,"p3":ColorConv.COLOR_BGR2GRAY});
             //RNOpencv3.cvtColor(srcMat, dstMat, ColorConv.COLOR_BGR2GRAY)
-			else {
-			  if (this.props.overlay) {
-			    RNOpencv3.invokeMethod("addWeighted", {"p1":dstMat,"p2":1.0,"p3":this.props.overlay,"p4":1.0,"p5":0.0,"p6":dstMat})
-			  }
-				
+			else {	
               RNOpencv3.matToImage(dstMat, sourceFile)
               .then((image) => {
                 RNOpencv3.deleteMat(srcMat)
