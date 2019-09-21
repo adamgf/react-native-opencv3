@@ -20,6 +20,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfFloat;
 
+import android.util.Log;
+
 /*
  *  In javascript land a Mat is an opaque object represented by an integer index into an array ...
  *  That way large amounts of data do not need to be encoded decoded and passed back-and-forth
@@ -116,13 +118,17 @@ class MatManager {
     // This method should only be used for sending data to a callback in the RN app ...
     // TODO: get this to work for different data types checking CvType
     public static WritableArray getMatData(int matIndex, int rownum, int colnum) {
-        Mat mat = (Mat)matAtIndex(matIndex);
-        float[] retFloats = new float[mat.rows() * mat.cols() * mat.channels()];
-        mat.get(rownum, colnum, retFloats);
         WritableArray retArr = new WritableNativeArray();
-        for (float retFloat : retFloats) {
-          retArr.pushDouble(retFloat);
-        }
+		Log.i(TAG, "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBmatIndex is: " + matIndex);
+        Mat mat = (Mat)matAtIndex(matIndex);
+		
+		if (mat.rows() > 0 && mat.cols() > 0) {
+        	float[] retFloats = new float[mat.rows() * mat.cols() * mat.channels()];
+        	mat.get(rownum, colnum, retFloats);
+        	for (float retFloat : retFloats) {
+          		retArr.pushDouble(retFloat);
+        	}
+		}
         return retArr;
     }
 

@@ -25,7 +25,7 @@ class CvCamera extends Component {
 	if (Platform.OS === 'android') {
       UIManager.dispatchViewManagerCommand(
         findNodeHandle(this),
-        UIManager.CvCameraView.Commands.setOverlay,
+        UIManager.getViewManagerConfig('CvCameraView').Commands.setOverlay,
         [overlayMat],
       )
     }
