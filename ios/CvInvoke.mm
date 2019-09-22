@@ -221,7 +221,7 @@
             [invokeGroup setValue:funcs forKey:@"functions"];
             [invokeGroup setValue:parms forKey:@"paramsArr"];
             [invokeGroup setValue:otobs forKey:@"outs"];
-            [invokeGroup setValue:calls forKey:@"calls"];
+            [invokeGroup setValue:calls forKey:@"callbacks"];
             [invokeGroupList addObject:invokeGroup];
         }
     }
@@ -235,7 +235,7 @@
     NSArray *functions = (NSArray*)[cvInvokeMap valueForKey:@"functions"];
     NSArray *paramsArr = (NSArray*)[cvInvokeMap valueForKey:@"paramsArr"];
     NSArray *outs = (NSArray*)[cvInvokeMap valueForKey:@"outs"];
-    NSArray *callbacks = (NSArray*)[cvInvokeMap valueForKey:@"calls"];
+    NSArray *callbacks = (NSArray*)[cvInvokeMap valueForKey:@"callbacks"];
     
     // back to front
     for (int i=(int)(functions.count-1);i >= 0;i--) {
