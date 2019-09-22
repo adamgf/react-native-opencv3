@@ -81,8 +81,7 @@ RCT_EXPORT_METHOD(invokeMethods:(NSDictionary*)cvInvokeMap) {
 
 RCT_EXPORT_METHOD(invokeMethodWithCallback:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out callback:(NSString*)callback) {
     CvInvoke *invoker = [[CvInvoke alloc] init];
-    [invoker invokeCvMethod:in func:func params:params out:out];
-    int dstMatIndex = invoker.dstMatIndex;
+    int dstMatIndex = [invoker invokeCvMethod:in func:func params:params out:out];
     NSArray *retArr = [MatManager.sharedMgr getMatData:dstMatIndex rownum:0 colnum:0];
     [self sendCallbackData:retArr callback:callback dstMatIndex:dstMatIndex];
 }

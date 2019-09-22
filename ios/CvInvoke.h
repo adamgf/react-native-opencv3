@@ -38,7 +38,7 @@ enum NumberType {
 
 -(int)invokeCvMethods:(NSDictionary*)cvInvokeMap;
 
--(void)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out;
+-(int)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out;
 
 -(NSArray*)parseInvokeMap:(NSDictionary*)cvInvokeMap;
 

@@ -235,7 +235,7 @@
     NSArray *functions = (NSArray*)[cvInvokeMap valueForKey:@"functions"];
     NSArray *paramsArr = (NSArray*)[cvInvokeMap valueForKey:@"paramsArr"];
     NSArray *outs = (NSArray*)[cvInvokeMap valueForKey:@"outs"];
-    NSArray *callbacks = (NSArray*)[cvInvokeMap valueForKey:@"callbacks"];
+    NSArray *callbacks = (NSArray*)[cvInvokeMap valueForKey:@"calls"];
     
     // back to front
     for (int i=(int)(functions.count-1);i >= 0;i--) {
@@ -247,8 +247,7 @@
         if (i == 0) {
             self.callback = [callbacks objectAtIndex:0];
             // last method in invoke group might have callback ...
-            [self invokeCvMethod:inobj func:function params:params out:outobj];
-            ret = self.dstMatIndex;
+            ret = [self invokeCvMethod:inobj func:function params:params out:outobj];
         }
         else {
             [self invokeCvMethod:inobj func:function params:params out:outobj];
@@ -264,8 +263,9 @@
     return [paramTypesStr componentsSeparatedByString:@","];
 }
 
--(void)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out {
+-(int)invokeCvMethod:(NSString*)in func:(NSString*)func params:(NSDictionary*)params out:(NSString*)out {
    
+   int result = -1;
    int numParams = 0;
    if (params != nil && params != (NSDictionary*)NSNull.null) {
        numParams = [CvInvoke getNumKeys:params];
@@ -311,8 +311,7 @@
            [self getObjectArr:params params:methodParams objects:ps];
            
            if (numParams != methodParams.count) {
-               self.dstMatIndex = -1;
-               return;
+               return -1;
                //[NSException raise:@"Invalid parameter" format:@"One of the parameters is invalid and %@ cannot be invoked.", func];
            }
        }
@@ -366,11 +365,17 @@
        
        if (self.dstMatIndex >= 0) {
            [MatManager.sharedMgr setMat:self.dstMatIndex matToSet:dstMat];
+           result = self.dstMatIndex;
+           self.dstMatIndex = -1;
            self.arrMatIndex = -1;
        }
    }
    @catch (NSException* EXC) {
+       result = 1000;
        NSLog(@"%@ -- %@", EXC.name, EXC.debugDescription);
+   }
+   @finally {
+       return result;
    }
 }
 
@@ -383,18 +388,18 @@
             NSArray *invokeGroups = [CvInvoke populateInvokeGroups:cvInvokeMap];
             responseArr = [[NSMutableArray alloc] initWithCapacity:invokeGroups.count];
             for (int i=(int)(invokeGroups.count-1);i >= 0;i--) {
-                int matIdx = [self invokeCvMethods:(NSDictionary*)invokeGroups[i]];
-                if (self.callback != nil && self.callback != (NSString*)NSNull.null && matIdx >= 0 && matIdx < 1000) {
-                    NSArray *retArr = [MatManager.sharedMgr getMatData:matIdx rownum:0 colnum:0];
+                self.dstMatIndex = [self invokeCvMethods:(NSDictionary*)invokeGroups[i]];
+                if (self.callback != nil && self.callback != (NSString*)NSNull.null && self.dstMatIndex >= 0 && self.dstMatIndex < 1000) {
+                    NSArray *retArr = [MatManager.sharedMgr getMatData:self.dstMatIndex rownum:0 colnum:0];
                     [(NSMutableArray*)responseArr addObject:retArr];
                 }
             }
         }
     }
     else {
-        int matIdx = [self invokeCvMethods:cvInvokeMap];
-        if (self.callback != nil && self.callback != (NSString*)NSNull.null && matIdx >= 0 && matIdx < 1000) {
-            responseArr = [MatManager.sharedMgr getMatData:matIdx rownum:0 colnum:0];
+        self.dstMatIndex = [self invokeCvMethods:cvInvokeMap];
+        if (self.callback != nil && self.callback != (NSString*)NSNull.null && self.dstMatIndex >= 0 && self.dstMatIndex < 1000) {
+            responseArr = [MatManager.sharedMgr getMatData:self.dstMatIndex rownum:0 colnum:0];
         }
     }
 	return responseArr;
