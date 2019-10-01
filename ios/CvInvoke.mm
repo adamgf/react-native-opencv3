@@ -142,6 +142,15 @@
                 ocvtypes sizeType(dSize);
                 ps.push_back(sizeType);
             }
+            else if ([param isEqualToString:@"Rect"]) {
+                double top = [(NSNumber*)[dMap valueForKey:@"top"] doubleValue];
+                double left = [(NSNumber*)[dMap valueForKey:@"left"] doubleValue];
+                double wid = [(NSNumber*)[dMap valueForKey:@"width"] doubleValue];
+                double hei = [(NSNumber*)[dMap valueForKey:@"height"] doubleValue];
+                CvRect dRect(left, top, wid, hei);
+                ocvtypes rectType(dRect);
+                ps.push_back(rectType);
+            }
         }
         i++;
     }
@@ -357,6 +366,8 @@
                }
                else {
                    std::string dFunc = std::string([func UTF8String]);
+                   
+                   dstMat = callOpencvMethod(methodIndex, ps);
                    
                    dstMat = callOpencvMethod(methodIndex, ps);
                }

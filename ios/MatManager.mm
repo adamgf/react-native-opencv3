@@ -171,16 +171,23 @@
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     Mat mat = MW.myMat;
     
-    // TODO: check type of mat to put different data types ...
-    float* dataVals = new float[data.count];
+    int matType = mat.type();
+    uchar depth = matType & CV_MAT_DEPTH_MASK;
+    //uchar chans = 1 + (matType >> CV_CN_SHIFT);
+    
     for (int i=0;i < data.count;i++) {
         NSNumber *dataVal = [data objectAtIndex:i];
-        dataVals[i] = [dataVal floatValue];
+        switch ( depth ) {
+            default:
+            case CV_8U: { mat.at<uchar>(rownum, i) = [dataVal unsignedCharValue]; break; }
+            case CV_8S: { mat.at<schar>(rownum, i) = [dataVal charValue]; break; }
+            case CV_16U: { mat.at<ushort>(rownum, i) = [dataVal unsignedShortValue]; break; }
+            case CV_16S: { mat.at<short>(rownum, i) = [dataVal shortValue]; break; }
+            case CV_32S: { mat.at<int>(rownum, i) = [dataVal intValue]; break; }
+            case CV_32F: { mat.at<float>(rownum, i) = [dataVal floatValue]; break; }
+            case CV_64F: { mat.at<double>(rownum, i) = [dataVal doubleValue]; break; }
+        }
     }
-    mat.at<float>(rownum, 0) = dataVals[0];
-    mat.at<float>(rownum, 1) = dataVals[1];
-    mat.at<float>(rownum, 2) = dataVals[2];
-    mat.at<float>(rownum, 3) = dataVals[3];
     
     [self setMat:matIndex matToSet:mat];
 }
@@ -196,6 +203,7 @@
 -(void)deleteMatAtIndex:(int)matIndex {
     MatWrapper *MW = (MatWrapper*)self.mats[matIndex];
     MW.myMat.release();
+    MW.myMat.~Mat();
     [self.mats removeObjectAtIndex:matIndex];
 }
 
@@ -203,12 +211,13 @@
     for (int i=0;i < self.mats.count;i++) {
         MatWrapper *MW = (MatWrapper*)self.mats[i];
         MW.myMat.release();
+        MW.myMat.~Mat();
     }
     [self.mats removeAllObjects];
 }
 
 -(void)dealloc {
-    [self.mats removeAllObjects];
+    [self deleteMats];
     self.mats = nil;
 }
 

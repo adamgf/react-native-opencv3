@@ -18,8 +18,12 @@ std::vector<std::string> Functions = {
     "bitwise_not",
     "rotate",
     "line",
+    "line",
+    "line",
+    "line",
     "normalize",
     "calcHist",
+    "calcBackProject",
     "submat",
     "Canny",
     "Canny",
@@ -36,6 +40,9 @@ std::vector<std::string> Functions = {
     "resize",
     "resize",
     "resize",
+    "rectangle",
+    "rectangle",
+    "rectangle",
     "rectangle",
     "setTo",
     "medianBlur",
@@ -126,7 +133,96 @@ std::vector<std::string> Functions = {
     "warpPerspective",
     "warpPerspective",
     "circle",
-    "addWeighted"
+    "circle",
+    "circle",
+    "circle",
+    "addWeighted",
+    "remap",
+    "remap",
+    "remap",
+    "getRotationMatrix2D",
+    "invertAffineTransform",
+    "getPerspectiveTransform",
+    "getAffineTransform",
+    "getRectSubPix",
+    "getRectSubPix",
+    "logPolar",
+    "linearPolar",
+    "integral",
+    "integral",
+    "accumulate",
+    "accumulate",
+    "accumulateSquare",
+    "accumulateSquare",
+    "accumulateProduct",
+    "accumulateProduct",
+    "accumulateWeighted",
+    "accumulateWeighted",
+    "createHanningWindow",
+    "threshold",
+    "adaptiveThreshold",
+    "pyrDown",
+    "pyrDown",
+    "pyrDown",
+    "pyrUp",
+    "pyrUp",
+    "pyrUp",
+    "undistort",
+    "undistort",
+    "undistort",
+    "getDefaultNewCameraMatrix",
+    "getDefaultNewCameraMatrix",
+    "getDefaultNewCameraMatrix",
+    "undistortPoints",
+    "undistortPoints",
+    "undistortPoints",
+    "equalizeHist",
+    "watershed",
+    "pyrMeanShiftFiltering",
+    "distanceTransform",
+    "distanceTransform",
+    "cvtColorTwoPlane",
+    "demosaicing",
+    "demosaicing",
+    "matchTemplate",
+    "matchTemplate",
+    "connectedComponents",
+    "connectedComponents",
+    "connectedComponents",
+    "connectedComponents",
+    "approxPolyDP",
+    "minEnclosingTriangle",
+    "convexHull",
+    "convexHull",
+    "convexHull",
+    "convexityDefects",
+    "intersectConvexConvex",
+    "intersectConvexConvex",
+    "fitLine",
+    "blendLinear",
+    "applyColorMap",
+    "applyColorMap",
+    "arrowedLine",
+    "arrowedLine",
+    "arrowedLine",
+    "arrowedLine",
+    "arrowedLine",
+    "ellipse",
+    "ellipse",
+    "ellipse",
+    "ellipse",
+    "drawMarker",
+    "drawMarker",
+    "drawMarker",
+    "drawMarker",
+    "drawMarker",
+    "fillConvexPoly",
+    "fillConvexPoly",
+    "fillConvexPoly",
+    "putText",
+    "putText",
+    "putText",
+    "putText"
 };
 
 std::vector<std::string> types = {
@@ -134,8 +230,12 @@ std::vector<std::string> types = {
     "Mat,OutMat,int,int",
     "Mat,OutMat",
     "Mat,OutMat,int",
+    "OutMat,Point,Point,Scalar",
     "OutMat,Point,Point,Scalar,int",
+    "OutMat,Point,Point,Scalar,int,int",
+    "OutMat,Point,Point,Scalar,int,int,int",
     "Mat,OutMat,double,double,int",
+    "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
     "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
     "double,double,double,double", // OutMat is implicitly incoming Mat ...
     "Mat,OutMat,double,double",
@@ -153,7 +253,10 @@ std::vector<std::string> types = {
     "Mat,OutMat,Size,double",
     "Mat,OutMat,Size,double,double",
     "Mat,OutMat,Size,double,double,int",
+    "OutMat,Point,Point,Scalar",
     "OutMat,Point,Point,Scalar,int",
+    "OutMat,Point,Point,Scalar,int,int",
+    "OutMat,Point,Point,Scalar,int,int,int",
     "OutMat,Scalar",
     "Mat,OutMat,int",
     "Mat,OutMat,Size,double",
@@ -242,8 +345,100 @@ std::vector<std::string> types = {
     "Mat,OutMat,Mat,Size,int",
     "Mat,OutMat,Mat,Size,int,int",
     "Mat,OutMat,Mat,Size,int,int,Scalar",
+    "OutMat,Point,int,Scalar",
+    "OutMat,Point,int,Scalar,int",
+    "OutMat,Point,int,Scalar,int,int",
     "OutMat,Point,int,Scalar,int,int,int",
-    "Mat,double,Mat,double,double,OutMat"
+    "Mat,double,Mat,double,double,OutMat",
+    "Mat,OutMat,Mat,Mat,int",
+    "Mat,OutMat,Mat,Mat,int,int",
+    "Mat,OutMat,Mat,Mat,int,int,Scalar",
+    "Point,double,double",
+    "Mat,OutMat",
+    "Mat,Mat",
+    "Mat,Mat",
+    "Mat,Size,Point,OutMat",
+    "Mat,Size,Point,OutMat,int",
+    "Mat,OutMat,Point,double,int",
+    "Mat,OutMat,Point,double,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat",
+    "Mat,OutMat,Mat",
+    "Mat,OutMat",
+    "Mat,OutMat,Mat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,Mat",
+    "Mat,OutMat,double",
+    "Mat,OutMat,double,Mat",
+    "OutMat,Size,int",
+    "Mat,OutMat,double,double,int",
+    "Mat,OutMat,double,int,int,int,double",
+    "Mat,OutMat",
+    "Mat,OutMat,Size",
+    "Mat,OutMat,Size,int",
+    "Mat,OutMat",
+    "Mat,OutMat,Size",
+    "Mat,OutMat,Size,int",
+    "Mat,OutMat,Mat,Mat",
+    "Mat,OutMat,Mat,Mat,Mat",
+    "Mat",
+    "Mat,Size",
+    "Mat,Size,bool",
+    "Mat,OutMat,Mat,Mat",
+    "Mat,OutMat,Mat,Mat,Mat",
+    "Mat,OutMat,Mat,Mat,Mat",
+    "Mat,OutMat",
+    "Mat,OutMat",
+    "Mat,OutMat,double,double",
+    "Mat,OutMat,int,int",
+    "Mat,OutMat,int,int,int",
+    "Mat,Mat,OutMat,int",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int,int",
+    "Mat,Mat,OutMat,int",
+    "Mat,Mat,OutMat,int,Mat",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int,int",
+    "Mat,OutMat,int,int,int",
+    "Mat,OutMat,double,bool",
+    "Mat,OutMat",
+    "Mat,OutMat",
+    "Mat,OutMat,bool",
+    "Mat,OutMat,bool,bool",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,bool",
+    "Mat,OutMat,int,double,double,double",
+    "Mat,Mat,Mat,Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat,Mat",
+    "OutMat,Point,Point,Scalar",
+    "OutMat,Point,Point,Scalar,int",
+    "OutMat,Point,Point,Scalar,int,int",
+    "OutMat,Point,Point,Scalar,int,int,int",
+    "OutMat,Point,Point,Scalar,int,int,int,double",
+    "OutMat,Point,Point,Scalar",
+    "OutMat,Point,Point,Scalar,int",
+    "OutMat,Point,Point,Scalar,int,int",
+    "OutMat,Point,Point,Scalar,int,int,int",
+    "OutMat,Point,Size,double,double,double,Scalar",
+    "OutMat,Point,Size,double,double,double,Scalar,int",
+    "OutMat,Point,Size,double,double,double,Scalar,int,int",
+    "OutMat,Point,Size,double,double,double,Scalar,int,int,int",
+    "OutMat,Point,Scalar",
+    "OutMat,Point,Scalar,int",
+    "OutMat,Point,Scalar,int,int",
+    "OutMat,Point,Scalar,int,int,int",
+    "OutMat,Point,Scalar,int,int,int,int",
+    "OutMat,Mat,Scalar",
+    "OutMat,Mat,Scalar,int",
+    "OutMat,Mat,Scalar,int,int",
+    "OutMat,String,Point,int,double,Scalar",
+    "OutMat,String,Point,int,double,Scalar,int",
+    "OutMat,String,Point,int,double,Scalar,int,int",
+    "OutMat,String,Point,int,double,Scalar,int,int,bool"
 };
 
 typedef enum fns {
@@ -252,8 +447,12 @@ typedef enum fns {
     BITWISE_NOT,
     ROTATE,
     LINE,
+    LINE2,
+    LINE3,
+    LINE4,
     NORMALIZE,
     CALCHIST,
+    CALCBACKPROJECT,
     SUBMAT,
     CANNY,
     CANNY2,
@@ -271,6 +470,9 @@ typedef enum fns {
     RESIZE3,
     RESIZE4,
     RECTANGLE,
+    RECTANGLE2,
+    RECTANGLE3,
+    RECTANGLE4,
     SETTO,
     MEDIANBLUR,
     GAUSSIANBLUR,
@@ -360,7 +562,95 @@ typedef enum fns {
     WARPPERSPECTIVE3,
     WARPPERSPECTIVE4,
     CIRCLE,
-    ADDWEIGHTED
+    CIRCLE2,
+    CIRCLE3,
+    CIRCLE4,
+    ADDWEIGHTED,
+    REMAP,
+    REMAP2,
+    REMAP3,
+    GETROTATIONMATRIX2D,
+    INVERTAFFINETRANSFORM,
+    GETPERSPECTIVETRANSFORM,
+    GETAFFINETRANSFORM,
+    GETRECTSUBPIX,
+    GETRECTSUBPIX2,
+    LOGPOLAR,
+    LINEARPOLAR,
+    INTEGRAL,
+    INTEGRAL2,
+    ACCUMULATE,
+    ACCUMULATE2,
+    ACCUMULATESQUARE,
+    ACCUMULATESQUARE2,
+    ACCUMULATEPRODUCT,
+    ACCUMULATEPRODUCT2,
+    ACCUMULATEWEIGHTED,
+    ACCUMULATEWEIGHTED2,
+    CREATEHANNINGWINDOW,
+    THRESHOLD,
+    ADAPTIVETHRESHOLD,
+    PYRDOWN,
+    PYRDOWN2,
+    PYRDOWN3,
+    PYRUP,
+    PYRUP2,
+    PYRUP3,
+    UNDISTORT,
+    UNDISTORT2,
+    GETDEFAULTNEWCAMERAMATRIX,
+    GETDEFAULTNEWCAMERAMATRIX2,
+    GETDEFAULTNEWCAMERAMATRIX3,
+    UNDISTORTPOINTS,
+    UNDISTORTPOINTS2,
+    UNDISTORTPOINTS3,
+    EQUALIZEHIST,
+    WATERSHED,
+    PYRMEANSHIFTFILTERING,
+    DISTANCETRANSFORM,
+    DISTANCETRANSFORM2,
+    CVTCOLORTWOPLANE,
+    DEMOSAICING,
+    DEMOSAICING2,
+    MATCHTEMPLATE,
+    MATCHTEMPLATE2,
+    CONNECTEDCOMPONENTS,
+    CONNECTEDCOMPONENTS2,
+    CONNECTEDCOMPONENTS3,
+    CONNECTEDCOMPONENTS4,
+    APPROXPOLYDP, // DP!
+    MINENCLOSINGTRIANGLE,
+    CONVEXHULL,
+    CONVEXHULL2,
+    CONVEXHULL3,
+    CONVEXITYDEFECTS,
+    INTERSECTCONVEXCONVEX,
+    INTERSECTCONVEXCONVEX2,
+    FITLINE,
+    BLENDLINEAR,
+    APPLYCOLORMAP,
+    APPLYCOLORMAP2,
+    ARROWEDLINE,
+    ARROWEDLINE2,
+    ARROWEDLINE3,
+    ARROWEDLINE4,
+    ARROWEDLINE5,
+    ELLIPSE,
+    ELLIPSE2,
+    ELLIPSE3,
+    ELLIPSE4,
+    DRAWMARKER,
+    DRAWMARKER2,
+    DRAWMARKER3,
+    DRAWMARKER4,
+    DRAWMARKER5,
+    FILLCONVEXPOLY,
+    FILLCONVEXPOLY2,
+    FILLCONVEXPOLY3,
+    PUTTEXT,
+    PUTTEXT2,
+    PUTTEXT3,
+    PUTTEXT4
 } ipfns;
 
 // these were functions used in conjunction with std::variant
@@ -416,8 +706,9 @@ std::tuple<std::tuple<MatType,MatType,IntType>,std::tuple<MatType,MatType>,std::
 };
  */
 
+// Note: std::visit or something similar may be able to be used to get rid of this huuuuge ftn.  I did not use it because it is not supported until iOS 12 ...
 // if you figure out a way around this using variable arguments or something go for it!
-// this function blows!!
+// TODO: return arbitrary data in an NSArray instead of just one Mat ...
 Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
 
     switch (index) {
@@ -456,8 +747,37 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].pt;
             auto p3 = args[2].pt;
             auto p4 = args[3].sc;
+            line(p1, p2, p3, p4);
+            return p1;
+        }
+        case LINE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
             auto p5 = args[4].i;
             line(p1, p2, p3, p4, p5);
+            return p1;
+        }
+        case LINE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            line(p1, p2, p3, p4, p5, p6);
+            return p1;
+        }
+        case LINE4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            line(p1, p2, p3, p4, p5, p6, p7);
             return p1;
         }
         case NORMALIZE: {
@@ -494,6 +814,32 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             const float* histRange = { range };
             bool uniform = true, accumulate = false;
             calcHist(&rgba_planes[channel], 1, 0, p3, p4, 1, &histSize, &histRange, uniform, accumulate);
+            return p4;
+        }
+        case CALCBACKPROJECT: {
+            // I have not tested this function yet ...
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].m;
+            
+            int channel = p2.at<int>(0,0);
+            if (channel == 0) { // to maintain continuity between android and ios
+                channel = 2;
+            }
+            else if (channel == 2) {
+                channel = 0;
+            }
+            float lorange = p5.at<float>(0,0);
+            float hirange = p5.at<float>(p5.cols-1,p5.rows-1) + 1; // exclusive
+            float range[] = { lorange, hirange };
+            
+            std::vector<Mat> rgba_planes;
+            split(p1, rgba_planes);
+            const float* histRange = { range };
+
+            calcBackProject(&rgba_planes[channel], 1, &channel, p3, p4, &histRange);
             return p4;
         }
         case SUBMAT: {
@@ -640,8 +986,37 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].pt;
             auto p3 = args[2].pt;
             auto p4 = args[3].sc;
+            rectangle(p1, p2, p3, p4);
+            return p1;
+        }
+        case RECTANGLE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
             auto p5 = args[4].i;
             rectangle(p1, p2, p3, p4, p5);
+            return p1;
+        }
+        case RECTANGLE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            rectangle(p1, p2, p3, p4, p5, p6);
+            return p1;
+        }
+        case RECTANGLE4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            rectangle(p1, p2, p3, p4, p5, p6, p7);
             return p1;
         }
         case SETTO: {
@@ -1497,6 +1872,33 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].pt;
             auto p3 = args[2].i;
             auto p4 = args[3].sc;
+            circle(p1, p2, p3, p4);
+            return p1;
+        }
+        case CIRCLE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].i;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            circle(p1, p2, p3, p4, p5);
+            return p1;
+        }
+        case CIRCLE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].i;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            circle(p1, p2, p3, p4, p5, p6);
+            return p1;
+        }
+        case CIRCLE4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].i;
+            auto p4 = args[3].sc;
             auto p5 = args[4].i;
             auto p6 = args[5].i;
             auto p7 = args[6].i;
@@ -1512,6 +1914,708 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p6 = args[5].m;
             addWeighted(p1, p2, p3, p4, p5, p6);
             return p6;
+        }
+        case REMAP: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].i;
+            remap(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case REMAP2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            remap(p1, p2, p3, p4, p5, p6);
+            return p2;
+        }
+        case REMAP3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].sc;
+            remap(p1, p2, p3, p4, p5, p6, p7);
+            return p2;
+        }
+        case GETROTATIONMATRIX2D: {
+            auto p1 = args[0].pt;
+            auto p2 = args[1].d;
+            auto p3 = args[2].d;
+            auto p4 = getRotationMatrix2D(p1, p2, p3);
+            return p4;
+        }
+        case INVERTAFFINETRANSFORM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            invertAffineTransform(p1, p2);
+            return p2;
+        }
+        case GETPERSPECTIVETRANSFORM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = getPerspectiveTransform(p1, p2);
+            return p3;
+        }
+        case GETAFFINETRANSFORM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = getAffineTransform(p1, p2);
+            return p3;
+        }
+        case GETRECTSUBPIX: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].sz;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].m;
+            getRectSubPix(p1, p2, p3, p4);
+            return p4;
+        }
+        case GETRECTSUBPIX2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].sz;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].m;
+            auto p5 = args[4].i;
+            getRectSubPix(p1, p2, p3, p4, p5);
+            return p4;
+        }
+        case LOGPOLAR: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].d;
+            auto p5 = args[4].i;
+            logPolar(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case LINEARPOLAR: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].d;
+            auto p5 = args[4].i;
+            linearPolar(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case INTEGRAL: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            integral(p1, p2);
+            return p2;
+        }
+        case INTEGRAL2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            integral(p1, p2, p3);
+            return p2;
+        }
+        case ACCUMULATE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            accumulate(p1, p2);
+            return p2;
+        }
+        case ACCUMULATE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            accumulate(p1, p2, p3);
+            return p2;
+        }
+        case ACCUMULATESQUARE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            accumulateSquare(p1, p2);
+            return p2;
+        }
+        case ACCUMULATESQUARE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            accumulateSquare(p1, p2, p3);
+            return p2;
+        }
+        case ACCUMULATEPRODUCT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            accumulateProduct(p1, p2, p3);
+            return p3;
+        }
+        case ACCUMULATEPRODUCT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            accumulateProduct(p1, p2, p3, p4);
+            return p3;
+        }
+        case ACCUMULATEWEIGHTED: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            accumulateWeighted(p1, p2, p3);
+            return p2;
+        }
+        case ACCUMULATEWEIGHTED2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].m;
+            accumulateWeighted(p1, p2, p3, p4);
+            return p2;
+        }
+        case CREATEHANNINGWINDOW: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].sz;
+            auto p3 = args[2].i;
+            createHanningWindow(p1, p2, p3);
+            return p1;
+        }
+        case THRESHOLD: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
+            auto p5 = args[4].i;
+            threshold(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case ADAPTIVETHRESHOLD: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            auto p6 = args[4].i;
+            auto p7 = args[4].d;
+            adaptiveThreshold(p1, p2, p3, p4, p5, p6, p7);
+            return p2;
+        }
+        case PYRDOWN: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            pyrDown(p1, p2);
+            return p2;
+        }
+        case PYRDOWN2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sz;
+            pyrDown(p1, p2, p3);
+            return p2;
+        }
+        case PYRDOWN3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].i;
+            pyrDown(p1, p2, p3, p4);
+            return p2;
+        }
+        case PYRUP: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            pyrUp(p1, p2);
+            return p2;
+        }
+        case PYRUP2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sz;
+            pyrUp(p1, p2, p3);
+            return p2;
+        }
+        case PYRUP3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].i;
+            pyrUp(p1, p2, p3, p4);
+            return p2;
+        }
+        case UNDISTORT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            undistort(p1, p2, p3, p4);
+            return p2;
+        }
+        case UNDISTORT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[3].m;
+            undistort(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case GETDEFAULTNEWCAMERAMATRIX: {
+            auto p1 = args[0].m;
+            auto p2 = getDefaultNewCameraMatrix(p1);
+            return p1;
+        }
+        case GETDEFAULTNEWCAMERAMATRIX2: {
+            auto p1 = args[0].m;
+            auto p2 = args[0].sz;
+            auto p3 = getDefaultNewCameraMatrix(p1, p2);
+            return p1;
+        }
+        case GETDEFAULTNEWCAMERAMATRIX3: {
+            auto p1 = args[0].m;
+            auto p2 = args[0].sz;
+            auto p3 = args[0].b;
+            auto p4 = getDefaultNewCameraMatrix(p1, p2, p3);
+            return p4;
+        }
+        case UNDISTORTPOINTS: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            undistortPoints(p1, p2, p3, p4);
+            return p2;
+        }
+        case UNDISTORTPOINTS2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].m;
+            undistortPoints(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case UNDISTORTPOINTS3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].m;
+            auto p6 = args[5].m;
+            undistortPoints(p1, p2, p3, p4, p5, p6);
+            return p2;
+        }
+        case EQUALIZEHIST: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            equalizeHist(p1, p2);
+            return p2;
+        }
+        case WATERSHED: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            watershed(p1, p2);
+            return p2;
+        }
+        case PYRMEANSHIFTFILTERING: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
+            pyrMeanShiftFiltering(p1, p2, p3, p4);
+            return p2;
+        }
+        case DISTANCETRANSFORM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            distanceTransform(p1, p2, p3, p4);
+            return p2;
+        }
+        case DISTANCETRANSFORM2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            distanceTransform(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case CVTCOLORTWOPLANE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].i;
+            cvtColorTwoPlane(p1, p2, p3, p4);
+            return p3;
+        }
+        case DEMOSAICING: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            demosaicing(p1, p2, p3);
+            return p2;
+        }
+        case DEMOSAICING2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            demosaicing(p1, p2, p3, p4);
+            return p2;
+        }
+        case MATCHTEMPLATE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].i;
+            matchTemplate(p1, p2, p3, p4);
+            return p3;
+        }
+        case MATCHTEMPLATE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].i;
+            auto p5 = args[4].m;
+            matchTemplate(p1, p2, p3, p4, p5);
+            return p3;
+        }
+        case CONNECTEDCOMPONENTS: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            connectedComponents(p1, p2);
+            return p2;
+        }
+        case CONNECTEDCOMPONENTS2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            connectedComponents(p1, p2, p3);
+            return p2;
+        }
+        case CONNECTEDCOMPONENTS3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            connectedComponents(p1, p2, p3, p4);
+            return p2;
+        }
+        case CONNECTEDCOMPONENTS4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            connectedComponents(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case APPROXPOLYDP: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].b;
+            approxPolyDP(p1, p2, p3, p4);
+            return p2;
+        }
+        case MINENCLOSINGTRIANGLE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            minEnclosingTriangle(p1, p2);
+            return p2;
+        }
+        case CONVEXHULL: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            convexHull(p1, p2);
+            return p2;
+        }
+        case CONVEXHULL2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].b;
+            convexHull(p1, p2, p3);
+            return p2;
+        }
+        case CONVEXHULL3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].b;
+            auto p4 = args[3].b;
+            convexHull(p1, p2, p3, p4);
+            return p2;
+        }
+        case CONVEXITYDEFECTS: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            convexityDefects(p1, p2, p3);
+            return p3;
+        }
+        case INTERSECTCONVEXCONVEX: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            intersectConvexConvex(p1, p2, p3);
+            return p3;
+        }
+        case INTERSECTCONVEXCONVEX2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].b;
+            intersectConvexConvex(p1, p2, p3, p4);
+            return p2;
+        }
+        case FITLINE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].d;
+            fitLine(p1, p2, p3, p4, p5, p6);
+            return p2;
+        }
+        case BLENDLINEAR: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[4].m;
+            blendLinear(p1, p2, p3, p4, p5);
+            return p5;
+        }
+        case APPLYCOLORMAP: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            applyColorMap(p1, p2, p3);
+            return p2;
+        }
+        case APPLYCOLORMAP2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            applyColorMap(p1, p2, p3);
+            return p2;
+        }
+        case ARROWEDLINE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            arrowedLine(p1, p2, p3, p4);
+            return p1;
+        }
+        case ARROWEDLINE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            arrowedLine(p1, p2, p3, p4, p5);
+            return p1;
+        }
+        case ARROWEDLINE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            arrowedLine(p1, p2, p3, p4, p5, p6);
+            return p1;
+        }
+        case ARROWEDLINE4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            arrowedLine(p1, p2, p3, p4, p5, p6, p7);
+            return p1;
+        }
+        case ARROWEDLINE5: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].sc;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            auto p8 = args[7].d;
+            arrowedLine(p1, p2, p3, p4, p5, p6, p7, p8);
+            return p1;
+        }
+        case ELLIPSE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].d;
+            auto p7 = args[6].sc;
+            ellipse(p1, p2, p3, p4, p5, p6, p7);
+            return p1;
+        }
+        case ELLIPSE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].d;
+            auto p7 = args[6].sc;
+            auto p8 = args[7].i;
+            ellipse(p1, p2, p3, p4, p5, p6, p7, p8);
+            return p1;
+        }
+        case ELLIPSE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].d;
+            auto p7 = args[6].sc;
+            auto p8 = args[7].i;
+            auto p9 = args[8].i;
+            ellipse(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            return p1;
+        }
+        case ELLIPSE4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sz;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].d;
+            auto p7 = args[6].sc;
+            auto p8 = args[7].i;
+            auto p9 = args[8].i;
+            auto p10 = args[9].i;
+            ellipse(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+            return p1;
+        }
+        case DRAWMARKER: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sc;
+            drawMarker(p1, p2, p3);
+            return p1;
+        }
+        case DRAWMARKER2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sc;
+            auto p4 = args[3].i;
+            drawMarker(p1, p2, p3, p4);
+            return p1;
+        }
+        case DRAWMARKER3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sc;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            drawMarker(p1, p2, p3, p4, p5);
+            return p1;
+        }
+        case DRAWMARKER4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sc;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            drawMarker(p1, p2, p3, p4, p5, p6);
+            return p1;
+        }
+        case DRAWMARKER5: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].pt;
+            auto p3 = args[2].sc;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            drawMarker(p1, p2, p3, p4, p5, p6, p7);
+            return p1;
+        }
+        case FILLCONVEXPOLY: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sc;
+            fillConvexPoly(p1, p2, p3);
+            return p1;
+        }
+        case FILLCONVEXPOLY2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sc;
+            auto p4 = args[3].i;
+            fillConvexPoly(p1, p2, p3, p4);
+            return p1;
+        }
+        case FILLCONVEXPOLY3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].sc;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            fillConvexPoly(p1, p2, p3, p4, p5);
+            return p1;
+        }
+        case PUTTEXT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].str;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].i;
+            auto p5 = args[4].d;
+            auto p6 = args[5].sc;
+            putText(p1, p2, p3, p4, p5, p6);
+            return p1;
+        }
+        case PUTTEXT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].str;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].i;
+            auto p5 = args[4].d;
+            auto p6 = args[5].sc;
+            auto p7 = args[6].i;
+            putText(p1, p2, p3, p4, p5, p6, p7);
+            return p1;
+        }
+        case PUTTEXT3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].str;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].i;
+            auto p5 = args[4].d;
+            auto p6 = args[5].sc;
+            auto p7 = args[6].i;
+            auto p8 = args[7].i;
+            putText(p1, p2, p3, p4, p5, p6, p7, p8);
+            return p1;
+        }
+        case PUTTEXT4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].str;
+            auto p3 = args[2].pt;
+            auto p4 = args[3].i;
+            auto p5 = args[4].d;
+            auto p6 = args[5].sc;
+            auto p7 = args[6].i;
+            auto p8 = args[7].i;
+            auto p9 = args[7].b;
+            putText(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            return p1;
         }
     }
     return Mat();

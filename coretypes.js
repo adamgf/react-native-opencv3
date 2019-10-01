@@ -96,3 +96,32 @@ export class CvSize {
 	}	
   }
 }
+
+export class CvRect {
+  constructor(top, left, width, height) {
+    if (top) {
+	  this.top = top
+	}
+	else {
+	  this.top = 0.0
+	}
+	if (left) {
+	  this.left = left
+	}
+	else {
+	  this.left = 0.0
+	}
+	if (width) {
+      this.width = width
+	}
+	else {
+	  this.width = 0.0
+	}
+	if (height) {
+      this.height = height
+	}
+	else {
+	  this.height = 0.0
+	}		  	
+  }
+}
