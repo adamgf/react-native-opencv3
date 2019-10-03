@@ -328,7 +328,7 @@ std::vector<std::string> types = {
     "Mat,OutMat,double,double,int,int",
     "Mat,OutMat,double,double,int,int,Mat",
     "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
-    "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
+    "Mat,MatOfInt,Mat,OutMat,MatOfFloat",
     "double,double,double,double", // OutMat is implicitly incoming Mat ...
     "Mat,OutMat,double,double",
     "Mat,OutMat,double,double,int",
@@ -2417,8 +2417,8 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p3 = args[2].d;
             auto p4 = args[3].i;
             auto p5 = args[4].i;
-            auto p6 = args[4].i;
-            auto p7 = args[4].d;
+            auto p6 = args[5].i;
+            auto p7 = args[6].d;
             adaptiveThreshold(p1, p2, p3, p4, p5, p6, p7);
             return p2;
         }
@@ -2477,7 +2477,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].m;
             auto p3 = args[2].m;
             auto p4 = args[3].m;
-            auto p5 = args[3].m;
+            auto p5 = args[4].m;
             undistort(p1, p2, p3, p4, p5);
             return p2;
         }
@@ -2488,14 +2488,14 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
         }
         case GETDEFAULTNEWCAMERAMATRIX2: {
             auto p1 = args[0].m;
-            auto p2 = args[0].sz;
+            auto p2 = args[1].sz;
             auto p3 = getDefaultNewCameraMatrix(p1, p2);
             return p3;
         }
         case GETDEFAULTNEWCAMERAMATRIX3: {
             auto p1 = args[0].m;
-            auto p2 = args[0].sz;
-            auto p3 = args[0].b;
+            auto p2 = args[1].sz;
+            auto p3 = args[2].b;
             auto p4 = getDefaultNewCameraMatrix(p1, p2, p3);
             return p4;
         }
@@ -2934,7 +2934,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p6 = args[5].sc;
             auto p7 = args[6].i;
             auto p8 = args[7].i;
-            auto p9 = args[7].b;
+            auto p9 = args[8].b;
             putText(p1, p2, p3, p4, p5, p6, p7, p8, p9);
             return p1;
         }
@@ -2981,7 +2981,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].m;
             auto p3 = args[2].m;
             auto p4 = args[3].m;
-            auto p5 = args[3].i;
+            auto p5 = args[4].i;
             add(p1, p2, p3, p4, p5);
             return p3;
         }
@@ -3005,7 +3005,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].m;
             auto p3 = args[2].m;
             auto p4 = args[3].m;
-            auto p5 = args[3].i;
+            auto p5 = args[4].i;
             subtract(p1, p2, p3, p4, p5);
             return p3;
         }
@@ -3029,7 +3029,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].m;
             auto p3 = args[2].m;
             auto p4 = args[3].d;
-            auto p5 = args[3].i;
+            auto p5 = args[4].i;
             multiply(p1, p2, p3, p4, p5);
             return p3;
         }
@@ -3053,7 +3053,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].m;
             auto p3 = args[2].m;
             auto p4 = args[3].d;
-            auto p5 = args[3].i;
+            auto p5 = args[4].i;
             divide(p1, p2, p3, p4, p5);
             return p3;
         }
@@ -3074,7 +3074,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
         case LOOKUPTABLE: {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
-            auto p3 = args[1].m;
+            auto p3 = args[2].m;
             LUT(p1, p2, p3);
             return p3;
         }
@@ -3155,7 +3155,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
-            auto p4 = args[2].m;
+            auto p4 = args[3].m;
             bitwise_and(p1, p2, p3, p4);
             return p3;
         }
@@ -3170,7 +3170,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
-            auto p4 = args[2].m;
+            auto p4 = args[3].m;
             bitwise_or(p1, p2, p3, p4);
             return p3;
         }
@@ -3185,7 +3185,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
-            auto p4 = args[2].m;
+            auto p4 = args[3].m;
             bitwise_xor(p1, p2, p3, p4);
             return p3;
         }
@@ -3213,7 +3213,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
-            auto p4 = args[2].m;
+            auto p4 = args[3].m;
             inRange(p1, p2, p3, p4);
             return p4;
         }
@@ -3221,7 +3221,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
-            auto p4 = args[2].i;
+            auto p4 = args[3].i;
             compare(p1, p2, p3, p4);
             return p3;
         }
@@ -3275,7 +3275,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
-            auto p4 = args[2].b;
+            auto p4 = args[3].b;
             phase(p1, p2, p3, p4);
             return p3;
         }
@@ -3523,7 +3523,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p2 = args[1].m;
             auto p3 = args[2].m;
             auto p4 = args[3].i;
-            auto p5 = args[3].b;
+            auto p5 = args[4].b;
             mulSpectrums(p1, p2, p3, p4, p5);
             return p3;
         }
