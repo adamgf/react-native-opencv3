@@ -13,14 +13,18 @@
 // There may be a better way to do these three things by encapsulating them in an array of structs
 // still I like its simplicity ...
 std::vector<std::string> Functions = {
+    "cvtColor", // beginning ImgProc functions
     "cvtColor",
-    "cvtColor",
-    "bitwise_not",
     "rotate",
     "line",
     "line",
     "line",
     "line",
+    "normalize",
+    "normalize",
+    "normalize",
+    "normalize",
+    "normalize",
     "normalize",
     "calcHist",
     "calcBackProject",
@@ -34,6 +38,8 @@ std::vector<std::string> Functions = {
     "Sobel",
     "Sobel",
     "Sobel",
+    "convertScaleAbs",
+    "convertScaleAbs",
     "convertScaleAbs",
     "transform",
     "resize",
@@ -137,6 +143,7 @@ std::vector<std::string> Functions = {
     "circle",
     "circle",
     "addWeighted",
+    "addWeighted",
     "remap",
     "remap",
     "remap",
@@ -221,19 +228,105 @@ std::vector<std::string> Functions = {
     "putText",
     "putText",
     "putText",
-    "putText"
+    "putText",
+    "copyMakeBorder", // beginning Core functions
+    "copyMakeBorder",
+    "add",
+    "add",
+    "add",
+    "subtract",
+    "subtract",
+    "subtract",
+    "multiply",
+    "multiply",
+    "multiply",
+    "divide",
+    "divide",
+    "divide",
+    "scaleAdd",
+    "convertFp16",
+    "LUT",
+    "findNonZero",
+    "reduce",
+    "reduce",
+    "extractChannel",
+    "insertChannel",
+    "flip",
+    "repeat",
+    "hconcat",
+    "vconcat",
+    "bitwise_and",
+    "bitwise_and",
+    "bitwise_or",
+    "bitwise_or",
+    "bitwise_xor",
+    "bitwise_xor",
+    "bitwise_not",
+    "bitwise_not",
+    "absdiff",
+    "inRange",
+    "compare",
+    "min",
+    "max",
+    "sqrt",
+    "pow",
+    "exp",
+    "log",
+    "phase",
+    "phase",
+    "magnitude",
+    "patchNaNs",
+    "patchNaNs",
+    "gemm",
+    "gemm",
+    "mulTransposed",
+    "mulTransposed",
+    "mulTransposed",
+    "mulTransposed",
+    "transpose",
+    "perspectiveTransform",
+    "completeSymm",
+    "completeSymm",
+    "setIdentity",
+    "setIdentity",
+    "invert",
+    "invert",
+    "solve",
+    "solve",
+    "sort",
+    "sortIdx",
+    "solveCubic",
+    "solvePoly",
+    "dft",
+    "dft",
+    "dft",
+    "idft",
+    "idft",
+    "idft",
+    "dct",
+    "dct",
+    "idct",
+    "idct",
+    "mulSpectrums",
+    "mulSpectrums",
+    "randu",
+    "randn",
 };
 
 std::vector<std::string> types = {
-    "Mat,OutMat,int",
+    "Mat,OutMat,int", // beginning ImgProc functions
     "Mat,OutMat,int,int",
-    "Mat,OutMat",
     "Mat,OutMat,int",
     "OutMat,Point,Point,Scalar",
     "OutMat,Point,Point,Scalar,int",
     "OutMat,Point,Point,Scalar,int,int",
     "OutMat,Point,Point,Scalar,int,int,int",
+    "Mat,OutMat",
+    "Mat,OutMat,double",
+    "Mat,OutMat,double,double",
     "Mat,OutMat,double,double,int",
+    "Mat,OutMat,double,double,int,int",
+    "Mat,OutMat,double,double,int,int,Mat",
     "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
     "Mat,MatOfInt,Mat,OutMat,MatOfInt,MatOfFloat",
     "double,double,double,double", // OutMat is implicitly incoming Mat ...
@@ -246,6 +339,8 @@ std::vector<std::string> types = {
     "Mat,OutMat,int,double,double,int,double",
     "Mat,OutMat,int,double,double,int,double,double",
     "Mat,OutMat,int,double,double,int,double,double,int",
+    "Mat,OutMat",
+    "Mat,OutMat,double",
     "Mat,OutMat,double,double",
     "Mat,OutMat,Mat",
     "Mat,OutMat,Size",
@@ -349,10 +444,11 @@ std::vector<std::string> types = {
     "OutMat,Point,int,Scalar,int,int",
     "OutMat,Point,int,Scalar,int,int,int",
     "Mat,double,Mat,double,double,OutMat",
+    "Mat,double,Mat,double,double,OutMat,int",
     "Mat,OutMat,Mat,Mat,int",
     "Mat,OutMat,Mat,Mat,int,int",
     "Mat,OutMat,Mat,Mat,int,int,Scalar",
-    "Point,double,double",
+    "Point,double,double", // OutMat returned from function ...
     "Mat,OutMat",
     "Mat,Mat",
     "Mat,Mat",
@@ -381,7 +477,7 @@ std::vector<std::string> types = {
     "Mat,OutMat,Size,int",
     "Mat,OutMat,Mat,Mat",
     "Mat,OutMat,Mat,Mat,Mat",
-    "Mat",
+    "Mat", // OutMat is returned from function ...
     "Mat,Size",
     "Mat,Size,bool",
     "Mat,OutMat,Mat,Mat",
@@ -433,19 +529,105 @@ std::vector<std::string> types = {
     "OutMat,String,Point,int,double,Scalar",
     "OutMat,String,Point,int,double,Scalar,int",
     "OutMat,String,Point,int,double,Scalar,int,int",
-    "OutMat,String,Point,int,double,Scalar,int,int,bool"
+    "OutMat,String,Point,int,double,Scalar,int,int,bool",
+    "Mat,OutMat,int,int,int,int,int", // beginning Core functions
+    "Mat,OutMat,int,int,int,int,int,Scalar",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,Mat",
+    "Mat,Mat,OutMat,Mat,int",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,Mat",
+    "Mat,Mat,OutMat,Mat,int",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,double",
+    "Mat,Mat,OutMat,double,int",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,double",
+    "Mat,Mat,OutMat,double,int",
+    "Mat,double,Mat,OutMat",
+    "Mat,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,OutMat",
+    "Mat,OutMat,int,int",
+    "Mat,OutMat,int,int,int",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int",
+    "Mat,int,int,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,Mat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,Mat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,Mat",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,int",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,OutMat",
+    "Mat,double,OutMat",
+    "Mat,OutMat",
+    "Mat,OutMat",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,bool",
+    "Mat,Mat,OutMat",
+    "OutMat",
+    "OutMat,double",
+    "Mat,Mat,double,Mat,double,OutMat",
+    "Mat,Mat,double,Mat,double,OutMat,int",
+    "Mat,OutMat,bool",
+    "Mat,OutMat,bool,Mat",
+    "Mat,OutMat,bool,Mat,double",
+    "Mat,OutMat,bool,Mat,double,int",
+    "Mat,OutMat",
+    "Mat,OutMat,Mat",
+    "OutMat",
+    "OutMat,bool"
+    "OutMat",
+    "OutMat,Scalar",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,Mat,OutMat",
+    "Mat,Mat,OutMat,int",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat,int,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,OutMat",
+    "Mat,OutMat,int",
+    "Mat,Mat,OutMat,int",
+    "Mat,Mat,OutMat,int,bool",
+    "OutMat,Mat,Mat",
+    "OutMat,Mat,Mat",
 };
 
 typedef enum fns {
-    CVTCOLOR,
+    CVTCOLOR, // beginning ImgProc functions
     CVTCOLOR2,
-    BITWISE_NOT,
     ROTATE,
     LINE,
     LINE2,
     LINE3,
     LINE4,
     NORMALIZE,
+    NORMALIZE2,
+    NORMALIZE3,
+    NORMALIZE4,
+    NORMALIZE5,
+    NORMALIZE6,
     CALCHIST,
     CALCBACKPROJECT,
     SUBMAT,
@@ -459,6 +641,8 @@ typedef enum fns {
     SOBEL4,
     SOBEL5,
     CONVERTSCALEABS,
+    CONVERTSCALEABS2,
+    CONVERTSCALEABS3,
     TRANSFORM,
     RESIZE,
     RESIZE2,
@@ -561,6 +745,7 @@ typedef enum fns {
     CIRCLE3,
     CIRCLE4,
     ADDWEIGHTED,
+    ADDWEIGHTED2,
     REMAP,
     REMAP2,
     REMAP3,
@@ -645,7 +830,89 @@ typedef enum fns {
     PUTTEXT,
     PUTTEXT2,
     PUTTEXT3,
-    PUTTEXT4
+    PUTTEXT4,
+    COPYMAKEBORDER, // beginning Core functions
+    COPYMAKEBORDER2,
+    ADD,
+    ADD2,
+    ADD3,
+    SUBTRACT,
+    SUBTRACT2,
+    SUBTRACT3,
+    MULTIPLY,
+    MULTIPLY2,
+    MULTIPLY3,
+    DIVIDE,
+    DIVIDE2,
+    DIVIDE3,
+    SCALEADD,
+    CONVERTFP16,
+    LOOKUPTABLE,
+    FINDNONZERO,
+    REDUCE,
+    REDUCE2,
+    EXTRACTCHANNEL,
+    INSERTCHANNEL,
+    FLIP,
+    REPEAT,
+    HCONCAT,
+    VCONCAT,
+    BITWISE_AND,
+    BITWISE_AND2,
+    BITWISE_OR,
+    BITWISE_OR2,
+    BITWISE_XOR,
+    BITWISE_XOR2,
+    BITWISE_NOT,
+    BITWISE_NOT2,
+    ABSDIFF,
+    INRANGE,
+    COMPARE,
+    MINIMUM,
+    MAXIMUM,
+    SQUAREROOT,
+    POW,
+    EXP,
+    LOG,
+    PHASE,
+    PHASE2,
+    MAGNITUDE,
+    PATCHNANS,
+    PATCHNANS2,
+    GEMM,
+    GEMM2,
+    MULTRANSPOSED,
+    MULTRANSPOSED2,
+    MULTRANSPOSED3,
+    MULTRANSPOSED4,
+    TRANSPOSE,
+    PERSPECTIVETRANSFORM,
+    COMPLETESYMM,
+    COMPLETESYMM2,
+    SETIDENTITY,
+    SETIDENTITY2,
+    INVERT,
+    INVERT2,
+    SOLVE,
+    SOLVE2,
+    SORT,
+    SORTIDX,
+    SOLVECUBIC,
+    SOLVEPOLY,
+    DFT,
+    DFT2,
+    DFT3,
+    IDFT,
+    IDFT2,
+    IDFT3,
+    DCT,
+    DCT2,
+    IDCT,
+    IDCT2,
+    MULSPECTRUMS,
+    MULSPECTRUMS2,
+    RANDU,
+    RANDN,
 } ipfns;
 
 // these were functions used in conjunction with std::variant
@@ -707,6 +974,7 @@ std::tuple<std::tuple<MatType,MatType,IntType>,std::tuple<MatType,MatType>,std::
 Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
 
     switch (index) {
+        // Beginning of supported ImgProc functions ...
         case CVTCOLOR: {
             // auto p1 = castmat(&args[0]);
             auto p1 = args[0].m;
@@ -721,12 +989,6 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p3 = args[2].i;
             auto p4 = args[3].i;
             cvtColor(p1, p2, p3, p4);
-            return p2;
-        }
-        case BITWISE_NOT: {
-            auto p1 = args[0].m;
-            auto p2 = args[1].m;
-            bitwise_not(p1, p2);
             return p2;
         }
         case ROTATE: {
@@ -777,10 +1039,52 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
         case NORMALIZE: {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
+            normalize(p1, p2);
+            return p2;
+        }
+        case NORMALIZE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            normalize(p1, p2, p3);
+            return p2;
+        }
+        case NORMALIZE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
+            normalize(p1, p2, p3, p4);
+            return p2;
+        }
+        case NORMALIZE4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
             auto p3 = args[2].d;
             auto p4 = args[3].d;
             auto p5 = args[4].i;
             normalize(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case NORMALIZE5: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            normalize(p1, p2, p3, p4, p5, p6);
+            return p2;
+        }
+        case NORMALIZE6: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].d;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].m;
+            normalize(p1, p2, p3, p4, p5, p6, p7);
             return p2;
         }
         case CALCHIST: {
@@ -926,6 +1230,19 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             return p2;
         }
         case CONVERTSCALEABS: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            convertScaleAbs(p1, p2);
+            return p2;
+        }
+        case CONVERTSCALEABS2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            convertScaleAbs(p1, p2, p3);
+            return p2;
+        }
+        case CONVERTSCALEABS3: {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].d;
@@ -1908,6 +2225,17 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             addWeighted(p1, p2, p3, p4, p5, p6);
             return p6;
         }
+        case ADDWEIGHTED2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].d;
+            auto p3 = args[2].m;
+            auto p4 = args[3].d;
+            auto p5 = args[4].d;
+            auto p6 = args[5].m;
+            auto p7 = args[6].i;
+            addWeighted(p1, p2, p3, p4, p5, p6, p7);
+            return p6;
+        }
         case REMAP: {
             auto p1 = args[0].m;
             auto p2 = args[1].m;
@@ -2156,13 +2484,13 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
         case GETDEFAULTNEWCAMERAMATRIX: {
             auto p1 = args[0].m;
             auto p2 = getDefaultNewCameraMatrix(p1);
-            return p1;
+            return p2;
         }
         case GETDEFAULTNEWCAMERAMATRIX2: {
             auto p1 = args[0].m;
             auto p2 = args[0].sz;
             auto p3 = getDefaultNewCameraMatrix(p1, p2);
-            return p1;
+            return p3;
         }
         case GETDEFAULTNEWCAMERAMATRIX3: {
             auto p1 = args[0].m;
@@ -2610,6 +2938,610 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             putText(p1, p2, p3, p4, p5, p6, p7, p8, p9);
             return p1;
         }
+        case COPYMAKEBORDER: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            copyMakeBorder(p1, p2, p3, p4, p5, p6, p7);
+            return p2;
+        }
+        case COPYMAKEBORDER2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            auto p6 = args[5].i;
+            auto p7 = args[6].i;
+            auto p8 = args[7].sc;
+            copyMakeBorder(p1, p2, p3, p4, p5, p6, p7, p8);
+            return p2;
+        }
+        case ADD: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            add(p1, p2, p3);
+            return p3;
+        }
+        case ADD2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            add(p1, p2, p3, p4);
+            return p3;
+        }
+        case ADD3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[3].i;
+            add(p1, p2, p3, p4, p5);
+            return p3;
+        }
+        case SUBTRACT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            subtract(p1, p2, p3);
+            return p3;
+        }
+        case SUBTRACT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            subtract(p1, p2, p3, p4);
+            return p3;
+        }
+        case SUBTRACT3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            auto p5 = args[3].i;
+            subtract(p1, p2, p3, p4, p5);
+            return p3;
+        }
+        case MULTIPLY: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            multiply(p1, p2, p3);
+            return p3;
+        }
+        case MULTIPLY2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].d;
+            multiply(p1, p2, p3, p4);
+            return p3;
+        }
+        case MULTIPLY3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].d;
+            auto p5 = args[3].i;
+            multiply(p1, p2, p3, p4, p5);
+            return p3;
+        }
+        case DIVIDE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            divide(p1, p2, p3);
+            return p3;
+        }
+        case DIVIDE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].d;
+            divide(p1, p2, p3, p4);
+            return p3;
+        }
+        case DIVIDE3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].d;
+            auto p5 = args[3].i;
+            divide(p1, p2, p3, p4, p5);
+            return p3;
+        }
+        case SCALEADD: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].d;
+            auto p3 = args[2].m;
+            auto p4 = args[3].m;
+            scaleAdd(p1, p2, p3, p4);
+            return p4;
+        }
+        case CONVERTFP16: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            convertFp16(p1, p2);
+            return p2;
+        }
+        case LOOKUPTABLE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[1].m;
+            LUT(p1, p2, p3);
+            return p3;
+        }
+        case FINDNONZERO: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            findNonZero(p1, p2);
+            return p2;
+        }
+        case REDUCE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            reduce(p1, p2, p3, p4);
+            return p2;
+        }
+        case REDUCE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            auto p5 = args[4].i;
+            reduce(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case EXTRACTCHANNEL: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            extractChannel(p1, p2, p3);
+            return p2;
+        }
+        case INSERTCHANNEL: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            insertChannel(p1, p2, p3);
+            return p2;
+        }
+        case FLIP: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            flip(p1, p2, p3);
+            return p2;
+        }
+        case REPEAT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].i;
+            auto p3 = args[2].i;
+            auto p4 = args[3].m;
+            repeat(p1, p2, p3, p4);
+            return p4;
+        }
+        case HCONCAT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            hconcat(p1, p2, p3);
+            return p3;
+        }
+        case VCONCAT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            vconcat(p1, p2, p3);
+            return p3;
+        }
+        case BITWISE_AND: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            bitwise_and(p1, p2, p3);
+            return p3;
+        }
+        case BITWISE_AND2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[2].m;
+            bitwise_and(p1, p2, p3, p4);
+            return p3;
+        }
+        case BITWISE_OR: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            bitwise_or(p1, p2, p3);
+            return p3;
+        }
+        case BITWISE_OR2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[2].m;
+            bitwise_or(p1, p2, p3, p4);
+            return p3;
+        }
+        case BITWISE_XOR: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            bitwise_xor(p1, p2, p3);
+            return p3;
+        }
+        case BITWISE_XOR2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[2].m;
+            bitwise_xor(p1, p2, p3, p4);
+            return p3;
+        }
+        case BITWISE_NOT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            bitwise_not(p1, p2);
+            return p2;
+        }
+        case BITWISE_NOT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            bitwise_not(p1, p2, p3);
+            return p2;
+        }
+        case ABSDIFF: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            absdiff(p1, p2, p3);
+            return p3;
+        }
+        case INRANGE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[2].m;
+            inRange(p1, p2, p3, p4);
+            return p4;
+        }
+        case COMPARE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[2].i;
+            compare(p1, p2, p3, p4);
+            return p3;
+        }
+        case MINIMUM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            min(p1, p2, p3);
+            return p3;
+        }
+        case MAXIMUM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            max(p1, p2, p3);
+            return p3;
+        }
+        case SQUAREROOT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            sqrt(p1, p2);
+            return p2;
+        }
+        case POW: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].d;
+            auto p3 = args[2].m;
+            pow(p1, p2, p3);
+            return p3;
+        }
+        case EXP: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            exp(p1, p2);
+            return p2;
+        }
+        case LOG: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            log(p1, p2);
+            return p2;
+        }
+        case PHASE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            phase(p1, p2, p3);
+            return p3;
+        }
+        case PHASE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[2].b;
+            phase(p1, p2, p3, p4);
+            return p3;
+        }
+        case MAGNITUDE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            magnitude(p1, p2, p3);
+            return p3;
+        }
+        case PATCHNANS: {
+            auto p1 = args[0].m;
+            patchNaNs(p1);
+            return p1;
+        }
+        case PATCHNANS2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].d;
+            patchNaNs(p1, p2);
+            return p1;
+        }
+        case GEMM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].m;
+            auto p5 = args[4].d;
+            auto p6 = args[5].m;
+            gemm(p1, p2, p3, p4, p5, p6);
+            return p6;
+        }
+        case GEMM2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].d;
+            auto p4 = args[3].m;
+            auto p5 = args[4].d;
+            auto p6 = args[5].m;
+            auto p7 = args[6].i;
+            gemm(p1, p2, p3, p4, p5, p6, p7);
+            return p6;
+        }
+        case MULTRANSPOSED: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].b;
+            mulTransposed(p1, p2, p3);
+            return p2;
+        }
+        case MULTRANSPOSED2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].b;
+            auto p4 = args[3].m;
+            mulTransposed(p1, p2, p3, p4);
+            return p2;
+        }
+        case MULTRANSPOSED3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].b;
+            auto p4 = args[3].m;
+            auto p5 = args[4].d;
+            mulTransposed(p1, p2, p3, p4, p5);
+            return p2;
+        }
+        case MULTRANSPOSED4: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].b;
+            auto p4 = args[3].m;
+            auto p5 = args[4].d;
+            auto p6 = args[5].i;
+            mulTransposed(p1, p2, p3, p4, p5, p6);
+            return p2;
+        }
+        case TRANSPOSE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            transpose(p1, p2);
+            return p2;
+        }
+        case PERSPECTIVETRANSFORM: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            perspectiveTransform(p1, p2, p3);
+            return p2;
+        }
+        case COMPLETESYMM: {
+            auto p1 = args[0].m;
+            completeSymm(p1);
+            return p1;
+        }
+        case COMPLETESYMM2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].b;
+            completeSymm(p1, p2);
+            return p1;
+        }
+        case SETIDENTITY: {
+            auto p1 = args[0].m;
+            setIdentity(p1);
+            return p1;
+        }
+        case SETIDENTITY2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].sc;
+            setIdentity(p1, p2);
+            return p1;
+        }
+        case INVERT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            invert(p1, p2);
+            return p2;
+        }
+        case INVERT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            invert(p1, p2, p3);
+            return p2;
+        }
+        case SOLVE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            solve(p1, p2, p3);
+            return p3;
+        }
+        case SOLVE2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].i;
+            solve(p1, p2, p3, p4);
+            return p3;
+        }
+        case SORT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            sort(p1, p2, p3);
+            return p2;
+        }
+        case SORTIDX: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            sortIdx(p1, p2, p3);
+            return p2;
+        }
+        case SOLVECUBIC: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            solveCubic(p1, p2);
+            return p2;
+        }
+        case SOLVEPOLY: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            solvePoly(p1, p2, p3);
+            return p2;
+        }
+        case DFT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            dft(p1, p2);
+            return p2;
+        }
+        case DFT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            dft(p1, p2, p3);
+            return p2;
+        }
+        case DFT3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            dft(p1, p2, p3, p4);
+            return p2;
+        }
+        case IDFT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            idft(p1, p2);
+            return p2;
+        }
+        case IDFT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            idft(p1, p2, p3);
+            return p2;
+        }
+        case IDFT3: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            auto p4 = args[3].i;
+            idft(p1, p2, p3, p4);
+            return p2;
+        }
+        case DCT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            dct(p1, p2);
+            return p2;
+        }
+        case DCT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            dct(p1, p2, p3);
+            return p2;
+        }
+        case IDCT: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            idct(p1, p2);
+            return p2;
+        }
+        case IDCT2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            idct(p1, p2, p3);
+            return p2;
+        }
+        case MULSPECTRUMS: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].i;
+            mulSpectrums(p1, p2, p3, p4);
+            return p3;
+        }
+        case MULSPECTRUMS2: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            auto p4 = args[3].i;
+            auto p5 = args[3].b;
+            mulSpectrums(p1, p2, p3, p4, p5);
+            return p3;
+        }
+        case RANDU: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            randu(p1, p2, p3);
+            return p1;
+        }
+        case RANDN: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].m;
+            randn(p1, p2, p3);
+            return p1;
+        }
+
     }
     return Mat();
 }
