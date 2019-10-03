@@ -169,7 +169,6 @@ std::vector<std::string> Functions = {
     "pyrUp",
     "undistort",
     "undistort",
-    "undistort",
     "getDefaultNewCameraMatrix",
     "getDefaultNewCameraMatrix",
     "getDefaultNewCameraMatrix",
@@ -241,7 +240,7 @@ std::vector<std::string> types = {
     "Mat,OutMat,double,double",
     "Mat,OutMat,double,double,int",
     "Mat,OutMat,double,double,int,bool",
-    "",
+    "", // OutMat is implicitly incoming Mat ...
     "Mat,OutMat,int,double,double",
     "Mat,OutMat,int,double,double,int",
     "Mat,OutMat,int,double,double,int,double",
@@ -387,7 +386,7 @@ std::vector<std::string> types = {
     "Mat,Size,bool",
     "Mat,OutMat,Mat,Mat",
     "Mat,OutMat,Mat,Mat,Mat",
-    "Mat,OutMat,Mat,Mat,Mat",
+    "Mat,OutMat,Mat,Mat,Mat,Mat",
     "Mat,OutMat",
     "Mat,OutMat",
     "Mat,OutMat,double,double",
@@ -419,10 +418,6 @@ std::vector<std::string> types = {
     "OutMat,Point,Point,Scalar,int,int",
     "OutMat,Point,Point,Scalar,int,int,int",
     "OutMat,Point,Point,Scalar,int,int,int,double",
-    "OutMat,Point,Point,Scalar",
-    "OutMat,Point,Point,Scalar,int",
-    "OutMat,Point,Point,Scalar,int,int",
-    "OutMat,Point,Point,Scalar,int,int,int",
     "OutMat,Point,Size,double,double,double,Scalar",
     "OutMat,Point,Size,double,double,double,Scalar,int",
     "OutMat,Point,Size,double,double,double,Scalar,int,int",
@@ -712,7 +707,6 @@ std::tuple<std::tuple<MatType,MatType,IntType>,std::tuple<MatType,MatType>,std::
 Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
 
     switch (index) {
-        // Horrific monolithic Imgproc madness!!  Cthulhu is awakened!
         case CVTCOLOR: {
             // auto p1 = castmat(&args[0]);
             auto p1 = args[0].m;
@@ -817,7 +811,6 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             return p4;
         }
         case CALCBACKPROJECT: {
-            // I have not tested this function yet ...
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;
@@ -1685,7 +1678,7 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             erode(p1, p2, p3, p4, p5, p6);
             return p2;
         }
-        case ERODE5: {
+        case ERODE5: { //100
             auto p1 = args[0].m;
             auto p2 = args[1].m;
             auto p3 = args[2].m;

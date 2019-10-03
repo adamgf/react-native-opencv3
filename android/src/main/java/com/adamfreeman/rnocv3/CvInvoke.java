@@ -209,6 +209,14 @@ class CvInvoke {
                    Size dSize = new Size(width, height);
                    retObjs.add(dSize);
                }
+			   else if (param == Rect.class) {
+			       double top = dMap.getDouble("top");
+				   double left = dMap = dMap.getDouble("left");
+                   double width = dMap.getDouble("width");
+                   double height = dMap.getDouble("height");
+				   Rect dRect = new Rect(top, left, width, height);
+				   retObjs.add(dRect);
+			   }
 	   	   }
 		   else if (itsType == ReadableType.Number) {
                if (param == int.class) {
