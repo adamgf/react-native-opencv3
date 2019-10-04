@@ -210,10 +210,10 @@ class CvInvoke {
                    retObjs.add(dSize);
                }
 			   else if (param == Rect.class) {
-			       double top = dMap.getDouble("top");
-				   double left = dMap = dMap.getDouble("left");
-                   double width = dMap.getDouble("width");
-                   double height = dMap.getDouble("height");
+			       int top = dMap.getInt("top");
+				   int left = dMap.getInt("left");
+                   int width = dMap.getInt("width");
+                   int height = dMap.getInt("height");
 				   Rect dRect = new Rect(top, left, width, height);
 				   retObjs.add(dRect);
 			   }
