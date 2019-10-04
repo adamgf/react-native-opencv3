@@ -352,11 +352,6 @@
                MatWrapper *MW = [[MatWrapper alloc] init];
                MW.myMat = matParam;
                self.matParams[out] = MW;
-               // TODO ...
-               //id matParam;
-               //if (matParam != NULL) {
-               //    [self.matParams setObject:matParam forKey:out];
-               //}
            }
            else {
                if (matToUse.rows > 0 && [func isEqualToString:@"release"]) {
@@ -366,8 +361,6 @@
                }
                else {
                    std::string dFunc = std::string([func UTF8String]);
-                   
-                   dstMat = callOpencvMethod(methodIndex, ps);
                    
                    dstMat = callOpencvMethod(methodIndex, ps);
                }
