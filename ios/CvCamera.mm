@@ -395,15 +395,15 @@ static CvVideoCamera *videoCamera;
             self.onFacesDetected(@{@"payload":payloadJSON});
         }
     }
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
     
         if (self.mCvInvokeGroup != nil) {
             double currMillis = [self.startDate timeIntervalSinceNow];
-            double diff = (currMillis - mCurrentMillis) * 1000.0;
+            double diff = (currMillis - self->mCurrentMillis) * 1000.0;
             diff = (diff < 0.0) ? -diff : diff;
             if (diff >= (double)[self.mOverlayInterval doubleValue]) {
                 
-                mCurrentMillis = currMillis;
+                self->mCurrentMillis = currMillis;
                 self.startDate = [NSDate date];
                 
                 CvInvoke *invoker = [[CvInvoke alloc] initWithRgba:image_copy gray:gray];
@@ -424,35 +424,32 @@ static CvVideoCamera *videoCamera;
                 }
             }
         }
-        
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-
         if (self.mOverlay != nil) {
             int matIndex = [[self.mOverlay valueForKey:@"matIndex"] intValue];
             Mat overlayMat = [MatManager.sharedMgr matAtIndex:matIndex];
             addWeighted(image_copy, 1.0, overlayMat, 1.0, 0.0, image_copy);
         }
     
-        if (mTakePicture) {
-            mTakePicture = false;
+        if (self->mTakePicture) {
+            self->mTakePicture = false;
             MatWrapper *MW = [[MatWrapper alloc] init];
             MW.myMat = image_copy;
             self.takePicBlock(MW);
         }
-        else if (mRecording) {
-            if (mVideoWriter.isOpened()) {
+        else if (self->mRecording) {
+            if (self->mVideoWriter.isOpened()) {
                 Mat flippedColors;
                 cvtColor(image_copy, flippedColors, COLOR_RGBA2BGR);
-                mVideoWriter.write(flippedColors);
+                self->mVideoWriter.write(flippedColors);
             }
         }
-        else if (mRecordingFinished) {
-            mRecordingFinished = false;
-            self.recordVidBlock([NSNumber numberWithInt:mWidth], [NSNumber numberWithInt:mHeight], self.mFilename);
+        else if (self->mRecordingFinished) {
+            self->mRecordingFinished = false;
+            self.recordVidBlock([NSNumber numberWithInt:self->mWidth], [NSNumber numberWithInt:self->mHeight], self.mFilename);
         }
+    
         UIImage *videoImage = MatToUIImage(image_copy);
-        
         [self setImage:videoImage];
     });
 }
@@ -542,8 +539,8 @@ static CvVideoCamera *videoCamera;
         mRecording = false;
         mRecordingFinished = true;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            mVideoWriter.release();
-            mVideoWriter.~VideoWriter();
+            self->mVideoWriter.release();
+            self->mVideoWriter.~VideoWriter();
         });
         self.recordVidBlock = recordVidBlock;
     }
