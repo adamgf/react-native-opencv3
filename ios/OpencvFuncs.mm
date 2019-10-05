@@ -309,8 +309,8 @@ std::vector<std::string> Functions = {
     "mulSpectrums",
     "mulSpectrums",
     "randu",
-    "rotate",
     "randn",
+    "rotate",
 };
 
 std::vector<std::string> types = {
@@ -610,8 +610,8 @@ std::vector<std::string> types = {
     "Mat,Mat,OutMat,int",
     "Mat,Mat,OutMat,int,bool",
     "OutMat,Mat,Mat",
-    "Mat,OutMat,int",
     "OutMat,Mat,Mat",
+    "Mat,OutMat,int",
 };
 
 typedef enum fns {
@@ -911,8 +911,8 @@ typedef enum fns {
     MULSPECTRUMS,
     MULSPECTRUMS2,
     RANDU,
-    ROTATE,
     RANDN,
+    ROTATE,
 } ipfns;
 
 // these were functions used in conjunction with std::variant
