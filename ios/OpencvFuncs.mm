@@ -15,7 +15,6 @@
 std::vector<std::string> Functions = {
     "cvtColor", // beginning ImgProc functions
     "cvtColor",
-    "rotate",
     "line",
     "line",
     "line",
@@ -263,7 +262,7 @@ std::vector<std::string> Functions = {
     "bitwise_xor",
     "bitwise_not",
     "bitwise_not",
-    "absdiff",
+    "absdiff", 
     "inRange",
     "compare",
     "min",
@@ -310,13 +309,13 @@ std::vector<std::string> Functions = {
     "mulSpectrums",
     "mulSpectrums",
     "randu",
+    "rotate",
     "randn",
 };
 
 std::vector<std::string> types = {
     "Mat,OutMat,int", // beginning ImgProc functions
     "Mat,OutMat,int,int",
-    "Mat,OutMat,int",
     "OutMat,Point,Point,Scalar",
     "OutMat,Point,Point,Scalar,int",
     "OutMat,Point,Point,Scalar,int,int",
@@ -563,7 +562,7 @@ std::vector<std::string> types = {
     "Mat,Mat,OutMat",
     "Mat,Mat,OutMat,Mat",
     "Mat,OutMat",
-    "Mat,OutMat,int",
+    "Mat,OutMat,Mat",
     "Mat,Mat,OutMat",
     "Mat,Mat,Mat,OutMat",
     "Mat,Mat,OutMat,int",
@@ -587,7 +586,7 @@ std::vector<std::string> types = {
     "Mat,OutMat",
     "Mat,OutMat,Mat",
     "OutMat",
-    "OutMat,bool"
+    "OutMat,bool",
     "OutMat",
     "OutMat,Scalar",
     "Mat,OutMat",
@@ -611,13 +610,13 @@ std::vector<std::string> types = {
     "Mat,Mat,OutMat,int",
     "Mat,Mat,OutMat,int,bool",
     "OutMat,Mat,Mat",
+    "Mat,OutMat,int",
     "OutMat,Mat,Mat",
 };
 
 typedef enum fns {
     CVTCOLOR, // beginning ImgProc functions
     CVTCOLOR2,
-    ROTATE,
     LINE,
     LINE2,
     LINE3,
@@ -912,6 +911,7 @@ typedef enum fns {
     MULSPECTRUMS,
     MULSPECTRUMS2,
     RANDU,
+    ROTATE,
     RANDN,
 } ipfns;
 
@@ -989,13 +989,6 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p3 = args[2].i;
             auto p4 = args[3].i;
             cvtColor(p1, p2, p3, p4);
-            return p2;
-        }
-        case ROTATE: {
-            auto p1 = args[0].m;
-            auto p2 = args[1].m;
-            auto p3 = args[2].i;
-            rotate(p1, p2, p3);
             return p2;
         }
         case LINE: {
@@ -3540,6 +3533,13 @@ Mat callOpencvMethod(int index, std::vector<ocvtypes>& args, Mat dMat) {
             auto p3 = args[2].m;
             randn(p1, p2, p3);
             return p1;
+        }
+        case ROTATE: {
+            auto p1 = args[0].m;
+            auto p2 = args[1].m;
+            auto p3 = args[2].i;
+            rotate(p1, p2, p3);
+            return p2;
         }
 
     }
