@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 const { RNOpencv3 } = NativeModules;
 
 import { ColorConv, CvType, Imgproc, Core } from './constants';
-import { CvScalar, CvPoint, CvSize } from './coretypes';
+import { CvScalar, CvPoint, CvSize, CvRect } from './coretypes';
 import { Mat, MatOfInt, MatOfFloat, setTo, get } from './mats';
 import { CvImage, downloadAssetSource } from './cvimage';
 import { findNodeHandle } from 'react-native';
@@ -226,5 +226,6 @@ export {
   MatOfFloat,
   CvScalar,
   CvPoint,
-  CvSize
+  CvSize,
+  CvRect
 };
