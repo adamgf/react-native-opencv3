@@ -1,6 +1,6 @@
 {
   "_from": "git+https://github.com/adamgf/react-native-opencv3.git",
-  "_id": "react-native-opencv3@1.0.5",
+  "_id": "react-native-opencv3@1.0.4",
   "_inBundle": false,
   "_integrity": "",
   "_location": "/react-native-opencv3",
@@ -41,5 +41,5 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "1.0.5"
+  "version": "1.0.4"
 }
