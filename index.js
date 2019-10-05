@@ -9,7 +9,7 @@ const { RNOpencv3 } = NativeModules;
 import { ColorConv, CvType, Imgproc, Core } from './constants';
 import { CvScalar, CvPoint, CvSize, CvRect } from './coretypes';
 import { Mat, MatOfInt, MatOfFloat, setTo, get } from './mats';
-import { CvImage, downloadAssetSource } from './cvimage';
+import { CvImage } from './cvimage';
 import { findNodeHandle } from 'react-native';
 
 const CvCameraView = requireNativeComponent('CvCameraView', CvCamera);
@@ -213,7 +213,6 @@ const RNCv = RNOpencv3
 export {
   RNCv,
   CvImage,
-  downloadAssetSource,
   CvCamera,
   CvInvoke,
   CvInvokeGroup,
