@@ -143,6 +143,28 @@ import {RNCv, Mat, CvType, CvSize, CvPoint, CvScalar, ColorConv} from 'react-nat
 	
     this.setState({ ...this.state, destImageUri: uri })
   }
+  
+  ...
+  
+  render() {
+    const { destImageUri } = this.state
+    let circlesImageUri = this.resolveAssetSource(require('./images/Billiard-balls-table.jpg')).uri
+
+    if (destImageUri.length > 0) {
+      const prependFilename = Platform.OS === 'ios' ? '' : 'file://'
+      circlesImageUri = prependFilename + destImageUri  
+    }
+	
+    return (
+      <View style={styles.container}>
+        <Image
+          style={{width: 200, height: 250}}
+          source={{ uri: `${circlesImageUri}` }}
+        />
+	  </View>
+	)
+  }
+
 ```
 
 `downloadAssetSource` is a convenience meta method provided that uses RNFS under the hood to download the asset source locally to be used by RNCv to convert into a Mat.  You can include this method in your app by adding it to the constructor via -->
