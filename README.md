@@ -20,8 +20,8 @@ Add to Podfile ->
 
 `pod 'RNOpencv3', :path => '../node_modules/react-native-opencv3/ios', :subspecs => [
       'CvCamera'
-  ]
-  pod 'RNFS', :path => '../node_modules/react-native-fs'`
+  ]  
+pod 'RNFS', :path => '../node_modules/react-native-fs'`
   
 `$ pod install`
 
@@ -67,7 +67,7 @@ CvInvoke can either be used to wrap a CvImage as shown in the example or on one 
 
 ## CvInvokeGroup
 
-`CvInvokeGroup` is a simple react native component intended to wrap a bunch of CvInvoke react native components so multiple sets of data can be sent back to the callback specified in your app.  It's primary usage is to have two or more sets of CvInvokes applied to the same CvCamera instance.  It is not necessary if only one set of CvInvokes is used but can still be used for one set of CvInvokes to put the CvInvokes on separate lines.  The `groupId` property is just an arbitrary string used to identify the set of CvInvokes for *that* CvInvokeGroup.
+`CvInvokeGroup` is a simple react native component intended to wrap a bunch of CvInvoke react native components so multiple arrays of data (an array of arrays) can be sent back to the callback specified in your app.  It's primary usage is to have two or more sets of CvInvokes applied to the same CvCamera instance.  It is not necessary if only one set of CvInvokes is used but can still be used for one set of CvInvokes to put the CvInvokes on separate lines.  The `groupId` property is just an arbitrary string used to identify the set of CvInvokes for *that* CvInvokeGroup.  The groupids for each CvInvokeGroup should be unique.
 
 Example:
 ```javascript
@@ -86,7 +86,7 @@ Example:
 </CvInvokeGroup>
 ```
 
-In this example invokeGroup0 executes two functions on CvCamera and invokeGroup1 executes two different functions on CvCamera.  The data from the two invoke groups is returned to the `onPayload` method as two distinct arrays but both are part of the *payload* value sent to the callback in javascript.
+In this example invokeGroup0 executes two functions on CvCamera and invokeGroup1 executes two different functions on CvCamera.  The data from the two invoke groups is returned to the `onPayload` method as two distinct arrays but both are part of the *payload* value sent to the callback.
 
 ## RNCv
 
@@ -96,7 +96,7 @@ Example usage in asynchronous function:
 ```javascript
   componentDidMount = async() => {
 	  
-	const newImagePath = this.RNFS.DocumentDirectoryPath + '/Billiard-balls-table-circles.jpg'
+    const newImagePath = this.RNFS.DocumentDirectoryPath + '/Billiard-balls-table-circles.jpg'
 	  
     const interMat = await new Mat().init()
     const circlesMat = await new Mat().init()
@@ -110,45 +110,45 @@ Example usage in asynchronous function:
     } 
 	
     const sourceuri = this.resolveAssetSource(require('./images/Billiard-balls-table.jpg')).uri
-	const sourceFile = await this.downloadAssetSource(sourceuri)
-	const srcMat = await RNCv.imageToMat(sourceFile)
-	const gaussianKernelSize = new CvSize(9, 9)
+    const sourceFile = await this.downloadAssetSource(sourceuri)
+    const srcMat = await RNCv.imageToMat(sourceFile)
+    const gaussianKernelSize = new CvSize(9, 9)
 	
-	RNCv.invokeMethod('cvtColor', {"p1":srcMat,"p2":interMat,"p3":ColorConv.COLOR_BGR2GRAY}) 
-	RNCv.invokeMethod('GaussianBlur', {"p1":interMat,"p2":interMat,"p3":gaussianKernelSize,"p4":2,"p5":2})
-	RNCv.invokeMethod('HoughCircles', {"p1":interMat,"p2":circlesMat,"p3":3,"p4":2,"p5":100,"p6":100,"p7":90,"p8":1,"p9":130})
+    RNCv.invokeMethod('cvtColor', {"p1":srcMat,"p2":interMat,"p3":ColorConv.COLOR_BGR2GRAY}) 
+    RNCv.invokeMethod('GaussianBlur', {"p1":interMat,"p2":interMat,"p3":gaussianKernelSize,"p4":2,"p5":2})
+    RNCv.invokeMethod('HoughCircles', {"p1":interMat,"p2":circlesMat,"p3":3,"p4":2,"p5":100,"p6":100,"p7":90,"p8":1,"p9":130})
 	
-  	const scalar1 = new CvScalar(255,0,255,255)
-  	const scalar2 = new CvScalar(255,255,0,255)
+    const scalar1 = new CvScalar(255,0,255,255)
+    const scalar2 = new CvScalar(255,255,0,255)
 	
-	const circles = await RNCv.getMatData(circlesMat, 0, 0)
+    const circles = await RNCv.getMatData(circlesMat, 0, 0)
 	
     for (let i=0;i < circles.length;i+=3) {
-  	  const center = new CvPoint(Math.round(circles[i]), Math.round(circles[i+1]))
-  	  const radius = Math.round(circles[i+2])
+      const center = new CvPoint(Math.round(circles[i]), Math.round(circles[i+1]))
+      const radius = Math.round(circles[i+2])
       RNCv.invokeMethod("circle", {"p1":overlayMat,"p2":center,"p3":3,"p4":scalar1,"p5":12,"p6":8,"p7":0})
       RNCv.invokeMethod("circle", {"p1":overlayMat,"p2":center,"p3":radius,"p4":scalar2,"p5":24,"p6":8,"p7":0})
-  	}
+    }
     
-	RNCv.invokeMethod("addWeighted", {"p1":srcMat,"p2":1.0,"p3":overlayMat,"p4":1.0,"p5":0.0,"p6":srcMat})
-	const { uri, width, height } = await RNCv.matToImage(srcMat, newImagePath)
+    RNCv.invokeMethod("addWeighted", {"p1":srcMat,"p2":1.0,"p3":overlayMat,"p4":1.0,"p5":0.0,"p6":srcMat})
+    const { uri, width, height } = await RNCv.matToImage(srcMat, newImagePath)
 	
-	RNCv.deleteMat(overlayMat)	
-	RNCv.deleteMat(interMat)	
-	RNCv.deleteMat(circlesMat)
+    RNCv.deleteMat(overlayMat)	
+    RNCv.deleteMat(interMat)	
+    RNCv.deleteMat(circlesMat)
 	
-	this.setState({ ...this.state, destImageUri: uri })
+    this.setState({ ...this.state, destImageUri: uri })
   }
 ```
 
 `downloadAssetSource` is a convenience method provided that uses RNFS under the hood to download the asset source locally to be used by RNCv to convert into a Mat.  You can include this method in your app by adding it to the constructor via -->
 ```javascript
-	this.downloadAssetSource = require('react-native-opencv3/downloadAssetSource')
+this.downloadAssetSource = require('react-native-opencv3/downloadAssetSource')
 ```
 
 and then call the method in your app using this.downloadAssetSource(uri) where the uri is the uri of the source image which can be obtained using the React function resolveAssetSource which can also be included via -->
 ```javascript
-    this.resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource')
+this.resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource')
 ```
 For more info about resolveAssetSource refer to the online React documentation.
 
@@ -197,7 +197,7 @@ In conjunction with the `onDetectFaces` property the properties `faceClassifier`
 27. haarcascade_mcs_upperbody
 28. haarcascade_mcs_eyepair_big		
 29. haarcascade_profileface
-```
+
 Only the classifiers in the CvFaceDetection sample app have currently been tested.
 
 The `landmarksModel` property should only be used for the 64 face landmarks in conjunction with a face classifier.  Currently it can only be set to `lbfmodel` because there is only one landmarks data file supported.  As for face boxes, face landmarks should also be used in conjunction with the same `onFacesDetected` callback.  Like face detection For the json format of the landmarks data returned to the callback method see below.
@@ -324,7 +324,7 @@ Using the reference to the camera instance an image can be taken with whatever f
     const { uri, width, height } = await this.cvCamera.takePicture('myimage.jpg')
     //alert('Picture successfully taken uri is: ' + uri)
     if (Platform.OS === 'android') {
-  	  this.setState({ picuri : 'file://' + uri })
+      this.setState({ picuri : 'file://' + uri })
     }
     else {
       this.setState({ picuri : uri })
@@ -347,29 +347,29 @@ Using the reference to the camera instance a video can be recorded by first call
   startRecordingVideo = async() => {
     filenameStr = 'myvideo'
     if (Platform.OS === 'android') {
-	  filenameStr += '.avi'
+      filenameStr += '.avi'
     }
     else {
-	  filenameStr += '.m4v'
+      filenameStr += '.m4v'
     }
     let itexists = await RNFS.exists(filenameStr)
     if (itexists) {
-  	  await RNFS.unlink(filenameStr)
+      await RNFS.unlink(filenameStr)
     }
     this.cvCamera.startRecording(filenameStr)
   }
   
   stopRecordingVideo = async() => {
     const { uri, width, height } = await this.cvCamera.stopRecording()
-	const { size } = await RNFS.stat(uri)
-	if (Platform.OS === 'android') {
+    const { size } = await RNFS.stat(uri)
+    if (Platform.OS === 'android') {
       // avi does not seem to play in react-native-video ??
       alert('Video uri is: ' + uri + ' width is: ' + width + ' height is: ' + height + ' size is: ' + size)
-	  this.setState({ videouri : 'file://' + uri})
-	}
-	else {
+      this.setState({ videouri : 'file://' + uri})
+    }
+    else {
       this.setState({ videouri : uri })
-	}
+    }
   }
   
   <CvCamera
@@ -390,9 +390,9 @@ A number of ImgProc and Core constants are supported.  As well as ColorConv cons
 
 There are also some functions that are available for the various basic types but not all of these have been tested.  The best thing to do is investigate the sample apps to see what is available and has been tested.
 
-Of course not all OpenCV functions are supported but a large chunk of ImgProc and Core methods are.  To see what is supported on iOS look at the file ImgProcFunctions.mm.  On Android method invocation is used so any Core and ImgProc function can be called but not every function is going to work because arrays of Mats cannot yet be passed to functions for example.
+Of course not all OpenCV functions are supported but a large chunk of ImgProc and Core methods are.  To see what is supported on iOS look at the file OpencvFuncs.mm.  On Android method invocation is used so any Core and ImgProc function can be called but not every function is going to work because arrays of Mats cannot yet be passed to functions for example.
 
-Copyright © 2019-20 Adam G. Freeman, All Rights Reserved.
+*Copyright © 2019-20 Adam G. Freeman, All Rights Reserved.*
 
 Sample apps are at: https://github.com/adamgf/react-native-opencv3-tests
 
