@@ -161,8 +161,8 @@ import {RNCv, Mat, CvType, CvSize, CvPoint, CvScalar, ColorConv} from 'react-nat
           style={{width: 200, height: 250}}
           source={{ uri: `${circlesImageUri}` }}
         />
-	  </View>
-	)
+      </View>
+    )
   }
 
 ```
