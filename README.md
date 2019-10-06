@@ -186,13 +186,13 @@ For more info about resolveAssetSource refer to the online React documentation.
 
 `CvCamera` is a React Native component that displays the front or back facing camera view and can be wrapped in CvInvoke tags.  The innermost CvInvoke tag should reference either 'rgba', 'rgbat', 'gray' or 'grayt' as the first parameter 'p1' in the params dictionary property.  The optional `facing` property should be set to either 'front' the default for the camera view away from the user or 'back' for towards the user.  
 
-The `onFrameSize` property refers to the callback that gets the frame size information.  The information is returned to the callback in the json dictionary format: `{ "payload" : { "frameSize" : { "frameWidth" : XXX, "frameHeight" : YYY }}}`.  The callback in your app should also be called `onFrameSize`.
+The optional `onFrameSize` property refers to the callback that gets the frame size information.  The information is returned to the callback in the json dictionary format: `{ "payload" : { "frameSize" : { "frameWidth" : XXX, "frameHeight" : YYY }}}`.  The callback in your app should also be called `onFrameSize`.
    
-The `onPayload` property refers to the callback that gets the payload data from the set of enclosing CvInvoke methods.  The outermost CvInvoke method should include a `callback` property that also references this method.  The method should be named `onPayload`.  The data returned to the callback will be in the json dictionary format: `{ "payload" : ... }` where the ... value is either an array of data or an array of arrays of data.  When a callback is used the property `overlayInterval` should be set to at least 100 milliseconds.  This is the amount of time before a new chunk of data is sent back to the callback so an overlay image can be updated.  You may need to test different values to see what is the best value to use for your application.
+The optional `onPayload` property refers to the callback that gets the payload data from the set of enclosing CvInvoke methods.  The outermost CvInvoke method should include a `callback` property that also references this method.  The method should be named `onPayload`.  The data returned to the callback will be in the json dictionary format: `{ "payload" : ... }` where the ... value is either an array of data or an array of arrays of data.  When a callback is used the property `overlayInterval` should be set to at least 100 milliseconds.  This is the amount of time before a new chunk of data is sent back to the callback so an overlay image can be updated.  You may need to test different values to see what is the best value to use for your application.
 
-The `onDetectFaces` property refers to the callback that gets the payload data if one or more faces is detected in the camera view.  The format of the payload data is described below.  The callback in your app should be named `onDetectFaces`.
+The optional `onDetectFaces` property refers to the callback that gets the payload data if one or more faces is detected in the camera view.  The format of the payload data is described below.  The callback in your app should be named `onDetectFaces`.
 
-In conjunction with the `onDetectFaces` property the properties `faceClassifier`, `eyesClassifier`, 'noseClassifer` and `mouthClassifier` should be specified with a minimum of the faceClassifier property being set and each refers to its corresponding cascade classifier data file.  The available classifiers currently are: 
+In conjunction with the `onDetectFaces` property the properties `faceClassifier`, `eyesClassifier`, `noseClassifer` and `mouthClassifier` should be specified with a minimum of the faceClassifier property being set and each refers to its corresponding cascade classifier data file.  The available classifiers currently are: 
 
 1. haarcascade_mcs_eyepair_small 
 2. haarcascade_righteye_2splits
@@ -263,6 +263,8 @@ Face Detection Example:
     }
   }
 
+  ...
+  
   <CvCamera
     facing='back'
     faceClassifier='haarcascade_frontalface_alt2'
@@ -288,6 +290,9 @@ Face Landmarks Example:
       }
     }
   }
+  
+  ...
+  
   <CvCamera
     facing='back'
     faceClassifier='haarcascade_frontalface_alt2'
@@ -357,6 +362,8 @@ Using the reference to the camera instance an image can be taken with whatever f
     }
   }
   
+  ...
+  
   <CvCamera
     ref={ref => { this.cvCamera = ref }}
     style={styles.preview}
@@ -367,7 +374,7 @@ Using the reference to the camera instance an image can be taken with whatever f
 
 #### Recording video
 
-Using the reference to the camera instance a video can be recorded by first calling the asynchronous CvCamera method `startRecording` and after time has elapsed calling the asynchronous CvCamera method `stopRecording` as in this example:
+Using the reference to the camera instance a video can be recorded by first calling the CvCamera method `startRecording` and after time has elapsed calling the asynchronous CvCamera method `stopRecording` as in this example:
 ```javascript
 
   startRecordingVideo = async() => {
@@ -397,6 +404,8 @@ Using the reference to the camera instance a video can be recorded by first call
       this.setState({ videouri : uri })
     }
   }
+  
+  ...
   
   <CvCamera
     ref={ref => { this.cvCamera = ref }}
