@@ -188,7 +188,7 @@ For more info about resolveAssetSource refer to the online React documentation.
 
 The optional `onFrameSize` property refers to the callback that gets the frame size information.  The information is returned to the callback in the json dictionary format: `{ "payload" : { "frameSize" : { "frameWidth" : XXX, "frameHeight" : YYY }}}`.  The callback in your app should also be called `onFrameSize`.
    
-The optional `onPayload` property refers to the callback that gets the payload data from the set of enclosing CvInvoke methods.  The outermost CvInvoke method should include a `callback` property that also references this method.  The method should be named `onPayload`.  The data returned to the callback will be in the json dictionary format: `{ "payload" : ... }` where the ... value is either an array of data or an array of arrays of data.  When a callback is used the property `overlayInterval` should be set to at least 100 milliseconds.  This is the amount of time before a new chunk of data is sent back to the callback so an overlay image can be updated.  You may need to test different values to see what is the best value to use for your application.  Once inside the onPayload method you can use the data returned to generate an overlay Mat and then set the overlay on the CvCamera view using the `setOverlay` method as `this.cvCamera.setOverlay(overlayMat)`.  An example of this is in the CvImageManipulations sample app.
+### Face detection
 
 The optional `onDetectFaces` property refers to the callback that gets the payload data if one or more faces is detected in the camera view.  The format of the payload data is described below.  The callback in your app should be named `onDetectFaces`.
 
@@ -303,7 +303,7 @@ Face Landmarks Example:
 
 Facing='back' is towards the user so you can test it using your own face.  To specify the other direction set facing='front' or leave out the facing property.
 
-### Face detection data format
+#### Face detection data format
 
 The data returned to the callback method `onFacesDetected` will have the json dictionary format:
 ```javascript
@@ -316,13 +316,13 @@ The data returned to the callback method `onFacesDetected` will have the json di
       "faceId":"0",
       "nose":{"x":0.301075,"y":0.308244,"width":0.215054,"height":0.129032},
       "mouth":{"x":0.376344,"y":0.874552,"width":0.121864,"height":0.057348},
-	  "landmarks": [
-	    {"x":0.190278,"y":0.826562},
-	    {"x":0.172222,"y":0.828125},
-	    {"x":0.154167,"y":0.830469},
-	    {"x":0.134722,"y":0.833594},
-	    {"x":0.118056,"y":0.838281},
-	    {"x":0.102778,"y":0.846875}, 
+      "landmarks": [
+        {"x":0.190278,"y":0.826562},
+        {"x":0.172222,"y":0.828125},
+        {"x":0.154167,"y":0.830469},
+        {"x":0.134722,"y":0.833594},
+        {"x":0.118056,"y":0.838281},
+        {"x":0.102778,"y":0.846875}, 
 	    ... 
 	  ]
     },
@@ -332,13 +332,18 @@ The data returned to the callback method `onFacesDetected` will have the json di
 	  "height":0.209375,
 	  "faceId":"1",
       "firstEye":{"x":0.567164,"y":0.201493,"width":0.242537,"height":0.242537},
-      "secondEye":{"x":0.567164,"y":0.201493,"width":0.242537,"height":0.242537},
+      "secondEye":{"x":0.868172,"y":0.231591,"width":0.239439,"height":0.288819},
       "nose":{"x":0.343284,"y":0.537313,"width":0.268657,"height":0.160448}
     }
   ]} 
 }
 ```
-The values represent percentages so 0.15 represents 15% of the width for example.  For the face components like the nose for instance the percentage is the percentage of the face box not the entire image.  As you can see from the sample data if something is not detected it is simply not included in the return data.  For the landmarks there are 68 points of data.  For in-depth examples of how to parse the json payload return data check out the sample apps CvFaceDetection and CvFaceLandmarks.
+The values represent percentages so 0.15 represents 15% of the width for example.  For the face components other than the landmarks the percentage is the percentage of the face box not the entire image.  As can be seen from the sample data if something is not detected it is simply not included in the return data.  For the landmarks there are 68 points of data.  For in-depth examples of how to parse the json payload return data check out the sample apps CvFaceDetection and CvFaceLandmarks.
+
+
+### Callbacks and overlays
+
+The optional `onPayload` property refers to the callback that gets the payload data from the set of enclosing CvInvoke methods.  The outermost CvInvoke method should include a `callback` property that also references this method.  The method should be named `onPayload`.  The data returned to the callback will be in the json dictionary format: `{ "payload" : ... }` where the ... value is either an array of data or an array of arrays of data.  When a callback is used the property `overlayInterval` should be set to at least 100 milliseconds.  This is the amount of time before a new chunk of data is sent back to the callback so an overlay image can be updated.  You may need to test different values for overlayInterval to see what is the best value to use for your application.  Once inside the onPayload method you can use the data returned to generate an overlay Mat and then set the overlay on the CvCamera view using the `setOverlay` method as `this.cvCamera.setOverlay(overlayMat)`.  An example of this is in the CvImageManipulations sample app.
 
 ### Saving images and recording video
 
