@@ -1,9 +1,9 @@
 
 # react-native-opencv3
 
-React-native opencv3 or "RNOpencv3" wraps opencv native functions and propagates the return data from these functions to react native land for usage in android and iOS apps enabling native app developers with new functionality.  This package is not guaranteed bug-free and does not encompass all of OpenCV but is a good starting point with a nice chunk of Imgproc and Core functions supported and face and landmark detection and image and video overlays as well as saving images and recording video.  All two way communication between react-native and OpenCV is supported and thus can be expanded upon.  It establishes an infrastructure and provides scaffolding for eventually incorporating all functionality from Opencv core and extension modules.  
+React-native opencv3 or "RNOpencv3" wraps opencv native functions and propagates the return data from these functions to react native land for usage in android and iOS apps enabling native app developers with new functionality.  This package is not guaranteed bug-free and does not encompass all of OpenCV but is a good starting point with a nice chunk of Imgproc and Core functions supported and face and landmark detection and image and video overlays as well as saving images and recording video.  All two way communication between react-native and OpenCV is supported and thus can be expanded upon.  It establishes an infrastructure and provides scaffolding for eventually incorporating all functionality from OpenCV core and extension modules.  
 
-The basic methodology is that any function from opencv can be opaquely called from react native using a string to lookup the function and a dictionary to look up Mats and utilize other structures (CvScalar, CvPoint, etc.) that are referenced by the react native application and by using Java method invocation and method wrapping in C++.  Because Opencv provides a variety of methods that take an input of one or more Mats and other types and output one Mat, this seemed like a good place to start.  So RNOpencv3 is not intended to be some bulky monolithic library but a thin layer in between react native and opencv3 with functionality developers need to create awesome apps with more advanced image processing, object and face detection and other capabilities.  Hopefully this convinces others to take this basic framework run with it and become a contributor.
+The basic methodology is that any function from opencv can be opaquely called from react native using a string to lookup the function and a dictionary to look up Mats and utilize other structures (CvScalar, CvPoint, etc.) that are referenced by the react native application and by using Java method invocation and method wrapping in C++ to invoke the native methods.  Because Opencv provides a variety of methods that take an input of one or more Mats and other types and output one Mat, this seemed like a good place to start.  So RNOpencv3 is not intended to be some bulky monolithic library but a thin layer in between react native and opencv with functionality developers need to create awesome apps with more advanced image processing, object and face detection and other capabilities.  Hopefully this convinces others to take this basic framework run with it and become contributors.
 
 ## Getting started
 
@@ -18,10 +18,12 @@ Since the aar currently used was not built with jetify support, in `gradle.prope
 
 Add to Podfile ->
 
-`pod 'RNOpencv3', :path => '../node_modules/react-native-opencv3/ios', :subspecs => [
+```
+pod 'RNOpencv3', :path => '../node_modules/react-native-opencv3/ios', :subspecs => [
       'CvCamera'
-  ]`  
-`pod 'RNFS', :path => '../node_modules/react-native-fs'`
+  ]  
+pod 'RNFS', :path => '../node_modules/react-native-fs'
+```
   
 `$ pod install`
 
@@ -31,7 +33,7 @@ For `CvCamera` app should be portrait only.
 
 ## CvInvoke
 
-`CvInvoke` is a React Native component for wrapping `CvImage` and `CvCamera` react native components.  A CvInvoke component executes an OpenCV function on a CvImage or CvCamera view.  Multiple CvInvoke components can be chained such that multiple OpenCV functions can be called in order such that the innermost CvInvoke component invokes the first function the second innermost takes as input the output from the first etc.  This may be easier to visualize with an example:
+`CvInvoke` is a React Native component for wrapping `CvImage` and `CvCamera` react native components.  A CvInvoke component executes an OpenCV function on a CvImage or CvCamera view.  Multiple CvInvoke components can be chained such that multiple OpenCV functions can be called in order.  The innermost CvInvoke component invokes the first function the second innermost takes as input the output from the first etc.  This may be easier to visualize with an example:
 
 ```
 import {CvImage, CvInvoke, ColorConv, Core} from 'react-native-opencv3';
@@ -51,9 +53,9 @@ import {CvImage, CvInvoke, ColorConv, Core} from 'react-native-opencv3';
 
 ```
 
-In this example the first function executed on the source image is `cvtColor`, the second function executed is `rotate` and the third function executed is `bitwise_not` so the transformed image is displayed in the app.
+In this example the first function executed on the source image is `cvtColor`, the second function executed is `rotate` and the third function executed is `bitwise_not` and then the transformed image is displayed in the app.
 
-The only required property is `func` which directly maps to an OpenCV ImgProc or Core function or a function on a Mat.  The `params` property for the function should be specifed in a json dictionary as "p1", "p2", "p3" ...  All variants with different numbers of parameters are supported so for example `cvtColor` can be called with three or four parameters.  
+The only required property is `func` which directly maps to an OpenCV Imgproc or Core function or a function on a Mat.  The `params` property for the function should be specifed in a json dictionary as "p1": XX, "p2": YY, "p3": ZZ ...  All variants with different numbers of parameters are supported so for example `cvtColor` can be called with three or four parameters.  
 
 For functions that operate directly on a Mat type the Mat should be referenced via the `inObj` property and the output Mat should be referenced via the `outObj` property.  An example of one of these functions is `submat`.
 
@@ -63,11 +65,11 @@ If wrapping CvCamera, the special string "rgba" references the source incoming v
 
 The `callback` property should only be used in conjunction with CvCamera and should only be referenced by the outermost tag in the CvInvoke chain.  This sends the output data from the outermost tag back to your application.  The callback function should be named `onPayload`.  The data will be returned as a json dictionary with the key `payload` and the data being returned as the value.  The data returned in the payload is either one array or an array of arrays.
 
-CvInvoke can either be used to wrap a CvImage as shown in the example or on one separate line if part of a CvInvokeGroup.
+CvInvoke can either enclose a CvCamera or CvImage as shown in the example or be on its own separate line if part of a CvInvokeGroup.
 
 ## CvInvokeGroup
 
-`CvInvokeGroup` is a simple react native component intended to wrap a bunch of CvInvoke react native components so multiple arrays of data (an array of arrays) can be sent back to the callback specified in your app.  It's primary usage is to have two or more sets of CvInvokes applied to the same CvCamera instance.  It is not necessary if only one set of CvInvokes is used but can still be used for one set of CvInvokes to put the CvInvokes on separate lines.  The `groupId` property is just an arbitrary string used to identify the set of CvInvokes for *that* CvInvokeGroup.  The groupids for each CvInvokeGroup should be unique.
+`CvInvokeGroup` is a simple react native component intended to wrap a series of CvInvoke react native components so multiple arrays of data (an array of arrays) can be sent back to the callback specified in your app.  Its primary usage is to have two or more sets of CvInvokes applied to the same CvCamera instance.  A CvInvokeGroup is not necessary if only one set of CvInvokes is used but can still be used for one set of CvInvokes to put the CvInvoke tags on separate lines.  The `groupId` property is an arbitrary string used to identify the set of CvInvokes for *that* CvInvokeGroup.  The groupids for each CvInvokeGroup should be unique.
 
 Example:
 ```javascript
@@ -86,11 +88,11 @@ Example:
 </CvInvokeGroup>
 ```
 
-In this example invokeGroup0 executes two functions on CvCamera and invokeGroup1 executes two different functions on CvCamera.  The data from the two invoke groups is returned to the `onPayload` method as two distinct arrays but both are part of the *payload* value sent to the callback.
+In this example `invokeGroup0` executes two functions on CvCamera and `invokeGroup1` executes two different functions on CvCamera.  The data from the two invoke groups is returned to the `onPayload` method as two distinct arrays but both are part of the *payload* value sent to the callback.
 
 ## RNCv
 
-`RNCv` is a React Native component that allows asynchronous interaction with OpenCV.  Typically RNCv will be used to convert a source image into a Mat via the `RNCV.imageToMat` function, performing any kind of operations on the Mat and then converting the Mat back to an image via the `RNCV.matToImage` function.  To see how this is used in action check out the HoughCircles2 sample app.  HoughCircles2 also demonstrates how to use RNCv to modify a source image without using CvInvokes which are not possible with arbitrary data such as locations of circles.
+`RNCv` is a React Native component that permits asynchronous interaction with OpenCV.  Typically RNCv will be used to convert a source image into a Mat via the `RNCV.imageToMat` function, performing any kind of operations on the Mat using `RNCV.invokeMethod` and then converting the Mat back to an image via the `RNCV.matToImage` function.  To see how this is used in action check out the HoughCircles2 sample app.  HoughCircles2 also demonstrates how to use RNCv to modify a source image without using CvInvokes which may not be possible with arbitrary data such as locations of circles.
 
 Example usage in asynchronous function:
 ```javascript
@@ -172,7 +174,7 @@ import {RNCv, Mat, CvType, CvSize, CvPoint, CvScalar, ColorConv} from 'react-nat
 this.downloadAssetSource = require('react-native-opencv3/downloadAssetSource')
 ```
 
-and then call the method in your app using `this.downloadAssetSource(uri)` where the uri is the uri of the source image which can be obtained using the React function resolveAssetSource which can also be included via -->
+and then call the method in your app using `this.downloadAssetSource(uri)`.  The uri is the uri of the source image which can be obtained using the React function resolveAssetSource which can also be included via -->
 ```javascript
 this.resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource')
 ```
@@ -180,7 +182,7 @@ For more info about resolveAssetSource refer to the online React documentation.
 
 ## CvImage
 
-`CvImage` is a React Native component that is intended to exactly replicate the Image React component but applies a set of one or more CvInvoke operations to the source image.  It takes the same properties as the Image React component.  For example usage refer to the above CvInvoke example.
+`CvImage` is a React Native component that is intended to exactly replicate the Image React component but applies a set of one or more CvInvoke operations to the source image and displays the transformed image.  It takes the same properties as the Image React component.  For example usage refer to the above CvInvoke example.
 
 ## CvCamera
 
@@ -188,6 +190,25 @@ For more info about resolveAssetSource refer to the online React documentation.
 
 The optional `onFrameSize` property refers to the callback that gets the frame size information.  The information is returned to the callback in the json dictionary format: `{ "payload" : { "frameSize" : { "frameWidth" : XXX, "frameHeight" : YYY }}}`.  The callback in your app should also be called `onFrameSize`.
    
+Basic Usage Example:
+```javascript
+import {CvCamera, CvScalar, Mat, CvInvoke, CvInvokeGroup} from 'react-native-opencv3';
+
+...
+<CvInvokeGroup groupid='zeeGrup'>
+  <CvInvoke func='convertScaleAbs' params={{"p1":this.interMat,"p2":"rgba","p3":16,"p4":0}}/>
+  <CvInvoke func='convertScaleAbs' params={{"p1":"rgba","p2":this.interMat,"p3":1./16,"p4":0}}/>
+  <CvInvoke inobj='rgba' func='setTo' params={{"p1":posterScalar,"p2":this.interMat}}/>
+  <CvInvoke func='Canny' params={{"p1":"rgba","p2":this.interMat,"p3":80,"p4":90}}/>		
+  <CvCamera
+    ref={ref => { this.cvCamera = ref }}
+    style={styles.preview}
+    facing={facing}
+  />
+</CvInvokeGroup>
+
+```
+
 ### Face detection
 
 The optional `onDetectFaces` property refers to the callback that gets the payload data if one or more faces is detected in the camera view.  The format of the payload data is described below.  The callback in your app should be named `onDetectFaces`.
@@ -226,26 +247,7 @@ In conjunction with the `onDetectFaces` property the properties `faceClassifier`
 
 Only the classifiers in the CvFaceDetection sample app have currently been tested.
 
-The `landmarksModel` property should only be used for the 68 face landmarks in conjunction with a face classifier.  Currently it can only be set to `lbfmodel` because there is only one landmarks data file supported `lbfmodel.yaml`.  As for face boxes, face landmarks should also be used in conjunction with the same `onFacesDetected` callback.  Like face detection For the json format of the landmarks data returned to the callback method see below.  
-
-Basic Usage Example:
-```javascript
-import {CvCamera, CvScalar, Mat, CvInvoke, CvInvokeGroup} from 'react-native-opencv3';
-
-...
-<CvInvokeGroup groupid='zeeGrup'>
-  <CvInvoke func='convertScaleAbs' params={{"p1":this.interMat,"p2":"rgba","p3":16,"p4":0}}/>
-  <CvInvoke func='convertScaleAbs' params={{"p1":"rgba","p2":this.interMat,"p3":1./16,"p4":0}}/>
-  <CvInvoke inobj='rgba' func='setTo' params={{"p1":posterScalar,"p2":this.interMat}}/>
-  <CvInvoke func='Canny' params={{"p1":"rgba","p2":this.interMat,"p3":80,"p4":90}}/>		
-  <CvCamera
-    ref={ref => { this.cvCamera = ref }}
-    style={styles.preview}
-    facing={facing}
-  />
-</CvInvokeGroup>
-
-```
+The `landmarksModel` property should be used for the 68 face landmarks in conjunction with a face classifier.  Currently it can only be set to `lbfmodel` because there is only one landmarks data file supported `lbfmodel.yaml`.  As for face boxes, face landmarks should also be used in conjunction with the same `onFacesDetected` callback.  As for face detection For the json format of the landmarks data returned to the callback method see below.  
 
 Face Detection Example:
 ```javascript
@@ -301,7 +303,7 @@ Face Landmarks Example:
   />
 ```
 
-Facing='back' is towards the user so you can test it using your own face.  To specify the other direction set facing='front' or leave out the facing property.
+Including facing='back' sets the camera view towards the user so you can test it using your own face.  To specify the other direction set facing='front' or leave out the facing property.
 
 #### Face detection data format
 
@@ -323,18 +325,18 @@ The data returned to the callback method `onFacesDetected` will have the json di
         {"x":0.134722,"y":0.833594},
         {"x":0.118056,"y":0.838281},
         {"x":0.102778,"y":0.846875}, 
-	    ... 
-	  ]
+        ... 
+      ]
     },
     { "x":0.352778,
       "y":0.406250,
-	  "width":0.372222,
-	  "height":0.209375,
-	  "faceId":"1",
+      "width":0.372222,
+      "height":0.209375,
+      "faceId":"1",
       "firstEye":{"x":0.567164,"y":0.201493,"width":0.242537,"height":0.242537},
       "secondEye":{"x":0.868172,"y":0.231591,"width":0.239439,"height":0.288819},
       "nose":{"x":0.343284,"y":0.537313,"width":0.268657,"height":0.160448}
-    }
+     }
   ]} 
 }
 ```
@@ -343,7 +345,9 @@ The values represent percentages so 0.15 represents 15% of the width for example
 
 ### Callbacks and overlays
 
-The optional `onPayload` property refers to the callback that gets the payload data from the set of enclosing CvInvoke methods.  The outermost CvInvoke method should include a `callback` property that also references this method.  The method should be named `onPayload`.  The data returned to the callback will be in the json dictionary format: `{ "payload" : ... }` where the ... value is either an array of data or an array of arrays of data.  When a callback is used the property `overlayInterval` should be set to at least 100 milliseconds.  This is the amount of time before a new chunk of data is sent back to the callback so an overlay image can be updated.  You may need to test different values for overlayInterval to see what is the best value to use for your application.  Once inside the onPayload method you can use the data returned to generate an overlay Mat and then set the overlay on the CvCamera view using the `setOverlay` method as `this.cvCamera.setOverlay(overlayMat)`.  An example of this is in the CvImageManipulations sample app.
+The optional `onPayload` property refers to the callback that gets the payload data from the set of enclosing CvInvoke methods.  The outermost CvInvoke method should include a `callback` property that also references this method.  The method should be named `onPayload`.  The data returned to the callback will be in the json dictionary format: `{ "payload" : ... }` where the ... value is either an array of data or an array of arrays of data.  When a callback is used the property `overlayInterval` should be set to at least 100 milliseconds.  This is the amount of time before a new chunk of data is sent back to the callback so an overlay image can be updated.  You may need to test different values for overlayInterval to see what is the best value to use for your application.  You also may need to use different overlay interval values on iOS and Android.  
+
+Once inside the onPayload method you can use the data returned to generate an overlay Mat and then set the overlay on the CvCamera view using the `setOverlay` method as `this.cvCamera.setOverlay(overlayMat)`.  Callbacks and overlays are used in the CvImageManipulations sample app.  Usage is also shown in the above CvInvokeGroup example.
 
 ### Saving images and recording video
 
@@ -422,21 +426,23 @@ Using the reference to the camera instance a video can be recorded by first call
 
 ## Supported types, constants and functions
 
-There are currently just some very basic supported OpenCV types.  The supported javascript types that map directly to native OpenCV types are:
+There are currently some basic supported OpenCV types.  The supported types that map directly to native OpenCV types are:
 
 Mat, MatOfInt, MatOfFloat, CvPoint, CvScalar, CvSize and CvRect
 
-A number of ImgProc and Core constants are supported.  As well as ColorConv constants which are for converting from one colorspace to another.  The best way to see which constants are supported is to look at the file `constants.js`.  You can also use the actual number instead of the constant so 2 instead of Core.ROTATE_90_COUNTERCLOCKWISE for instance.
+A number of Imgproc and Core constants are supported.  As well as ColorConv constants which are for converting from one colorspace to another.  To see which constants are supported check out `constants.js`.  You can also use the actual number instead of the constant so 2 instead of Core.ROTATE_90_COUNTERCLOCKWISE for instance.  `CvType` is also supported for identifying and setting the data format of the Mats.
 
-There are also some functions that are available for the various basic types but not all of these have been tested.  The best thing to do is investigate the sample apps to see what is available and has been tested.
+There are also some functions that are available for the various basic types.  Not all of these have been tested but some are used in the sample apps. 
 
-Of course not all OpenCV functions are supported but a large chunk of ImgProc and Core methods are.  To see what is supported on iOS look at the file OpencvFuncs.mm.  On Android method invocation is used so any Core and ImgProc function can be called but not every function is going to work because arrays of Mats cannot yet be passed to functions for example.
+Of course not all OpenCV functions are supported but a large chunk of Imgproc and Core methods are.  The supported functions on iOS are listed in the file OpencvFuncs.mm.  On Android method invocation is used so any Core and Imgproc function can be called but not every function is going to work because arrays of Mats cannot yet be passed to functions for example.  Most Imgproc and Core functions that take the supported types and return or set the output Mat are available.
 
 *Copyright © 2019-20 Adam G. Freeman, All Rights Reserved.*
 
 Sample apps are at: https://github.com/adamgf/react-native-opencv3-tests
 
 If you would like to contribute to react-native-opencv3 please e-mail me at: adamgf@gmail.com
+
+Thanks to @jackychanfox for contributing.
 
 ## Apps that use react-native-opencv3
 
