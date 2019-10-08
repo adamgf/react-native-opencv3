@@ -186,10 +186,10 @@ For more info about resolveAssetSource refer to the online React documentation.
 
 ## CvCamera
 
-`CvCamera` is a React Native component that displays the front or back facing camera view and can be wrapped in CvInvoke tags.  The innermost CvInvoke tag should reference either 'rgba', 'rgbat', 'gray' or 'grayt' as the first parameter 'p1' in the params dictionary property.  The optional `facing` property should be set to either 'front' the default for the camera view away from the user or 'back' for towards the user.  The optional `androidCameraPermissionOptions` property lets you change the text for the camera permissions prompt on Android.
+`CvCamera` is a React Native component that displays the front or back facing camera view and can be wrapped in CvInvoke tags.  The innermost CvInvoke tag should reference either 'rgba', 'rgbat', 'gray' or 'grayt' as the first parameter 'p1' in the params dictionary property.  The optional `facing` property should be set to either 'front' the default for the camera view away from the user or 'back' for towards the user.  
 
 The optional `onFrameSize` property refers to the callback that gets the frame size information.  The information is returned to the callback in the json dictionary format: `{ "payload" : { "frameSize" : { "frameWidth" : XXX, "frameHeight" : YYY }}}`.  The callback in your app should also be called `onFrameSize`.
-
+   
 Basic Usage Example:
 ```javascript
 import {CvCamera, CvScalar, Mat, CvInvoke, CvInvokeGroup} from 'react-native-opencv3';
@@ -204,12 +204,6 @@ import {CvCamera, CvScalar, Mat, CvInvoke, CvInvokeGroup} from 'react-native-ope
     ref={ref => { this.cvCamera = ref }}
     style={styles.preview}
     facing={facing}
-    androidCameraPermissionOptions={{
-      title: 'Permission to use camera',
-      message: 'We need your permission to use your camera',
-      buttonPositive: 'Ok',
-      buttonNegative: 'Cancel',
-    }}
   />
 </CvInvokeGroup>
 
