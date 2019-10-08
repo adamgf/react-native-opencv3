@@ -20,22 +20,15 @@ class CvCamera extends Component {
   constructor(props) {
     super(props)
     this.cvCamera = React.createRef()
-    if (Platform.OS === 'android' && !PermissionsAndroid.PERMISSIONS.CAMERA) this.requestCameraPermission()
+    if (Platform.OS === 'android') this.requestCameraPermission()
     this.state = {
       cameraPermissed: Platform.OS === 'ios' ? true : PermissionsAndroid.PERMISSIONS.CAMERA
     }
   }
   async requestCameraPermission() {
-    const defaultOptions = {
-      title: 'Permission to use camera',
-      message: 'We need your permission to use your camera',
-      buttonPositive: 'Ok',
-      buttonNegative: 'Cancel',
-    }
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        this.props.androidCameraPermissionOptions || defaultOptions,
+        PermissionsAndroid.PERMISSIONS.CAMERA
       )
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         this.setState({cameraPermissed:true})
