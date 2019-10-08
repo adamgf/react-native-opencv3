@@ -93,8 +93,7 @@ class CvCamera extends Component {
 
 CvCamera.propTypes = {
   ...View.propTypes,
-  facing: PropTypes.string,
-  androidCameraPermissionOptions: PropTypes.object
+  facing: PropTypes.string
 };
 
 class CvInvokeGroup extends Component {
