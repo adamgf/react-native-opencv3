@@ -1,6 +1,6 @@
 
 // @author Adam G. Freeman, adamgf@gmail.com
-import { NativeModules, requireNativeComponent, View, UIManager, Platform } from 'react-native';
+import { NativeModules, requireNativeComponent, View, UIManager, Platform, PermissionsAndroid } from 'react-native';
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -19,7 +19,25 @@ var RNFS = require('react-native-fs')
 class CvCamera extends Component {
   constructor(props) {
     super(props)
-	this.cvCamera = React.createRef()
+    this.cvCamera = React.createRef()
+    if (Platform.OS === 'android') this.requestCameraPermission()
+    this.state = {
+      cameraPermissed: Platform.OS === 'ios' ? true : PermissionsAndroid.PERMISSIONS.CAMERA
+    }
+  }
+  async requestCameraPermission() {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA
+      )
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState({cameraPermissed:true})
+      } else {
+        console.log('Camera permission denied')
+      }
+    } catch (err) {
+      console.warn(err)
+    }
   }
   setOverlay(overlayMat) {
 	if (Platform.OS === 'android') {
@@ -37,11 +55,11 @@ class CvCamera extends Component {
   async takePicture(filename) {
 	const outputFilename = RNFS.DocumentDirectoryPath + '/' + filename
 	const pictureOptions = { 'filename' : outputFilename }
-	
+
 	if (Platform.OS === 'android') {
-	  return await NativeModules.CvCameraModule.takePicture(pictureOptions, findNodeHandle(this))	
+	  return await NativeModules.CvCameraModule.takePicture(pictureOptions, findNodeHandle(this))
 	}
-	else {	  
+	else {
       return await NativeModules.CvCameraView.takePicture(pictureOptions, findNodeHandle(this))
 	}
   }
@@ -51,30 +69,31 @@ class CvCamera extends Component {
 	  outputFilename = RNFS.ExternalStorageDirectoryPath + '/' + filename
 	}
 	const pictureOptions = { 'filename' : outputFilename }
-	
+
 	if (Platform.OS === 'android') {
-	  NativeModules.CvCameraModule.startRecording(pictureOptions, findNodeHandle(this))	
+	  NativeModules.CvCameraModule.startRecording(pictureOptions, findNodeHandle(this))
 	}
-	else {	  
+	else {
       NativeModules.CvCameraView.startRecording(pictureOptions, findNodeHandle(this))
 	}
   }
-  async stopRecording() {	
+  async stopRecording() {
 	if (Platform.OS === 'android') {
-	  return await NativeModules.CvCameraModule.stopRecording(findNodeHandle(this))	
+	  return await NativeModules.CvCameraModule.stopRecording(findNodeHandle(this))
 	}
-	else {	  
+	else {
       return await NativeModules.CvCameraView.stopRecording(findNodeHandle(this))
 	}
   }
   render() {
+    if (!this.state.cameraPermissed) return (<View/>)
     return (<CvCameraView ref={this.cvCamera} {...this.props} />);
   }
 }
 
 CvCamera.propTypes = {
   ...View.propTypes,
-  facing: PropTypes.string,
+  facing: PropTypes.string
 };
 
 class CvInvokeGroup extends Component {
