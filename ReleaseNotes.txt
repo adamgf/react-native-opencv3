@@ -1,0 +1,9 @@
+react-native-opencv3 Release Notes
+
+=-=-=-=-=-=-=-=-= 
+v1.0.6 10/10/2019
+
+- android camera and storage permissions now prompted for before CvCamera initialization
+- useStorage bool property added to CvCamera indicating to prompt for storage permissions
+
+=-=-=-=-=-=-=-=-=

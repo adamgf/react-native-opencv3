@@ -20,16 +20,24 @@ class CvCamera extends Component {
   constructor(props) {
     super(props)
     this.cvCamera = React.createRef()
-    if (Platform.OS === 'android') this.requestCameraPermission()
+    if (Platform.OS === 'android') this.requestCameraPermissions()
     this.state = {
       cameraPermissed: Platform.OS === 'ios' ? true : PermissionsAndroid.PERMISSIONS.CAMERA
     }
   }
-  async requestCameraPermission() {
+  async requestCameraPermissions() {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA
-      )
+	  let granted = false
+	  if (this.props.useStorage) {
+        granted = await PermissionsAndroid.requestMultiple([
+	      PermissionsAndroid.PERMISSIONS.CAMERA,
+		  PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+		  PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE 
+        ])
+      }
+	  else {
+        granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA)	
+	  }
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         this.setState({cameraPermissed:true})
       } else {
@@ -93,7 +101,8 @@ class CvCamera extends Component {
 
 CvCamera.propTypes = {
   ...View.propTypes,
-  facing: PropTypes.string
+  facing: PropTypes.string,
+  useStorage: PropTypes.bool
 };
 
 class CvInvokeGroup extends Component {

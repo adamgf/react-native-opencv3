@@ -351,7 +351,7 @@ Once inside the onPayload method you can use the data returned to generate an ov
 
 ### Saving images and recording video
 
-Currently the image formats jpeg and png are supported on both iOS and Android for saved images.  The image is saved in the format indicated by the filename extension so ".jpg" or ".jpeg" for jpeg and ".png" for png.  On Android the recorded video format is avi and on iOS the recorded video format is mpeg-4 with a filename extension of ".m4v".  There is no audio recorded with the video.  This may be a feature included for a future release.  For examples of saving images and recording video reference the CvCameraPreview app.
+The optional property `useStorage` should be set to `true` so the storage permissions `READ_EXTERNAL_STORAGE` and `WRITE_EXTERNAL_STORAGE` are prompted for. Currently the image formats jpeg and png are supported on both iOS and Android for saved images.  The image is saved in the format indicated by the filename extension so ".jpg" or ".jpeg" for jpeg and ".png" for png.  On Android the recorded video format is avi and on iOS the recorded video format is mpeg-4 with a filename extension of ".m4v".  There is no audio recorded with the video.  This may be a feature included for a future release.  For examples of saving images and recording video reference the CvCameraPreview app.
 
 To take a picture or record a video you should have a ref to the CvCamera instance as shown in the examples below.
 
@@ -377,6 +377,7 @@ Using the reference to the camera instance an image can be taken with whatever f
     ref={ref => { this.cvCamera = ref }}
     style={styles.preview}
     facing={facing}
+    useStorage={true}
   />
   
 ```
@@ -420,6 +421,7 @@ Using the reference to the camera instance a video can be recorded by first call
     ref={ref => { this.cvCamera = ref }}
     style={styles.preview}
     facing={facing}
+    useStorage={true}
   />
   
 ```
@@ -442,7 +444,7 @@ Sample apps are at: https://github.com/adamgf/react-native-opencv3-tests
 
 If you would like to contribute to react-native-opencv3 please e-mail me at: adamgf@gmail.com
 
-Thanks to @jackychanfox for contributing.
+Thanks to @jackychanfox and @jslok for contributing.
 
 ## Apps that use react-native-opencv3
 

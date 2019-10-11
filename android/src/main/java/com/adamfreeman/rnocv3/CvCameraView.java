@@ -2,37 +2,27 @@
 package com.adamfreeman.rnocv3;
 
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableNativeMap;
-import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.bridge.ReadableMapKeySetIterator;
 
-import android.content.res.Configuration;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.content.Context;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.TextureView;
-import android.view.WindowManager;
 import android.util.Base64;
-import android.app.Activity;
-import android.hardware.SensorManager;
 import android.view.OrientationEventListener;
 import android.util.Log;
+import androidx.core.content.ContextCompat;
 
 import org.opencv.videoio.VideoWriter;
 import org.opencv.android.Utils;
 import org.opencv.android.JavaCameraView;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.MatOfPoint2f;
@@ -51,13 +41,13 @@ import org.opencv.face.Facemark;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.File;
 import java.lang.Runnable;
 import java.util.ArrayList;
-import java.lang.Thread;
+import java.util.Timer;
+import java.util.TimerTask;
 
 enum whichOne {
     FACE_CLASSIFIER,
@@ -156,42 +146,53 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
 	private ReadableMap	   		   mVideoOptions;
 	
     public CvCameraView(ThemedReactContext context, int cameraFacing) {
-      super( context, cameraFacing);
-      Log.d(TAG, "Creating and setting view");
-      mCameraFacing = cameraFacing;
-      mContext = context;
+        super( context, cameraFacing);
+        Log.d(TAG, "Creating and setting view");
+        mCameraFacing = cameraFacing;
+        mContext = context;
 
-      this.setVisibility(TextureView.VISIBLE);
-      this.setCvCameraViewListener(this);
-
-      System.loadLibrary("opencv_java3");
-
-      mHolder = getHolder();
-      mHolder.addCallback(this);
-
-      // this is for older devices might as well keep it in here ...
-      mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
-      OrientationEventListener orientationEventListener = new OrientationEventListener(mContext) {
+        final CvCameraView weakRef = this;
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask()
+        {
             @Override
-            public void onOrientationChanged(int rotation) {
-              if (((rotation >= 0) && (rotation <= 45)) || (rotation > 315)) {
-                  mRotation = Core.ROTATE_90_CLOCKWISE;
-              }
-              else if ((rotation > 45) && (rotation <= 135)) {
-                  mRotation = Core.ROTATE_180;
-              }
-              else if((rotation > 135) && (rotation <= 225)) {
-                  mRotation = Core.ROTATE_90_COUNTERCLOCKWISE;
-              }
-              else {
-                  mRotation = -1;
-              }
-              Log.d(TAG, "orientation = " + mRotation);
-            }
-        };
+            public void run()
+            {
+                if (ContextCompat.checkSelfPermission(getContext(),
+                        Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
 
-        orientationEventListener.enable();
+                    timer.cancel();
+
+                    weakRef.setVisibility(TextureView.VISIBLE);
+                    weakRef.setCvCameraViewListener(weakRef);
+
+                    System.loadLibrary("opencv_java3");
+
+                    mHolder = getHolder();
+                    mHolder.addCallback(weakRef);
+
+                    // this is for older devices might as well keep it in here ...
+                    mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+                    OrientationEventListener orientationEventListener = new OrientationEventListener(mContext) {
+                        @Override
+                        public void onOrientationChanged(int rotation) {
+                            if (((rotation >= 0) && (rotation <= 45)) || (rotation > 315)) {
+                                mRotation = Core.ROTATE_90_CLOCKWISE;
+                            } else if ((rotation > 45) && (rotation <= 135)) {
+                                mRotation = Core.ROTATE_180;
+                            } else if ((rotation > 135) && (rotation <= 225)) {
+                                mRotation = Core.ROTATE_90_COUNTERCLOCKWISE;
+                            } else {
+                                mRotation = -1;
+                            }
+                            Log.d(TAG, "orientation = " + mRotation);
+                        }
+                    };
+                    orientationEventListener.enable();
+                }
+            }
+        }, 0, 100);
     }
 
     @Override
