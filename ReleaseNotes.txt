@@ -7,3 +7,8 @@ v1.0.6 10/10/2019
 - useStorage bool property added to CvCamera indicating to prompt for storage permissions
 
 =-=-=-=-=-=-=-=-=
+v1.0.7 10/11/2019
+
+- fixed major bug on Android so camera view shows after permissions accepted
+
+=-=-=-=-=-=-=-=-=
