@@ -19,11 +19,12 @@ var RNFS = require('react-native-fs')
 class CvCamera extends Component {
   constructor(props) {
     super(props)
-    this.cvCamera = React.createRef()
-    if (Platform.OS === 'android') this.requestCameraPermissions()
-    this.state = {
+	  this.state = {
       cameraPermissed: Platform.OS === 'ios' ? true : PermissionsAndroid.PERMISSIONS.CAMERA
     }
+  }
+  componentDidMount = () => {
+    if (Platform.OS === 'android') this.requestCameraPermissions()
   }
   async requestCameraPermissions() {
     try {
@@ -39,7 +40,10 @@ class CvCamera extends Component {
         granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA)	
 	  }
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        this.setState({cameraPermissed:true})
+		const retJson = await NativeModules.CvCameraModule.initCamera(findNodeHandle(this))
+		if (retJson.cameraInitialized) {
+          this.setState({cameraPermissed:true})
+		}
       } else {
         console.log('Camera permission denied')
       }
@@ -95,7 +99,7 @@ class CvCamera extends Component {
   }
   render() {
     if (!this.state.cameraPermissed) return (<View/>)
-    return (<CvCameraView ref={this.cvCamera} {...this.props} />);
+    return (<CvCameraView {...this.props} />);
   }
 }
 

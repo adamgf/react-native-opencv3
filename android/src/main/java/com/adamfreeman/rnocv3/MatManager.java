@@ -6,13 +6,6 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.File;
-import java.lang.Runnable;
 import java.util.ArrayList;
 
 import org.opencv.core.Scalar;

@@ -50,7 +50,26 @@ public class CvCameraModule extends ReactContextBaseJavaModule {
           }
       });
     }
-	
+
+    @ReactMethod
+    public void initCamera(final int viewTag, final Promise promise) {
+        final ReactApplicationContext context = getReactApplicationContext();
+        UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
+        uiManager.addUIBlock(new UIBlock() {
+            @Override
+            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+                CvCameraView cameraView = (CvCameraView) nativeViewHierarchyManager.resolveView(viewTag);
+                try {
+                    InitCameraBlock initCameraBlock = new InitCameraBlock(cameraView, promise);
+                    cameraView.initCamera(initCameraBlock);
+                }
+                catch (Exception e) {
+                    promise.reject("E_CAMERA_BAD_VIEWTAG", "initCamera: Expected a Camera component");
+                }
+            }
+        });
+    }
+
     @ReactMethod
     public void startRecording(final ReadableMap options, final int viewTag) {
       final ReactApplicationContext context = getReactApplicationContext();

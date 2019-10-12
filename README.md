@@ -9,9 +9,28 @@ The basic methodology is that any function from opencv can be opaquely called fr
 
 `$ npm install react-native-opencv3 --save`
 
+You will also need to install react-native-fs:
+
+`$ npm install react-native-opencv3 --save`
+
 ### Android
 
 Since the aar currently used was not built with jetify support, in `gradle.properties` change the line to `android.enableJetifier=false`.  If using `CvCamera` app should be in landscape mode so add line         android:screenOrientation="landscape" to activity section in AndroidManifest.xml.  Reference the sample apps to see this.
+
+Also if using `CvCamera` add the following lines to the `AndroidManifest.xml`.  Again reference the sample apps for this.
+```javascript
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-feature android:name="android.hardware.camera" android:required="false"/>
+<uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+<uses-feature android:name="android.hardware.camera.front" android:required="false"/>
+<uses-feature android:name="android.hardware.camera.front.autofocus" android:required="false"/>
+```
+
+If saving images and/or recording video you will also need to add the storage permissions to `AndroidManifest.xml`:
+```javascript
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
 
 
 ### Mostly automatic installation iOS

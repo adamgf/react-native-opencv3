@@ -105,12 +105,33 @@ class TakePicBlock implements Runnable {
    	}
 }
 
+class InitCameraBlock implements Runnable {
+
+    Promise promise;
+    CvCameraView cameraView;
+
+    public InitCameraBlock(CvCameraView cameraView, Promise promise) {
+        this.cameraView = cameraView;
+        this.promise = promise;
+    }
+
+    public void run() {
+        cameraView.setVisibility(TextureView.VISIBLE);
+
+        if (this.promise != null) {
+            WritableNativeMap result = new WritableNativeMap();
+            result.putBoolean("cameraInitialized", true);
+            promise.resolve(result);
+        }
+    }
+}
+
 public class CvCameraView extends JavaCameraView implements CvCameraViewListener2 {
 
     private static final String TAG = CvCameraView.class.getSimpleName();
 
-    private SurfaceHolder          mHolder;
-    private ThemedReactContext     mContext;
+    public  SurfaceHolder          mHolder;
+    public  ThemedReactContext     mContext;
 
     // params
     private ReadableMap            mOverlay;
@@ -139,6 +160,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
     private boolean				   mTakePicture	       = false;
 	private TakePicBlock	       takePicBlock;
 	private RecordVidBlock	       recordVidBlock;
+	private InitCameraBlock        initCameraBlock;
 	
 	// video and audio recording stuff
 	private VideoWriter 	       mVideoWriter        = null;
@@ -151,48 +173,39 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
         mCameraFacing = cameraFacing;
         mContext = context;
 
-        final CvCameraView weakRef = this;
-        final Timer timer = new Timer();
-        timer.schedule(new TimerTask()
-        {
+        this.setVisibility(TextureView.INVISIBLE);
+        this.setCvCameraViewListener(this);
+
+        System.loadLibrary("opencv_java3");
+
+        mHolder = getHolder();
+        mHolder.addCallback(this);
+
+        // this is for older devices might as well keep it in here ...
+        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        if (ContextCompat.checkSelfPermission(getContext(),
+            	Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            this.initCameraBlock = new InitCameraBlock(this, null);
+            this.initCameraBlock.run();
+        }
+
+        OrientationEventListener orientationEventListener = new OrientationEventListener(mContext) {
             @Override
-            public void run()
-            {
-                if (ContextCompat.checkSelfPermission(getContext(),
-                        Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-
-                    timer.cancel();
-
-                    weakRef.setVisibility(TextureView.VISIBLE);
-                    weakRef.setCvCameraViewListener(weakRef);
-
-                    System.loadLibrary("opencv_java3");
-
-                    mHolder = getHolder();
-                    mHolder.addCallback(weakRef);
-
-                    // this is for older devices might as well keep it in here ...
-                    mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
-                    OrientationEventListener orientationEventListener = new OrientationEventListener(mContext) {
-                        @Override
-                        public void onOrientationChanged(int rotation) {
-                            if (((rotation >= 0) && (rotation <= 45)) || (rotation > 315)) {
-                                mRotation = Core.ROTATE_90_CLOCKWISE;
-                            } else if ((rotation > 45) && (rotation <= 135)) {
-                                mRotation = Core.ROTATE_180;
-                            } else if ((rotation > 135) && (rotation <= 225)) {
-                                mRotation = Core.ROTATE_90_COUNTERCLOCKWISE;
-                            } else {
-                                mRotation = -1;
-                            }
-                            Log.d(TAG, "orientation = " + mRotation);
-                        }
-                    };
-                    orientationEventListener.enable();
+            public void onOrientationChanged(int rotation) {
+                if (((rotation >= 0) && (rotation <= 45)) || (rotation > 315)) {
+                    mRotation = Core.ROTATE_90_CLOCKWISE;
+                } else if ((rotation > 45) && (rotation <= 135)) {
+                    mRotation = Core.ROTATE_180;
+                } else if ((rotation > 135) && (rotation <= 225)) {
+                    mRotation = Core.ROTATE_90_COUNTERCLOCKWISE;
+                } else {
+                    mRotation = -1;
                 }
+                Log.d(TAG, "orientation = " + mRotation);
             }
-        }, 0, 100);
+        };
+        orientationEventListener.enable();
     }
 
     @Override
@@ -737,6 +750,11 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
                 .emit("onCameraFrame", response);
         }
         return in;
+    }
+
+    public void initCamera(InitCameraBlock initCameraBlock) {
+        this.initCameraBlock = initCameraBlock;
+        this.initCameraBlock.run();
     }
 
     public void takePicture(TakePicBlock takePicBlock) {
