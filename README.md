@@ -11,7 +11,7 @@ The basic methodology is that any function from opencv can be opaquely called fr
 
 You will also need to install react-native-fs:
 
-`$ npm install react-native-opencv3 --save`
+`$ npm install react-native-fs --save`
 
 ### Android
 
@@ -48,7 +48,7 @@ pod 'RNFS', :path => '../node_modules/react-native-fs'
 
 ### iOS
 
-For `CvCamera` app should be portrait only.
+For `CvCamera` app should be portrait only.  Also for `CvCamera` you will have to add the `Privacy - Camera Usage Description` property to your `Info.plist` file with a string description.
 
 ## CvInvoke
 
