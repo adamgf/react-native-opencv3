@@ -45,7 +45,7 @@ typedef void (^RecordVidBlock)(NSNumber*,NSNumber*,NSString*);
 
 //@property (nonatomic, retain) CvVideoCamera* videoCamera;
 
-@property (nonatomic, copy) RCTBubblingEventBlock onFacesDetected;
+@property (nonatomic, copy) RCTBubblingEventBlock onFacesDetectedCv;
 
 @property (nonatomic, copy) RCTBubblingEventBlock onFrameSize;
 

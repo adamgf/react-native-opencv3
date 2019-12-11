@@ -266,11 +266,11 @@ In conjunction with the `onDetectFaces` property the properties `faceClassifier`
 
 Only the classifiers in the CvFaceDetection sample app have currently been tested.
 
-The `landmarksModel` property should be used for the 68 face landmarks in conjunction with a face classifier.  Currently it can only be set to `lbfmodel` because there is only one landmarks data file supported `lbfmodel.yaml`.  As for face boxes, face landmarks should also be used in conjunction with the same `onFacesDetected` callback.  As for face detection For the json format of the landmarks data returned to the callback method see below.  
+The `landmarksModel` property should be used for the 68 face landmarks in conjunction with a face classifier.  Currently it can only be set to `lbfmodel` because there is only one landmarks data file supported `lbfmodel.yaml`.  As for face boxes, face landmarks should also be used in conjunction with the same `onFacesDetectedCv` callback.  As for face detection For the json format of the landmarks data returned to the callback method see below.  
 
 Face Detection Example:
 ```javascript
-  onFacesDetected = (e) => {
+  onFacesDetectedCv = (e) => {
     //alert('payload: ' + JSON.stringify(e.payload))
     if (Platform.OS === 'ios') {
       if ((!e.nativeEvent.payload && this.state.faces) || (e.nativeEvent.payload && !this.state.faces) || (e.nativeEvent.payload && this.state.faces)) {
@@ -292,13 +292,13 @@ Face Detection Example:
     eyesClassifier='haarcascade_eye_tree_eyeglasses'
     noseClassifier='nose'
     mouthClassifier='mouth'
-    onFacesDetected={this.onFacesDetected}
+    onFacesDetectedCv={this.onFacesDetectedCv}
   />
 ```
 
 Face Landmarks Example:
 ```javascript
-  onFacesDetected = (e) => {
+  onFacesDetectedCv = (e) => {
     //alert('payload: ' + JSON.stringify(e.payload))
     if (Platform.OS === 'ios') {
       if ((!e.nativeEvent.payload && this.state.faces) || (e.nativeEvent.payload && !this.state.faces) || (e.nativeEvent.payload && this.state.faces)) {
@@ -318,7 +318,7 @@ Face Landmarks Example:
     facing='back'
     faceClassifier='haarcascade_frontalface_alt2'
     landmarksModel='lbfmodel'
-    onFacesDetected={this.onFacesDetected}
+    onFacesDetectedCv={this.onFacesDetectedCv}
   />
 ```
 
@@ -326,7 +326,7 @@ Including facing='back' sets the camera view towards the user so you can test it
 
 #### Face detection data format
 
-The data returned to the callback method `onFacesDetected` will have the json dictionary format:
+The data returned to the callback method `onFacesDetectedCv` will have the json dictionary format:
 ```javascript
 { "payload" : { "faces": 
   [
