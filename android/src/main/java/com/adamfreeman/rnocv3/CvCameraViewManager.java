@@ -65,30 +65,30 @@ public class CvCameraViewManager extends SimpleViewManager<CvCameraView> {
         view.setCvInvokeGroup(cvinvoke);
     }
 
-    @ReactProp(name = "faceClassifier")
-    public void setFaceClassifier(CvCameraView view, String cascadeClassifier) {
-        view.setCascadeClassifier(cascadeClassifier, whichOne.FACE_CLASSIFIER);
-    }
+    // @ReactProp(name = "faceClassifier")
+    // public void setFaceClassifier(CvCameraView view, String cascadeClassifier) {
+    //     view.setCascadeClassifier(cascadeClassifier, whichOne.FACE_CLASSIFIER);
+    // }
 
-    @ReactProp(name = "eyesClassifier")
-    public void setEyesClassifier(CvCameraView view, String cascadeClassifier) {
-        view.setCascadeClassifier(cascadeClassifier, whichOne.EYES_CLASSIFIER);
-    }
+    // @ReactProp(name = "eyesClassifier")
+    // public void setEyesClassifier(CvCameraView view, String cascadeClassifier) {
+    //     view.setCascadeClassifier(cascadeClassifier, whichOne.EYES_CLASSIFIER);
+    // }
 
-    @ReactProp(name = "noseClassifier")
-    public void setNoseClassifier(CvCameraView view, String cascadeClassifier) {
-        view.setCascadeClassifier(cascadeClassifier, whichOne.NOSE_CLASSIFIER);
-    }
+    // @ReactProp(name = "noseClassifier")
+    // public void setNoseClassifier(CvCameraView view, String cascadeClassifier) {
+    //     view.setCascadeClassifier(cascadeClassifier, whichOne.NOSE_CLASSIFIER);
+    // }
 
-    @ReactProp(name = "mouthClassifier")
-    public void setMouthClassifier(CvCameraView view, String cascadeClassifier) {
-        view.setCascadeClassifier(cascadeClassifier, whichOne.MOUTH_CLASSIFIER);
-    }
+    // @ReactProp(name = "mouthClassifier")
+    // public void setMouthClassifier(CvCameraView view, String cascadeClassifier) {
+    //     view.setCascadeClassifier(cascadeClassifier, whichOne.MOUTH_CLASSIFIER);
+    // }
 
-    @ReactProp(name = "landmarksModel")
-    public void setLandmarksModel(CvCameraView view, String landmarksModel) {
-        view.setLandmarksModel(landmarksModel);
-    }
+    // @ReactProp(name = "landmarksModel")
+    // public void setLandmarksModel(CvCameraView view, String landmarksModel) {
+    //     view.setLandmarksModel(landmarksModel);
+    // }
 
     @ReactProp(name = "overlayInterval")
     public void setOverlayInterval(CvCameraView view, int overlayInterval) {

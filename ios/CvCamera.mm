@@ -15,22 +15,22 @@ static CvVideoCamera *videoCamera;
 
 @implementation CvCamera {
     // private properties
-    bool mUseFaceDetection;
-    bool mUseEyesDetection;
-    bool mUseNoseDetection;
-    bool mUseMouthDetection;
-    bool mUseLandmarks;
-    CGFloat mRelativeFaceSize;
-    int mAbsoluteFaceSize;
+    // bool mUseFaceDetection;
+    // bool mUseEyesDetection;
+    // bool mUseNoseDetection;
+    // bool mUseMouthDetection;
+    // bool mUseLandmarks;
+    // CGFloat mRelativeFaceSize;
+    // int mAbsoluteFaceSize;
     double mCurrentMillis;
     bool mTakePicture;
     bool framesInitialized;
     
-    CascadeClassifier face_cascade;
-    CascadeClassifier eyes_cascade;
-    CascadeClassifier mouth_cascade;
-    CascadeClassifier nose_cascade;
-    Ptr<face::Facemark> landmarks;
+    // CascadeClassifier face_cascade;
+    // CascadeClassifier eyes_cascade;
+    // CascadeClassifier mouth_cascade;
+    // CascadeClassifier nose_cascade;
+    // Ptr<face::Facemark> landmarks;
     
     // recording
     cv::VideoWriter mVideoWriter;
@@ -45,8 +45,8 @@ static CvVideoCamera *videoCamera;
     if ((self = [super init])) {
         self.startDate = [NSDate date];
         self.mOverlayInterval = 0;
-        mRelativeFaceSize = 0.2f;
-        mAbsoluteFaceSize = 0;
+        // mRelativeFaceSize = 0.2f;
+        // mAbsoluteFaceSize = 0;
         mCurrentMillis = 0;
         self.backgroundColor = [UIColor blackColor];
         self.bridge = bridge;
@@ -214,187 +214,187 @@ static CvVideoCamera *videoCamera;
         self.onFrameSize(@{@"payload":frameSizeStr});
     }
     
-    if (mUseFaceDetection) {
-        std::vector<cv::Rect> faces;
+    // if (mUseFaceDetection) {
+    //     std::vector<cv::Rect> faces;
 
-        equalizeHist(gray, gray);
+    //     equalizeHist(gray, gray);
 
-        UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
-        [self rotateImage:gray deviceOrientation:deviceOrientation];
+    //     UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+    //     [self rotateImage:gray deviceOrientation:deviceOrientation];
 
-        CGFloat height = gray.rows;
-        if (height * mRelativeFaceSize > 0.0f) {
-            CGFloat absoluteFaceSizeF = height * mRelativeFaceSize;
-            mAbsoluteFaceSize = (int)absoluteFaceSizeF;
-            CGFloat remainder = absoluteFaceSizeF - (CGFloat)mAbsoluteFaceSize;
-            if (remainder >= 0.5f) {
-                mAbsoluteFaceSize++;
-            }
-        }
+    //     CGFloat height = gray.rows;
+    //     if (height * mRelativeFaceSize > 0.0f) {
+    //         CGFloat absoluteFaceSizeF = height * mRelativeFaceSize;
+    //         mAbsoluteFaceSize = (int)absoluteFaceSizeF;
+    //         CGFloat remainder = absoluteFaceSizeF - (CGFloat)mAbsoluteFaceSize;
+    //         if (remainder >= 0.5f) {
+    //             mAbsoluteFaceSize++;
+    //         }
+    //     }
 
-        std::vector<std::vector<Point2f>> fits;
-        bool landmarksFound = false;
-        if (mUseLandmarks) {
-            // less sensitive if determining landmarks
-            face_cascade.detectMultiScale(gray, faces, 1.3, 5, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
-            landmarksFound = landmarks->fit(gray, faces, fits);
-        }
-        else {
-            face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
-        }
+    //     std::vector<std::vector<Point2f>> fits;
+    //     bool landmarksFound = false;
+    //     if (mUseLandmarks) {
+    //         // less sensitive if determining landmarks
+    //         face_cascade.detectMultiScale(gray, faces, 1.3, 5, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
+    //         landmarksFound = landmarks->fit(gray, faces, fits);
+    //     }
+    //     else {
+    //         face_cascade.detectMultiScale(gray, faces, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, cv::Size(mAbsoluteFaceSize, mAbsoluteFaceSize), cv::Size());
+    //     }
 
-        NSString *payloadJSON = @"";
-        if (faces.size() > 0) {
-            payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
-            for(size_t i = 0; i < faces.size(); i++) {
+    //     NSString *payloadJSON = @"";
+    //     if (faces.size() > 0) {
+    //         payloadJSON = [payloadJSON stringByAppendingString:@"{\"faces\":["];
+    //         for(size_t i = 0; i < faces.size(); i++) {
 
-                NSString *faceJSON = [self getPartJSON:gray partKey:@"" part:faces[i] widthToUse:image.cols heightToUse:image.rows];
-                payloadJSON = [payloadJSON stringByAppendingString:faceJSON];
+    //             NSString *faceJSON = [self getPartJSON:gray partKey:@"" part:faces[i] widthToUse:image.cols heightToUse:image.rows];
+    //             payloadJSON = [payloadJSON stringByAppendingString:faceJSON];
 
-                NSString *faceIdStr = [NSString stringWithFormat:@",\"faceId\":\"%d\"", (int)i];
-                payloadJSON = [payloadJSON stringByAppendingString:faceIdStr];
+    //             NSString *faceIdStr = [NSString stringWithFormat:@",\"faceId\":\"%d\"", (int)i];
+    //             payloadJSON = [payloadJSON stringByAppendingString:faceIdStr];
 
-                if (mUseEyesDetection || mUseNoseDetection || mUseMouthDetection || mUseLandmarks) {
+    //             if (mUseEyesDetection || mUseNoseDetection || mUseMouthDetection || mUseLandmarks) {
 
-                    cv::Mat dFace = cv::Mat(gray, faces[i]).clone();
+    //                 cv::Mat dFace = cv::Mat(gray, faces[i]).clone();
 
-                    if (mUseEyesDetection) {
-                        std::vector<cv::Rect> eyes;
-                        eyes_cascade.detectMultiScale(dFace, eyes, 1.1, 2);
-                        //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
-                        int eye1Index = -1;
-                        CGFloat centerX = 0.0f;
-                        CGFloat centerY = (CGFloat)faces[i].height*0.2f;
-                        if (eyes.size() > 0) {
-                            CGFloat minDist = 10000.0f;
-                            for(size_t j = 0; j < eyes.size(); j++) {
-                                centerX = (CGFloat)faces[i].width*0.3f;
-                                CGFloat eyeX = (CGFloat)eyes[j].x + (CGFloat)eyes[j].width*0.5f;
-                                CGFloat eyeY = (CGFloat)eyes[j].y + (CGFloat)eyes[j].height*0.5f;
-                                CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:eyeX pointY:eyeY];
-                                if (dist < minDist) {
-                                    minDist = dist;
-                                    eye1Index = (int)j;
-                                }
-                            }
-                            NSString *firstEyeJSON = [self getPartJSON:dFace partKey:@"firstEye" part:eyes[eye1Index] widthToUse:dFace.cols heightToUse:dFace.rows];
-                            payloadJSON = [payloadJSON stringByAppendingString:firstEyeJSON];
-                        }
-                        if (eyes.size() > 1) {
-                            CGFloat minDist = 10000.0f;
-                            int eye2Index = -1;
-                            for(size_t j = 0; j < eyes.size(); j++) {
-                                centerX = (CGFloat)faces[i].width*0.7f;
-                                CGFloat eyeX = (CGFloat)eyes[j].x + (CGFloat)eyes[j].width*0.5f;
-                                CGFloat eyeY = (CGFloat)eyes[j].y + (CGFloat)eyes[j].height*0.5f;
-                                CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:eyeX pointY:eyeY];
-                                if (dist < minDist && (int)j != eye1Index) {
-                                    minDist = dist;
-                                    eye2Index = (int)j;
-                                }
-                            }
-                            NSString *secondEyeJSON = [self getPartJSON:dFace partKey:@"secondEye" part:eyes[eye2Index] widthToUse:dFace.cols heightToUse:dFace.rows];
-                            payloadJSON = [payloadJSON stringByAppendingString:secondEyeJSON];
-                        }
-                    }
+    //                 if (mUseEyesDetection) {
+    //                     std::vector<cv::Rect> eyes;
+    //                     eyes_cascade.detectMultiScale(dFace, eyes, 1.1, 2);
+    //                     //mEyesClassifier.detectMultiScale(dFace, eyes, 1.1, 2, 0|Objdetect.CASCADE_SCALE_IMAGE, new Size((double)dFaceW, (double)dFaceH), new Size());
+    //                     int eye1Index = -1;
+    //                     CGFloat centerX = 0.0f;
+    //                     CGFloat centerY = (CGFloat)faces[i].height*0.2f;
+    //                     if (eyes.size() > 0) {
+    //                         CGFloat minDist = 10000.0f;
+    //                         for(size_t j = 0; j < eyes.size(); j++) {
+    //                             centerX = (CGFloat)faces[i].width*0.3f;
+    //                             CGFloat eyeX = (CGFloat)eyes[j].x + (CGFloat)eyes[j].width*0.5f;
+    //                             CGFloat eyeY = (CGFloat)eyes[j].y + (CGFloat)eyes[j].height*0.5f;
+    //                             CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:eyeX pointY:eyeY];
+    //                             if (dist < minDist) {
+    //                                 minDist = dist;
+    //                                 eye1Index = (int)j;
+    //                             }
+    //                         }
+    //                         NSString *firstEyeJSON = [self getPartJSON:dFace partKey:@"firstEye" part:eyes[eye1Index] widthToUse:dFace.cols heightToUse:dFace.rows];
+    //                         payloadJSON = [payloadJSON stringByAppendingString:firstEyeJSON];
+    //                     }
+    //                     if (eyes.size() > 1) {
+    //                         CGFloat minDist = 10000.0f;
+    //                         int eye2Index = -1;
+    //                         for(size_t j = 0; j < eyes.size(); j++) {
+    //                             centerX = (CGFloat)faces[i].width*0.7f;
+    //                             CGFloat eyeX = (CGFloat)eyes[j].x + (CGFloat)eyes[j].width*0.5f;
+    //                             CGFloat eyeY = (CGFloat)eyes[j].y + (CGFloat)eyes[j].height*0.5f;
+    //                             CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:eyeX pointY:eyeY];
+    //                             if (dist < minDist && (int)j != eye1Index) {
+    //                                 minDist = dist;
+    //                                 eye2Index = (int)j;
+    //                             }
+    //                         }
+    //                         NSString *secondEyeJSON = [self getPartJSON:dFace partKey:@"secondEye" part:eyes[eye2Index] widthToUse:dFace.cols heightToUse:dFace.rows];
+    //                         payloadJSON = [payloadJSON stringByAppendingString:secondEyeJSON];
+    //                     }
+    //                 }
 
-                    if (mUseNoseDetection) {
-                        std::vector<cv::Rect> noses;
-                        nose_cascade.detectMultiScale(dFace, noses, 1.1, 2);
+    //                 if (mUseNoseDetection) {
+    //                     std::vector<cv::Rect> noses;
+    //                     nose_cascade.detectMultiScale(dFace, noses, 1.1, 2);
 
-                        if (noses.size() > 0) {
-                            CGFloat minDist = 10000.0f;
-                            int noseIndex = -1;
-                            for(size_t j = 0; j < noses.size(); j++) {
-                                CGFloat centerX = (CGFloat)faces[i].width*0.5f;
-                                CGFloat centerY = (CGFloat)faces[i].height*0.5f;
-                                CGFloat noseX = (CGFloat)noses[j].x + (CGFloat)noses[j].width*0.5f;
-                                CGFloat noseY = (CGFloat)noses[j].y + (CGFloat)noses[j].height*0.5f;
-                                CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:noseX pointY:noseY];
-                                if (dist < minDist) {
-                                    minDist = dist;
-                                    noseIndex = (int)j;
-                                }
-                            }
-                            NSString *noseJSON = [self getPartJSON:dFace partKey:@"nose" part:noses[noseIndex] widthToUse:dFace.cols heightToUse:dFace.rows];
-                            payloadJSON = [payloadJSON stringByAppendingString:noseJSON];
-                        }
-                    }
+    //                     if (noses.size() > 0) {
+    //                         CGFloat minDist = 10000.0f;
+    //                         int noseIndex = -1;
+    //                         for(size_t j = 0; j < noses.size(); j++) {
+    //                             CGFloat centerX = (CGFloat)faces[i].width*0.5f;
+    //                             CGFloat centerY = (CGFloat)faces[i].height*0.5f;
+    //                             CGFloat noseX = (CGFloat)noses[j].x + (CGFloat)noses[j].width*0.5f;
+    //                             CGFloat noseY = (CGFloat)noses[j].y + (CGFloat)noses[j].height*0.5f;
+    //                             CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:noseX pointY:noseY];
+    //                             if (dist < minDist) {
+    //                                 minDist = dist;
+    //                                 noseIndex = (int)j;
+    //                             }
+    //                         }
+    //                         NSString *noseJSON = [self getPartJSON:dFace partKey:@"nose" part:noses[noseIndex] widthToUse:dFace.cols heightToUse:dFace.rows];
+    //                         payloadJSON = [payloadJSON stringByAppendingString:noseJSON];
+    //                     }
+    //                 }
 
-                    if (mUseMouthDetection) {
+    //                 if (mUseMouthDetection) {
 
-                        cv::Rect dRectMouthROI;
-                        dRectMouthROI.x = 0;
-                        dRectMouthROI.y = (int)((double)dFace.rows * 0.6f);
-                        dRectMouthROI.width = dFace.cols;
-                        dRectMouthROI.height = (int)((double)dFace.rows * 0.4f);
+    //                     cv::Rect dRectMouthROI;
+    //                     dRectMouthROI.x = 0;
+    //                     dRectMouthROI.y = (int)((double)dFace.rows * 0.6f);
+    //                     dRectMouthROI.width = dFace.cols;
+    //                     dRectMouthROI.height = (int)((double)dFace.rows * 0.4f);
 
-                        Mat dFaceForMouthDetecting = cv::Mat(dFace, dRectMouthROI).clone();
+    //                     Mat dFaceForMouthDetecting = cv::Mat(dFace, dRectMouthROI).clone();
 
-                        std::vector<cv::Rect> mouths;
-                        nose_cascade.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2);
-                        if (mouths.size() > 0) {
-                            CGFloat minDist = 10000.0f;
-                            int mouthIndex = -1;
-                            for(size_t j = 0; j < mouths.size(); j++) {
-                                CGFloat centerX = (CGFloat)faces[i].width*0.5f;
-                                CGFloat centerY = (CGFloat)faces[i].height;
-                                CGFloat mouthX = (CGFloat)mouths[j].x + (CGFloat)mouths[j].width*0.5f;
-                                CGFloat mouthY = (CGFloat)mouths[j].y + (CGFloat)mouths[j].height*0.5f + (CGFloat)faces[i].height*0.6f;
-                                CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:mouthX pointY:mouthY];
-                                if (dist < minDist) {
-                                    minDist = dist;
-                                    mouthIndex = (int)j;
-                                }
-                            }
-                            cv::Rect dRect;
-                            dRect.x = mouths[mouthIndex].x;
-                            dRect.y = mouths[mouthIndex].y + (int)((CGFloat)dFace.rows * 0.6f);
-                            dRect.width = mouths[mouthIndex].width;
-                            dRect.height = mouths[mouthIndex].height*0.8f;
+    //                     std::vector<cv::Rect> mouths;
+    //                     nose_cascade.detectMultiScale(dFaceForMouthDetecting, mouths, 1.1, 2);
+    //                     if (mouths.size() > 0) {
+    //                         CGFloat minDist = 10000.0f;
+    //                         int mouthIndex = -1;
+    //                         for(size_t j = 0; j < mouths.size(); j++) {
+    //                             CGFloat centerX = (CGFloat)faces[i].width*0.5f;
+    //                             CGFloat centerY = (CGFloat)faces[i].height;
+    //                             CGFloat mouthX = (CGFloat)mouths[j].x + (CGFloat)mouths[j].width*0.5f;
+    //                             CGFloat mouthY = (CGFloat)mouths[j].y + (CGFloat)mouths[j].height*0.5f + (CGFloat)faces[i].height*0.6f;
+    //                             CGFloat dist = [self calcDistance:centerX centerY:centerY pointX:mouthX pointY:mouthY];
+    //                             if (dist < minDist) {
+    //                                 minDist = dist;
+    //                                 mouthIndex = (int)j;
+    //                             }
+    //                         }
+    //                         cv::Rect dRect;
+    //                         dRect.x = mouths[mouthIndex].x;
+    //                         dRect.y = mouths[mouthIndex].y + (int)((CGFloat)dFace.rows * 0.6f);
+    //                         dRect.width = mouths[mouthIndex].width;
+    //                         dRect.height = mouths[mouthIndex].height*0.8f;
 
-                            NSString *mouthJSON = [self getPartJSON:dFace partKey:@"mouth" part:dRect widthToUse:dFace.cols heightToUse:dFace.rows];
-                            payloadJSON = [payloadJSON stringByAppendingString:mouthJSON];
-                        }
-                    }
+    //                         NSString *mouthJSON = [self getPartJSON:dFace partKey:@"mouth" part:dRect widthToUse:dFace.cols heightToUse:dFace.rows];
+    //                         payloadJSON = [payloadJSON stringByAppendingString:mouthJSON];
+    //                     }
+    //                 }
 
-                    if (landmarksFound) {
-                        if (fits.size() > 0) {
-                            payloadJSON = [payloadJSON stringByAppendingString:@",\"landmarks\":["];
-                            for (int j=0; j < 68; j++) { // 68 landmark points
-                                cv::Point thePt = fits[i][j];
-                                [self rotatePoint:gray thePoint:thePt];
-                                if (UIDeviceOrientationIsLandscape(deviceOrientation)) {
-                                    payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.rows,(double)thePt.y/(double)gray.cols]];
-                                }
-                                else {
-                                    payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.cols,(double)thePt.y/(double)gray.rows]];
-                                }
-                                if (j != 67) {
-                                    payloadJSON = [payloadJSON stringByAppendingString:@","];
-                                }
-                                //circle(gray, fits[i][j], 3, Scalar(200,0,0), 2);
-                            }
-                            payloadJSON = [payloadJSON stringByAppendingString:@"]"];
-                        }
-                    }
-                }
+    //                 if (landmarksFound) {
+    //                     if (fits.size() > 0) {
+    //                         payloadJSON = [payloadJSON stringByAppendingString:@",\"landmarks\":["];
+    //                         for (int j=0; j < 68; j++) { // 68 landmark points
+    //                             cv::Point thePt = fits[i][j];
+    //                             [self rotatePoint:gray thePoint:thePt];
+    //                             if (UIDeviceOrientationIsLandscape(deviceOrientation)) {
+    //                                 payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.rows,(double)thePt.y/(double)gray.cols]];
+    //                             }
+    //                             else {
+    //                                 payloadJSON = [payloadJSON stringByAppendingString:[NSString stringWithFormat:@"{\"x\":%f,\"y\":%f}",(double)thePt.x/(double)gray.cols,(double)thePt.y/(double)gray.rows]];
+    //                             }
+    //                             if (j != 67) {
+    //                                 payloadJSON = [payloadJSON stringByAppendingString:@","];
+    //                             }
+    //                             //circle(gray, fits[i][j], 3, Scalar(200,0,0), 2);
+    //                         }
+    //                         payloadJSON = [payloadJSON stringByAppendingString:@"]"];
+    //                     }
+    //                 }
+    //             }
 
-                if (i != (faces.size() - 1)) {
-                    payloadJSON = [payloadJSON stringByAppendingString:@"},"];
-                }
-                else {
-                    payloadJSON = [payloadJSON stringByAppendingString:@"}"];
-                }
-                //rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
-            }
-            payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
-        }
+    //             if (i != (faces.size() - 1)) {
+    //                 payloadJSON = [payloadJSON stringByAppendingString:@"},"];
+    //             }
+    //             else {
+    //                 payloadJSON = [payloadJSON stringByAppendingString:@"}"];
+    //             }
+    //             //rectangle(image_copy, faces[i].tl(), faces[i].br(), Scalar( 255, 255, 0 ), 3);
+    //         }
+    //         payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
+    //     }
 
-        if (self && self.onFacesDetected) {
-            self.onFacesDetected(@{@"payload":payloadJSON});
-        }
-    }
+    //     if (self && self.onFacesDetectedCv) {
+    //         self.onFacesDetectedCv(@{@"payload":payloadJSON});
+    //     }
+    // }
     dispatch_async(dispatch_get_main_queue(), ^{
     
         if (self.mCvInvokeGroup != nil) {
@@ -470,47 +470,47 @@ static CvVideoCamera *videoCamera;
     }
 }
 
-- (void)setLandmarksModel:(NSString*)landmarksModel {
-    NSString *landmarksPath = [FileUtils loadBundleResource:landmarksModel extension:@"yaml"];
+// - (void)setLandmarksModel:(NSString*)landmarksModel {
+//     NSString *landmarksPath = [FileUtils loadBundleResource:landmarksModel extension:@"yaml"];
 
-    if (landmarksPath) {
-        face::FacemarkLBF::Params params;
-        landmarks = face::FacemarkLBF::create(params);
-        landmarks->loadModel( std::string([landmarksPath UTF8String]));
-        mUseLandmarks = true;
-    }
-}
+//     if (landmarksPath) {
+//         face::FacemarkLBF::Params params;
+//         landmarks = face::FacemarkLBF::create(params);
+//         landmarks->loadModel( std::string([landmarksPath UTF8String]));
+//         mUseLandmarks = true;
+//     }
+// }
 
-- (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne {
-    NSString *cascadePath = [FileUtils loadBundleResource:cascadeClassifier extension:@"xml"];
+// - (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne {
+//     NSString *cascadePath = [FileUtils loadBundleResource:cascadeClassifier extension:@"xml"];
 
-    CascadeClassifier cascade;
-    if (cascadePath) {
-        if (!cascade.load( std::string([cascadePath UTF8String]))) {
-            NSLog(@"Unable to load cascade classifier at: %@", cascadePath);
-        }
-        else {
-            switch (whichOne) {
-                case ClassifierFace:
-                    face_cascade = cascade;
-                    mUseFaceDetection = true;
-                    break;
-                case ClassifierEyes:
-                    eyes_cascade = cascade;
-                    mUseEyesDetection = true;
-                    break;
-                case ClassifierNose:
-                    nose_cascade = cascade;
-                    mUseNoseDetection = true;
-                    break;
-                case ClassifierMouth:
-                    mouth_cascade = cascade;
-                    mUseMouthDetection = true;
-                    break;
-            }
-        }
-    }
-}
+//     CascadeClassifier cascade;
+//     if (cascadePath) {
+//         if (!cascade.load( std::string([cascadePath UTF8String]))) {
+//             NSLog(@"Unable to load cascade classifier at: %@", cascadePath);
+//         }
+//         else {
+//             switch (whichOne) {
+//                 case ClassifierFace:
+//                     face_cascade = cascade;
+//                     mUseFaceDetection = true;
+//                     break;
+//                 case ClassifierEyes:
+//                     eyes_cascade = cascade;
+//                     mUseEyesDetection = true;
+//                     break;
+//                 case ClassifierNose:
+//                     nose_cascade = cascade;
+//                     mUseNoseDetection = true;
+//                     break;
+//                 case ClassifierMouth:
+//                     mouth_cascade = cascade;
+//                     mUseMouthDetection = true;
+//                     break;
+//             }
+//         }
+//     }
+// }
 
 - (void)takePicture:(TakePicBlock)takePicBlock {
     mTakePicture = true;
