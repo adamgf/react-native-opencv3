@@ -16,12 +16,12 @@
 #import <UIKit/UIKit.h>
 #import <React/UIView+React.h>
 
-enum {
-    ClassifierFace,
-    ClassifierEyes,
-    ClassifierNose,
-    ClassifierMouth
-};
+// enum {
+//     ClassifierFace,
+//     ClassifierEyes,
+//     ClassifierNose,
+//     ClassifierMouth
+// };
 
 typedef NSInteger Classifier;
 
@@ -67,9 +67,9 @@ typedef void (^RecordVidBlock)(NSNumber*,NSNumber*,NSString*);
 
 - (void)changeFacing:(NSString*)facing;
 
-- (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne;
+// - (void)setCascadeClassifier:(NSString*)cascadeClassifier whichOne:(Classifier)whichOne;
 
-- (void)setLandmarksModel:(NSString*)landmarksModel;
+// - (void)setLandmarksModel:(NSString*)landmarksModel;
 
 - (void)takePicture:(TakePicBlock)takePicBlock;
 
