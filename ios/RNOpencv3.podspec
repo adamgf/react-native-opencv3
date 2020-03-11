@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
     ss.ios.resource_bundle = { 'ocvdata' => 'ocvdata/*.*ml' }
   end
 
-  s.dependency "OpenCV", "~> 3.4.1"
+  s.dependency "libopencv-contrib", "~> 3.4.1"
   s.dependency "React"
   
   # s.dependency "others"
