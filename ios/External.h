@@ -14,7 +14,7 @@
 #undef NO
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio/cap_ios.h>
-// #include <opencv2/face.hpp>
+#include <opencv2/face.hpp>
 #include <opencv2/imgcodecs/ios.h>
 using namespace cv;
 #if __has_feature(objc_bool)
