@@ -30,7 +30,7 @@ static CvVideoCamera *videoCamera;
     CascadeClassifier eyes_cascade;
     CascadeClassifier mouth_cascade;
     CascadeClassifier nose_cascade;
-    Ptr<face::Facemark> landmarks;
+    cv::Ptr<face::Facemark> landmarks;
     
     // recording
     cv::VideoWriter mVideoWriter;
