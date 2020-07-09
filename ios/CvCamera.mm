@@ -30,7 +30,7 @@ static CvVideoCamera *videoCamera;
     CascadeClassifier eyes_cascade;
     CascadeClassifier mouth_cascade;
     CascadeClassifier nose_cascade;
-    Ptr<face::Facemark> landmarks;
+    cv::Ptr<face::Facemark> landmarks;
     
     // recording
     cv::VideoWriter mVideoWriter;
@@ -391,8 +391,8 @@ static CvVideoCamera *videoCamera;
             payloadJSON = [payloadJSON stringByAppendingString:@"]}"];
         }
 
-        if (self && self.onFacesDetected) {
-            self.onFacesDetected(@{@"payload":payloadJSON});
+        if (self && self.onFacesDetectedCv) {
+            self.onFacesDetectedCv(@{@"payload":payloadJSON});
         }
     }
     dispatch_async(dispatch_get_main_queue(), ^{

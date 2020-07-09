@@ -661,7 +661,7 @@ public class CvCameraView extends JavaCameraView implements CvCameraViewListener
             //Log.d(TAG, "payload is: " + faceInfo);
             response.putString("payload", faceInfo);
             mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-              .emit("onFacesDetected", response);
+              .emit("onFacesDetectedCv", response);
         }
 
         boolean sendCallbackData = false;

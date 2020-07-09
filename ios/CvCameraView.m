@@ -20,7 +20,7 @@
 
 RCT_EXPORT_MODULE(CvCameraView)
 
-RCT_EXPORT_VIEW_PROPERTY(onFacesDetected, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onFacesDetectedCv, RCTBubblingEventBlock)
 	
 RCT_EXPORT_VIEW_PROPERTY(onFrameSize, RCTBubblingEventBlock)
 
