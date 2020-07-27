@@ -12,3 +12,10 @@ v1.0.7 10/11/2019
 - fixed major bug on Android so camera view shows after permissions accepted
 
 =-=-=-=-=-=-=-=-=
+v1.0.8 07/26/2020
+
+- incorporated changes and fixes from contributors
+- Ptr type scoped to cv::Ptr so iOS sample apps will build and run
+- varios namespace conflicts resolved
+
+=-=-=-=-=-=-=-=-=

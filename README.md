@@ -1,5 +1,5 @@
 
-# react-native-opencv3
+# react-native-opencv3 (v1.0.8)
 
 React-native opencv3 or "RNOpencv3" wraps opencv native functions and propagates the return data from these functions to react native land for usage in android and iOS apps enabling native app developers with new functionality.  This package is not guaranteed bug-free and does not encompass all of OpenCV but is a good starting point with a nice chunk of Imgproc and Core functions supported and face and landmark detection and image and video overlays as well as saving images and recording video.  All two way communication between react-native and OpenCV is supported and thus can be expanded upon.  It establishes an infrastructure and provides scaffolding for eventually incorporating all functionality from OpenCV core and extension modules.  
 
@@ -463,7 +463,7 @@ Sample apps are at: https://github.com/adamgf/react-native-opencv3-tests
 
 If you would like to contribute to react-native-opencv3 please e-mail me at: adamgf@gmail.com
 
-Thanks to @jackychanfox and @jslok for contributing.
+Thanks to @jackychanfox, @jslok, @przytua, @cirych and @dmydry for contributing.
 
 ## Apps that use react-native-opencv3
 
