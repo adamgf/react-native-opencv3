@@ -129,10 +129,12 @@ class MatManager {
         WritableArray retArr = new WritableNativeArray();
         Mat mat = (Mat)matAtIndex(matIndex);
 
-        double[] retDoubles = mat.get(rownum,colnum);
+        if (mat.rows() > 0 && mat.cols() > 0) {
+            double[] retDoubles = mat.get(rownum,colnum);
 
-        for(double retDouble : retDoubles){
-            retArr.pushDouble(retDouble);
+            for(double retDouble : retDoubles){
+                retArr.pushDouble(retDouble);
+            }
         }
 
         return retArr;
