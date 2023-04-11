@@ -24,6 +24,74 @@ RCT_EXPORT_METHOD(imageToMat:(NSString*)inPath resolver:(RCTPromiseResolveBlock)
     [FileUtils imageToMat:inPath resolver:resolve rejecter:reject];
 }
 
+RCT_EXPORT_METHOD(desaturate: (int)srcMatIndex dstMatIndex:(int)dstMatIndex scale:(int)scale
+                              colorLowLimit:(NSArray *)colorLowLimit colorHighLimit:(NSArray *)colorHighLimit
+                              //ha:(int)ha sa:(int)sa va:(int)va
+                              //hb:(int)hb sb:(int)sb vb:(int)vb
+                  resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    //
+    // retrieve the mats from memory, we'll need
+    // to work on both the computed and source mat.
+    Mat srcMat  = [MatManager.sharedMgr matAtIndex:srcMatIndex];
+    Mat dstMat = [MatManager.sharedMgr matAtIndex:dstMatIndex];
+    Mat desaturatedHSV, desaturatedImage, srcOrig, hsvImage, mask, result;
+    
+    srcOrig = srcMat.clone();
+    
+    float saturationScale = (float) scale / 100;
+    cvtColor(srcMat, hsvImage, COLOR_BGR2HSV);
+    
+    //
+    // switch to HSV values and split the arrays in 3
+    cvtColor(dstMat, hsvImage, COLOR_BGR2HSV);
+    
+    std::vector<Mat> channels(3);
+    split(hsvImage, channels);
+    cv::Mat &S = channels[1];
+    
+    //
+    // apply the desaturation on the S channel
+    // and recompute the image to BGR.
+    S = S * saturationScale;
+    min(S, 255, S);
+    max(S,   0, S);
+    
+    merge(channels, hsvImage);
+    hsvImage.convertTo(hsvImage, CV_8UC3);
+    cvtColor(hsvImage, desaturatedImage, COLOR_HSV2BGR);
+    
+    // getting the lowest range of the color
+    // using a threshold set in the threshold value
+    cv::Scalar minHSV = cv::Scalar([colorLowLimit[0] intValue],
+                                   [colorLowLimit[1] intValue],
+                                   [colorLowLimit[2] intValue]);
+    //    cv::Scalar minHSV = cv::Scalar(ha, sa, va);
+    
+    // getting the highest range of the color
+    // using a threshold set in the threshold value
+    //    cv::Scalar maxHSV = cv::Scalar(hb, sb,vb);
+    cv::Scalar maxHSV = cv::Scalar([colorHighLimit[0] intValue],
+                                   [colorHighLimit[1] intValue],
+                                   [colorHighLimit[2] intValue]);
+    
+    cv::Mat maskHSV, inverseMaskHSV, resultHSV;
+    cvtColor(srcOrig, hsvImage, COLOR_BGR2HSV);
+    
+    cv::inRange(hsvImage, minHSV, maxHSV, maskHSV);
+    
+    cv::bitwise_not(maskHSV, inverseMaskHSV);
+    cv::bitwise_and(hsvImage, hsvImage, resultHSV,  maskHSV);
+    
+    cvtColor(desaturatedImage, desaturatedHSV, COLOR_BGR2HSV);
+    cv::bitwise_and(resultHSV, desaturatedHSV, resultHSV, inverseMaskHSV);
+    
+    cv::add(resultHSV, desaturatedHSV, resultHSV, inverseMaskHSV);
+    cvtColor(resultHSV, resultHSV, COLOR_HSV2BGR);
+    
+    [MatManager.sharedMgr setMat:dstMatIndex matToSet:resultHSV];
+    resolve(@"ack");
+}
+
 RCT_EXPORT_METHOD(matToImage:(NSDictionary*)src outPath:(NSString*)outPath resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
     if (outPath == nil || outPath == (NSString*)NSNull.null || [outPath isEqualToString:@""]) {
