@@ -7,27 +7,27 @@ import { CvType } from './constants';
 
 export class Mat {
   constructor(numRows, numCols, cvtype, scalarval) {
-    if (numRows && numCols && cvtype) {
+    if (numRows !== undefined && numCols !== undefined && cvtype !== undefined) {
       this.rows = numRows
       this.cols = numCols
       this.CvType = cvtype
     }
-    if (scalarval) {
+    if (scalarval !== undefined) {
       this.CvScalar = scalarval
     }
   }
 
   init = async() => {
     let res
-    if (this.rows && this.cols && this.CvType && this.CvScalar) {
+    if (this.rows !== undefined && this.cols !== undefined && this.CvType !== undefined && this.CvScalar !== undefined) {
       res = await RNOpencv3.MatWithScalar(this.rows, this.cols, this.CvType, this.CvScalar)
     }
-    else if (this.rows && this.cols && this.CvType) {
+    else if (this.rows !== undefined && this.cols !== undefined && this.CvType !== undefined) {
       res = await RNOpencv3.MatWithParams(this.rows, this.cols, this.CvType)
     }
     else {
       res = await RNOpencv3.Mat()
-    }
+    }    
     res.setTo = this.setTo.bind(res)
     res.get = this.get.bind(res)
     res.put = this.put.bind(res)
@@ -64,12 +64,12 @@ export class MatOfInt {
   }
 
   init = async() => {
-	if (this.highintvalue && this.highintvalue != this.lowintvalue) {
+    if (this.highintvalue !== undefined && this.highintvalue !== this.lowintvalue) {
       return await RNOpencv3.MatOfInt(this.lowintvalue, this.highintvalue)
-	}
-	else {
-	  return await RNOpencv3.MatOfInt(this.lowintvalue, this.lowintvalue)
-	}
+    }
+    else {
+      return await RNOpencv3.MatOfInt(this.lowintvalue, this.lowintvalue)
+    }
   }
 }
 
@@ -80,7 +80,7 @@ export class MatOfFloat {
   }
 
   init = async() => {
-  	if (this.highfloatvalue && this.highfloatvalue != this.lowfloatvalue) {
+  	if (this.highfloatvalue !== undefined && this.highfloatvalue !== this.lowfloatvalue) {
       return await RNOpencv3.MatOfFloat(this.lowfloatvalue, this.highfloatvalue)
   	}
   	else {
